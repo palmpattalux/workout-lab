@@ -380,3 +380,18 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .page.scroll .scrim { position: fixed; }
 .remove { align-self: flex-start; border: 0; background: none; color: #d9480f; font: 700 .88rem var(--font); padding: 4px 0; cursor: pointer; }
 .confirm .yes.danger { background: #d9480f; }
+
+/* page A: everything floats gently in place; exercises can be dragged to another slot */
+.float { animation: float 4.2s ease-in-out infinite; }
+@keyframes float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -5px; } }
+.dot.filled {
+  touch-action: none; cursor: grab;
+  transition: left .5s cubic-bezier(.3, 1.35, .5, 1), top .5s cubic-bezier(.3, 1.35, .5, 1), transform .22s var(--ease), box-shadow .22s var(--ease), background .2s, color .2s;
+}
+.dot.filled.dragging, .dot.filled.dragging:active {
+  transition: transform .18s var(--ease), box-shadow .18s; animation: none; z-index: 7; cursor: grabbing;
+  transform: translate(-50%, -50%) scale(1.12); box-shadow: var(--float);
+}
+.dot.empty { transition: border-color .2s, background .2s, transform .2s var(--ease); }
+.dot.empty.target { border-color: var(--active); background: var(--active-soft); transform: translate(-50%, -50%) scale(1.08); }
+@media (prefers-reduced-motion: reduce) { .float { animation: none; } .dot.filled { transition: none; } }

@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, type PointerEvent } from 'react'
 import { Icon, WorkoutIcon, WorkoutMark, WORKOUT_ICONS, BODY_LETTERS } from '../components/icons'
 import HoldPicker from '../components/HoldPicker'
-import type { Workout } from '../lib/store'
+import { updateWorkout, type Workout } from '../lib/store'
+import { sound } from '../lib/sound'
 import { usePrefs, setPrefs } from '../lib/prefs'
 
 // Exercise dot positions, as % of the screen. The first four are traced from
@@ -17,6 +18,21 @@ const SLOTS = [
   { left: 85.0, top: 87.0 },
 ]
 
+// Each workout keeps the slot it was dragged to; the rest fill free slots in order.
+function placeAll(workouts: Workout[]) {
+  const taken = new Map<number, Workout>()
+  for (const w of workouts) if (w.slot !== undefined && w.slot < SLOTS.length && !taken.has(w.slot)) taken.set(w.slot, w)
+  const placed = new Set(taken.values())
+  let free = 0
+  for (const w of workouts) {
+    if (placed.has(w)) continue
+    while (free < SLOTS.length && taken.has(free)) free++
+    if (free >= SLOTS.length) break
+    taken.set(free, w)
+  }
+  return taken
+}
+
 const iconOptions = WORKOUT_ICONS.map((i) => ({ key: i.key, label: i.name, node: <WorkoutIcon k={i.key} size="24px" strokeWidth={2} /> }))
 const letterOptions = BODY_LETTERS.map((l) => ({ key: l.key, label: l.name, node: <b className="letter">{l.key}</b> }))
 
@@ -31,7 +47,57 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onCreat
   const [pickedIcon, setPickedIcon] = useState<string | null>(null)
   // First tap on a workout dot arms it: it turns into a glowing fingerprint (tap again to start)
   // and a pen (edit) appears above it.
-  const [chosen, setChosen] = useState<number | null>(null)
+  const [chosen, setChosen] = useState<string | null>(null)
+  const bySlot = placeAll(workouts)
+  const slotOf = new Map([...bySlot].map(([i, w]) => [w.id, i]))
+
+  // Dragging a dot: it follows the finger, then glides into the nearest slot (swapping with whoever is there).
+  const [drag, setDrag] = useState<{ id: string; x: number; y: number } | null>(null)
+  const press = useRef<{ id: string; x: number; y: number; moved: boolean } | null>(null)
+  const nearest = useRef<number | null>(null)
+  const justDragged = useRef(false)
+
+  function pagePoint(e: PointerEvent<HTMLElement>) {
+    const r = (e.currentTarget.offsetParent as HTMLElement).getBoundingClientRect()
+    return { x: e.clientX - r.left, y: e.clientY - r.top, w: r.width, h: r.height }
+  }
+  function onDotDown(e: PointerEvent<HTMLButtonElement>, id: string) {
+    press.current = { id, x: e.clientX, y: e.clientY, moved: false }
+    e.currentTarget.setPointerCapture(e.pointerId)
+  }
+  function onDotMove(e: PointerEvent<HTMLButtonElement>) {
+    const p = press.current
+    if (!p) return
+    if (!p.moved && Math.hypot(e.clientX - p.x, e.clientY - p.y) < 8) return
+    if (!p.moved) { p.moved = true; nearest.current = slotOf.get(p.id) ?? null; sound.pop() }
+    const pt = pagePoint(e)
+    setDrag({ id: p.id, x: pt.x, y: pt.y })
+    const n = closest(pt)
+    if (n !== nearest.current) { nearest.current = n; sound.tick() }
+  }
+  function closest(pt: { x: number; y: number; w: number; h: number }) {
+    let best = 0, bestD = Infinity
+    SLOTS.forEach((s, i) => {
+      const d = Math.hypot(pt.x - (s.left / 100) * pt.w, pt.y - (s.top / 100) * pt.h)
+      if (d < bestD) { bestD = d; best = i }
+    })
+    return best
+  }
+  function onDotUp(e: PointerEvent<HTMLButtonElement>) {
+    const p = press.current
+    press.current = null
+    if (!p?.moved) return
+    justDragged.current = true
+    const to = closest(pagePoint(e))
+    const from = slotOf.get(p.id)
+    const other = bySlot.get(to)
+    // pin every dot to where it is now so nothing else shifts, then move/swap the two
+    workouts.forEach((w) => { const s = slotOf.get(w.id); if (s !== undefined && w.slot !== s) updateWorkout(w.id, { slot: s }) })
+    if (other && other.id !== p.id && from !== undefined) updateWorkout(other.id, { slot: from })
+    updateWorkout(p.id, { slot: to })
+    setDrag(null)
+    sound.tap()
+  }
   const [settingsOpen, setSettingsOpen] = useState(false)
   const lastTap = useRef(0)
   // While an icon is picked, a double tap on "+" or a press anywhere else means "never mind".
@@ -50,35 +116,44 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onCreat
         <Icon name="book" size="46%" />
       </button>
 
-      {SLOTS.map((s, i) => {
-        const w = workouts[i]
-        if (!w && i >= 4) return null
+      {/* empty slots: the first four always, every one while dragging */}
+      {SLOTS.map((s, i) => (bySlot.has(i) || (i >= 4 && !drag)) ? null : (
+        <span key={'slot' + i} className={`btn circle dot empty${drag && nearest.current === i ? ' target' : ''}`}
+          style={{ left: `${s.left}%`, top: `${s.top}%` }} aria-hidden="true" />
+      ))}
+
+      {[...bySlot].map(([i, w]) => {
+        const s = SLOTS[i]
+        const dragging = drag?.id === w.id
+        const armed = chosen === w.id && !dragging
         return (
           <button
-            key={w?.id ?? 'slot' + i}
-            className={`btn circle dot${w ? ' filled' : ' empty'}${chosen === i ? ' armed' : ''}`}
-            style={{ left: `${s.left}%`, top: `${s.top}%` }}
-            aria-label={w ? `${w.exercise || 'Workout'} ${w.letter}` : `Exercise ${i + 1}`}
-            onClick={() => { if (!w) return; if (chosen === i) onOpenDot(w.id); else setChosen(i) }}
+            key={w.id}
+            className={`btn circle dot filled float${armed ? ' armed' : ''}${dragging ? ' dragging' : ''}`}
+            style={{ left: dragging ? drag.x : `${s.left}%`, top: dragging ? drag.y : `${s.top}%`, animationDelay: armed ? undefined : `${-i * 0.7}s` }}
+            aria-label={`${w.exercise || 'Workout'} ${w.letter}, drag to move`}
+            onPointerDown={(e) => onDotDown(e, w.id)}
+            onPointerMove={onDotMove}
+            onPointerUp={onDotUp}
+            onPointerCancel={() => { press.current = null; setDrag(null) }}
+            onClick={() => { if (justDragged.current) { justDragged.current = false; return } if (chosen === w.id) onOpenDot(w.id); else setChosen(w.id) }}
           >
-            {w && (chosen === i
+            {armed
               ? <Icon name="fingerprint" size="52%" strokeWidth={1.9} />
-              : <WorkoutMark icon={w.icon} letter={w.letter} size="1.15em" />)}
+              : <WorkoutMark icon={w.icon} letter={w.letter} size="1.15em" />}
           </button>
         )
       })}
 
-      {chosen !== null && workouts[chosen] && (
-        <>
-          <button
-            className="btn circle choice"
-            style={{ left: `${SLOTS[chosen].left}%`, top: `calc(${SLOTS[chosen].top}% - min(18.7cqw, 10.6cqh) / 2 - 34px)` }}
-            aria-label="Edit workout"
-            onClick={() => onEdit(workouts[chosen].id)}
-          >
-            <Icon name="write" size="48%" />
-          </button>
-        </>
+      {chosen !== null && !drag && slotOf.has(chosen) && (
+        <button
+          className="btn circle choice"
+          style={{ left: `${SLOTS[slotOf.get(chosen)!].left}%`, top: `calc(${SLOTS[slotOf.get(chosen)!].top}% - min(18.7cqw, 10.6cqh) / 2 - 34px)` }}
+          aria-label="Edit workout"
+          onClick={() => onEdit(chosen)}
+        >
+          <Icon name="write" size="48%" />
+        </button>
       )}
 
       {pickedIcon === null ? (
@@ -87,7 +162,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onCreat
           maxStep={40}
           instant
           onPick={(i) => setPickedIcon(iconOptions[i].key)}
-          className="dot add"
+          className="dot add float"
           style={{ left: '26.9%', top: '80.1%' }}
           ariaLabel="Add workout, drag up to pick an icon"
         >
@@ -100,7 +175,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onCreat
           instant
           onTap={tapAdd}
           onPick={(i) => { const icon = pickedIcon; setPickedIcon(null); onCreate(icon, letterOptions[i].key) }}
-          className="dot add in-progress"
+          className="dot add float in-progress"
           style={{ left: '26.9%', top: '80.1%' }}
           ariaLabel="Adding workout, drag up to pick a body part, double tap to cancel"
         >

@@ -13,6 +13,7 @@ export type Workout = {
   focus: string           // shown on page B as a reminder
   notes: string           // general notes, shown only in the book
   progressions?: string[] // progression moves added on page B (progression workouts)
+  slot?: number           // where its dot sits on page A (index in SLOTS), set by dragging
   createdAt: number
 }
 
