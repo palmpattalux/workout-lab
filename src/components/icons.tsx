@@ -13,6 +13,7 @@ const ui = {
   stairs: <path d="M3 20h5v-5h5v-5h5V5h3" />,
   arrowLeft: <path d="M19 12H5M11 6l-6 6 6 6" />,
   back: <path d="M15 5l-7 7 7 7" />,
+  check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
   close: <path d="M6 6l12 12M18 6 6 18" />,
   weight: <><path d="M9.5 7.5a2.5 2.5 0 1 1 5 0" /><path d="M7.2 9h9.6l2 10.5H5.2z" /></>,
   numbers: <path d="M9 4 7 20M17 4l-2 16M4.5 9h16M3.5 15h16" />,

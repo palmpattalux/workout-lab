@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Icon, WorkoutIcon, WorkoutMark, WORKOUT_ICONS, BODY_LETTERS } from '../components/icons'
-import { addWorkout, updateWorkout, type Workout } from '../lib/store'
+import { addWorkout, updateWorkout, deleteWorkout, type Workout } from '../lib/store'
 
 // The workout adding page, traced from the reference sketch.
 // With `editing` it is the edit page for that workout, filled with what's saved.
@@ -8,6 +8,7 @@ export default function CreatePage({ icon: icon0, letter: letter0, editing, onCl
   const [icon, setIcon] = useState(icon0)
   const [letter, setLetter] = useState(letter0)
   const [picking, setPicking] = useState(false)
+  const [confirmRemove, setConfirmRemove] = useState(false)
   const [exercise, setExercise] = useState(editing?.exercise ?? '')
   const [equipment, setEquipment] = useState(editing?.equipment ?? '')
   const [mode, setMode] = useState<'equipment' | 'progression'>(editing?.mode ?? 'equipment')
@@ -92,10 +93,24 @@ export default function CreatePage({ icon: icon0, letter: letter0, editing, onCl
 
         <textarea id="notes" className="field box" placeholder="General notes" value={notes} onChange={(e) => setNotes(e.target.value)} />
         <p className="hint">Control your variables</p>
+
+        {editing && <button className="remove" onClick={() => setConfirmRemove(true)}>Remove exercise</button>}
       </div>
 
+      {confirmRemove && editing && (
+        <div className="scrim" onClick={(e) => { if (e.target === e.currentTarget) setConfirmRemove(false) }}>
+          <div className="confirm" role="alertdialog" aria-label="Remove exercise?">
+            <p>Remove exercise?</p>
+            <div>
+              <button onClick={() => setConfirmRemove(false)}>No</button>
+              <button className="yes danger" onClick={() => { deleteWorkout(editing.id); onClose() }}>Yes</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <button className="btn circle big save-new" aria-label="Save workout" onClick={save}>
-        <Icon name="write" />
+        <Icon name="check" strokeWidth={2.2} />
       </button>
     </main>
   )

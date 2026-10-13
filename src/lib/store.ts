@@ -68,7 +68,7 @@ const byStart = (a: Session, b: Session) => a.startedAt - b.startedAt
 const clean = (o: object) => JSON.parse(JSON.stringify(o)) as Record<string, unknown>
 
 // ---------- online copy ----------
-type Remote = { saveWorkout(w: Workout): void; saveSession(s: Session): void; deleteSession(id: string): void }
+type Remote = { saveWorkout(w: Workout): void; saveSession(s: Session): void; deleteSession(id: string): void; deleteWorkout(id: string): void }
 let remote: Remote | null = null
 
 // Merge what the database has with anything made here before it answered.
@@ -93,6 +93,9 @@ async function useSupabase() {
     saveSession(x) {
       const { id, ...data } = x
       sb.from('sessions').upsert({ id, data: clean(data) }).then(({ error }) => { if (error) console.warn(error.message) })
+    },
+    deleteWorkout(id) {
+      sb.from('workouts').delete().eq('id', id).then(({ error }) => { if (error) console.warn(error.message) })
     },
     deleteSession(id) {
       sb.from('sessions').delete().eq('id', id).then(({ error }) => { if (error) console.warn(error.message) })
@@ -123,6 +126,7 @@ async function useArtifactDb() {
     saveWorkout(w) { const { id, ...b } = w; col.doc(id).set(clean(b)).catch(() => {}) },
     saveSession(x) { const { id, ...b } = x; col.doc(id).set(clean({ ...b, kind: 'session' })).catch(() => {}) },
     deleteSession(id) { col.doc(id).delete().catch(() => {}) },
+    deleteWorkout(id) { col.doc(id).delete().catch(() => {}) },
   }
   let first = true
   col.onSnapshot((snap) => {
@@ -195,6 +199,12 @@ export function saveSession(x: Session) {
   sessions = [...sessions, x]
   emit()
   remote?.saveSession(x)
+}
+
+export function deleteWorkout(id: string) {
+  workouts = workouts.filter((x) => x.id !== id)
+  emit()
+  remote?.deleteWorkout(id)
 }
 
 export function deleteSession(id: string) {
