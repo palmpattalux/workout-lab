@@ -138,11 +138,29 @@ export function setScope(userId: string | null) {
   scope = next
   remote = null
   readCache()
+  if (userId) adoptDeviceData()
   emit()
   scopeListeners.forEach((fn) => fn())
   if (supabase && userId) useSupabase()
   else if (!supabase) useArtifactDb()
 }
+// Workouts logged on this device before signing in move into the account the
+// first time someone logs in here, then the device-only copy is cleared.
+function adoptDeviceData() {
+  try {
+    const w: Workout[] = JSON.parse(localStorage.getItem('workout-lab:workouts') || '[]')
+    const x: Session[] = JSON.parse(localStorage.getItem('workout-lab:sessions') || '[]')
+    if (w.length === 0 && x.length === 0) return
+    const haveW = new Set(workouts.map((i) => i.id))
+    const haveS = new Set(sessions.map((i) => i.id))
+    workouts = [...workouts, ...w.filter((i) => !haveW.has(i.id))].sort(byDate)
+    sessions = [...sessions, ...x.filter((i) => !haveS.has(i.id))].sort(byStart)
+    const live = localStorage.getItem('workout-lab:active-session')
+    if (live && !localStorage.getItem(key('active-session'))) localStorage.setItem(key('active-session'), live)
+    ;['workouts', 'sessions', 'active-session'].forEach((n) => localStorage.removeItem('workout-lab:' + n))
+  } catch { /* storage blocked */ }
+}
+
 export function onScopeChange(fn: () => void) {
   scopeListeners.add(fn)
 }
