@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { WorkoutMark } from '../components/icons'
-import { useSessions, type Workout, type Session } from '../lib/store'
-import { useSession } from '../lib/session'
+import { useSessions, deleteSession, type Workout, type Session } from '../lib/store'
+import { useSession, discardSession } from '../lib/session'
 import { day, time, duration, setLines } from '../lib/format'
 
 // Every session as a row, newest at the top. Tap a row to see its exercises and sets.
@@ -9,6 +9,7 @@ export default function SessionsList({ workouts }: { workouts: Workout[] }) {
   const done = useSessions()
   const live = useSession()
   const [open, setOpen] = useState<string | null>(null)
+  const [removing, setRemoving] = useState<(Session & { live?: boolean }) | null>(null)
   const rows: (Session & { live?: boolean })[] = [...(live ? [{ ...live, live: true }] : []), ...[...done].reverse()]
 
   if (rows.length === 0) {
@@ -16,6 +17,21 @@ export default function SessionsList({ workouts }: { workouts: Workout[] }) {
   }
 
   return (
+    <>
+    {removing && (
+      <div className="scrim" onClick={(e) => { if (e.target === e.currentTarget) setRemoving(null) }}>
+        <div className="confirm" role="alertdialog" aria-label="Remove session?">
+          <p>Remove session?</p>
+          <div>
+            <button onClick={() => setRemoving(null)}>No</button>
+            <button className="yes danger" onClick={() => {
+              if (removing.live) discardSession(); else deleteSession(removing.id)
+              setOpen(null); setRemoving(null)
+            }}>Yes</button>
+          </div>
+        </div>
+      </div>
+    )}
     <ol className="sessions">
       {rows.map((s) => {
         const isOpen = open === s.id
@@ -49,11 +65,13 @@ export default function SessionsList({ workouts }: { workouts: Workout[] }) {
                     </div>
                   )
                 })}
+                <button className="remove" onClick={() => setRemoving(s)}>Remove session</button>
               </div>
             )}
           </li>
         )
       })}
     </ol>
+    </>
   )
 }

@@ -19,23 +19,32 @@ const ui = {
   write: <><path d="M15.5 4.5 19.5 8.5 9 19H5v-4z" /><path d="M13.5 6.5l4 4" /></>,
 }
 
-// The 15 workout icons offered when holding "+" on page A.
+// The 10 workout icons offered when dragging up from "+" on page A: bodybuilding and calisthenics only.
 export const WORKOUT_ICONS: { key: string; name: string; svg: ReactNode }[] = [
   { key: 'dumbbell', name: 'Dumbbell', svg: <path d="M6.5 7v10M17.5 7v10M3.5 9.5v5M20.5 9.5v5M6.5 12h11" /> },
   { key: 'barbell', name: 'Barbell', svg: <path d="M2 12h20M5 8v8M7.5 6.5v11M16.5 6.5v11M19 8v8" /> },
   { key: 'kettlebell', name: 'Kettlebell', svg: <><path d="M9.5 7.5a2.5 2.5 0 1 1 5 0" /><path d="M7.2 9h9.6l2 10.5H5.2z" /></> },
-  { key: 'bench', name: 'Bench', svg: <path d="M2 8h20M5 5v6M19 5v6M4 15h12M6 15v5M14 15v5M18 13v7" /> },
+  { key: 'bench', name: 'Bench press', svg: <path d="M2 7h20M5 4v6M19 4v6M4 15h12M6 15v5M14 15v5M18 13v7" /> },
+  { key: 'cable', name: 'Cable', svg: <><path d="M3 21h18M6 21V3h8M18 6.5v8.5M15.5 15.5h5M8.5 13h3v8h-3z" /><circle cx="16" cy="5" r="2" /></> },
   { key: 'pullup', name: 'Pull-up', svg: <><path d="M3 4h18M8 4v3l4 3 4-3V4M12 13v4M12 17l-2.5 4M12 17l2.5 4" /><circle cx="12" cy="11.5" r="1.6" /></> },
-  { key: 'run', name: 'Run', svg: <><circle cx="15.5" cy="4.5" r="1.8" /><path d="M7 21l3.5-5 3 2v4M10.5 16l2-6.5 4 2.5 3-1M12.5 9.5 9 10.5l-2 3" /></> },
-  { key: 'cycle', name: 'Cycle', svg: <><circle cx="6" cy="16" r="3.5" /><circle cx="18" cy="16" r="3.5" /><path d="M6 16l4-7h5l3 7M10 9l2 7h-6M14 6h2.5" /></> },
-  { key: 'swim', name: 'Swim', svg: <><circle cx="17" cy="7" r="1.8" /><path d="M4 12.5l5-4 4 3 3-1.5M2 17c2 0 2-1.5 4-1.5s2 1.5 4 1.5 2-1.5 4-1.5 2 1.5 4 1.5 2-1.5 4-1.5M2 21c2 0 2-1.5 4-1.5s2 1.5 4 1.5 2-1.5 4-1.5 2 1.5 4 1.5 2-1.5 4-1.5" /></> },
-  { key: 'rope', name: 'Jump rope', svg: <path d="M5 3v5M19 3v5M5 8c0 9 3 13 7 13s7-4 7-13" /> },
-  { key: 'row', name: 'Row', svg: <path d="M4 20 17.5 6.5M15.5 4.5l3-1.5 2.5 2.5-1.5 3zM2 16c1.5 0 2.5-1 4-1M12 21c1.5 0 2.5-1 4-1s2.5 1 4 1" /> },
-  { key: 'ball', name: 'Med ball', svg: <><circle cx="12" cy="12" r="8" /><path d="M4.5 9.5c5 2 10 2 15 0M4.5 14.5c5-2 10-2 15 0" /></> },
-  { key: 'band', name: 'Band', svg: <path d="M4 8c0-2 3.5-3 8-3s8 1 8 3-3.5 3-8 3-8-1-8-3zM4 8v8c0 2 3.5 3 8 3s8-1 8-3V8" /> },
-  { key: 'stretch', name: 'Stretch', svg: <><circle cx="12" cy="4" r="1.8" /><path d="M12 7.5v6.5M4.5 9.5l7.5-2 7.5 2M12 14l-5 6.5M12 14l5 6.5" /></> },
-  { key: 'boxing', name: 'Boxing', svg: <path d="M7 10V7a4 4 0 0 1 4-4h3a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4H9M7 10a2 2 0 0 0 0 4h2M8 17v4h7v-4M11 10h4" /> },
-  { key: 'timer', name: 'Hold / time', svg: <><circle cx="12" cy="13.5" r="7" /><path d="M12 13.5V9.5M10 3h4M12 3v3.5M18 6.5l1.5-1.5" /></> },
+  { key: 'dips', name: 'Dips', svg: <><path d="M2.5 11h6M15.5 11h6M4.5 11v10M19.5 11v10M8.5 11l3.5 3 3.5-3M12 14v3.5M12 17.5l-2 3.5M12 17.5l2 3.5" /><circle cx="12" cy="7.5" r="1.8" /></> },
+  { key: 'rings', name: 'Rings', svg: <><path d="M7 2v8.5M17 2v8.5M3 2h18" /><circle cx="7" cy="14" r="3.2" /><circle cx="17" cy="14" r="3.2" /></> },
+  { key: 'pushup', name: 'Push-up', svg: <><path d="M17 11.5 4 17.5M15 12.5v6M2 20h20" /><circle cx="19.2" cy="10" r="1.8" /></> },
+  { key: 'handstand', name: 'Handstand', svg: <><path d="M12 15.5V9M12 9l-2.5-6M12 9l2.5-6M8.5 21l3.5-5.5 3.5 5.5M6 21h12" /><circle cx="12" cy="17.6" r="1.7" /></> },
+]
+
+// Icons from the first version, kept so workouts made with them still draw.
+const OLD_ICONS: { key: string; svg: ReactNode }[] = [
+  { key: 'run', svg: <><circle cx="15.5" cy="4.5" r="1.8" /><path d="M7 21l3.5-5 3 2v4M10.5 16l2-6.5 4 2.5 3-1M12.5 9.5 9 10.5l-2 3" /></> },
+  { key: 'cycle', svg: <><circle cx="6" cy="16" r="3.5" /><circle cx="18" cy="16" r="3.5" /><path d="M6 16l4-7h5l3 7M10 9l2 7h-6M14 6h2.5" /></> },
+  { key: 'swim', svg: <><circle cx="17" cy="7" r="1.8" /><path d="M4 12.5l5-4 4 3 3-1.5M2 17c2 0 2-1.5 4-1.5s2 1.5 4 1.5 2-1.5 4-1.5 2 1.5 4 1.5 2-1.5 4-1.5" /></> },
+  { key: 'rope', svg: <path d="M5 3v5M19 3v5M5 8c0 9 3 13 7 13s7-4 7-13" /> },
+  { key: 'row', svg: <path d="M4 20 17.5 6.5M15.5 4.5l3-1.5 2.5 2.5-1.5 3zM2 16c1.5 0 2.5-1 4-1M12 21c1.5 0 2.5-1 4-1s2.5 1 4 1" /> },
+  { key: 'ball', svg: <><circle cx="12" cy="12" r="8" /><path d="M4.5 9.5c5 2 10 2 15 0M4.5 14.5c5-2 10-2 15 0" /></> },
+  { key: 'band', svg: <path d="M4 8c0-2 3.5-3 8-3s8 1 8 3-3.5 3-8 3-8-1-8-3zM4 8v8c0 2 3.5 3 8 3s8-1 8-3V8" /> },
+  { key: 'stretch', svg: <><circle cx="12" cy="4" r="1.8" /><path d="M12 7.5v6.5M4.5 9.5l7.5-2 7.5 2M12 14l-5 6.5M12 14l5 6.5" /></> },
+  { key: 'boxing', svg: <path d="M7 10V7a4 4 0 0 1 4-4h3a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4H9M7 10a2 2 0 0 0 0 4h2M8 17v4h7v-4M11 10h4" /> },
+  { key: 'timer', svg: <><circle cx="12" cy="13.5" r="7" /><path d="M12 13.5V9.5M10 3h4M12 3v3.5M18 6.5l1.5-1.5" /></> },
 ]
 
 // Body-part letters offered on the second hold.
@@ -65,7 +74,7 @@ export function Icon({ name, size = '42%', strokeWidth = 1.8 }: { name: IconName
 }
 
 export function WorkoutIcon({ k, size = '42%', strokeWidth = 1.8 }: { k: string; size?: string; strokeWidth?: number }) {
-  const found = WORKOUT_ICONS.find((i) => i.key === k)
+  const found = WORKOUT_ICONS.find((i) => i.key === k) ?? OLD_ICONS.find((i) => i.key === k)
   return <Svg size={size} strokeWidth={strokeWidth}>{found?.svg}</Svg>
 }
 

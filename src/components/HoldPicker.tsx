@@ -13,10 +13,12 @@ export type PickerOption = { key: string; node: ReactNode; label?: string }
 //
 // `visible` shows only that many options at once. Holding the finger at the top
 // of the line keeps scrolling to higher options; at the bottom, back down.
-export default function HoldPicker({ options, visible, side = 'above', onPick, onChange, maxStep, className, style, ariaLabel, children }: {
+export default function HoldPicker({ options, visible, side = 'above', instant, onTap, onPick, onChange, maxStep, className, style, ariaLabel, children }: {
   options: PickerOption[]
   visible?: number
   side?: 'above' | 'left' // 'left' for buttons near the top of the screen
+  instant?: boolean // open as soon as the finger drags up, no hold
+  onTap?: () => void // pressed and let go without opening
   onPick: (index: number) => void
   onChange?: (index: number) => void
   maxStep: number
@@ -86,11 +88,13 @@ export default function HoldPicker({ options, visible, side = 'above', onPick, o
   function onPointerDown(e: PointerEvent<HTMLButtonElement>) {
     startY.current = e.clientY
     e.currentTarget.setPointerCapture(e.pointerId)
+    if (instant) return
     timer.current = window.setTimeout(() => { timer.current = null; open() }, HOLD_MS)
   }
 
   function onPointerMove(e: PointerEvent<HTMLButtonElement>) {
     if (!ruler) {
+      if (instant) { if (startY.current - e.clientY > 6) open(); return }
       // moved before the hold registered: treat it as a scroll and cancel
       if (timer.current && Math.abs(e.clientY - startY.current) > 12) cancel()
       return
@@ -112,8 +116,10 @@ export default function HoldPicker({ options, visible, side = 'above', onPick, o
 
   function release() {
     const picked = ruler ? pos.current.offset + pos.current.local : null
+    const held = !!timer.current
     cancel()
     if (picked !== null) onPick(picked)
+    else if (instant || held) onTap?.()
   }
 
   const current = offset + local

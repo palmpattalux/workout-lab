@@ -375,3 +375,8 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
   .btn, .ruler span, .switch, .knob, .gear svg { transition: none; }
   .page, .ruler, .in-progress::after, .set-menu, .pop, .choice, .confirm, .dot.armed, .settings, .mark-sheet, .scrim { animation: none; }
 }
+
+/* removing a session */
+.page.scroll .scrim { position: fixed; }
+.remove { align-self: flex-start; border: 0; background: none; color: #d9480f; font: 700 .88rem var(--font); padding: 4px 0; cursor: pointer; }
+.confirm .yes.danger { background: #d9480f; }

@@ -68,7 +68,7 @@ const byStart = (a: Session, b: Session) => a.startedAt - b.startedAt
 const clean = (o: object) => JSON.parse(JSON.stringify(o)) as Record<string, unknown>
 
 // ---------- online copy ----------
-type Remote = { saveWorkout(w: Workout): void; saveSession(s: Session): void }
+type Remote = { saveWorkout(w: Workout): void; saveSession(s: Session): void; deleteSession(id: string): void }
 let remote: Remote | null = null
 
 // Merge what the database has with anything made here before it answered.
@@ -94,6 +94,9 @@ async function useSupabase() {
       const { id, ...data } = x
       sb.from('sessions').upsert({ id, data: clean(data) }).then(({ error }) => { if (error) console.warn(error.message) })
     },
+    deleteSession(id) {
+      sb.from('sessions').delete().eq('id', id).then(({ error }) => { if (error) console.warn(error.message) })
+    },
   }
   const [w, x] = await Promise.all([sb.from('workouts').select('id, data'), sb.from('sessions').select('id, data')])
   if (w.error || x.error) return // offline: keep the local copy, saves retry on next change
@@ -112,13 +115,14 @@ async function useArtifactDb() {
   const uid: string | null = await user.id()
   if (!uid) return
   type Col = {
-    doc(id: string): { set(d: Record<string, unknown>): Promise<void> }
+    doc(id: string): { set(d: Record<string, unknown>): Promise<void>; delete(): Promise<void> }
     onSnapshot(next: (s: { docs: { id: string; data(): Record<string, unknown> | undefined }[] }) => void, err?: (e: unknown) => void): () => void
   }
   const col = db.collection('data/users/' + uid) as Col
   remote = {
     saveWorkout(w) { const { id, ...b } = w; col.doc(id).set(clean(b)).catch(() => {}) },
     saveSession(x) { const { id, ...b } = x; col.doc(id).set(clean({ ...b, kind: 'session' })).catch(() => {}) },
+    deleteSession(id) { col.doc(id).delete().catch(() => {}) },
   }
   let first = true
   col.onSnapshot((snap) => {
@@ -191,6 +195,12 @@ export function saveSession(x: Session) {
   sessions = [...sessions, x]
   emit()
   remote?.saveSession(x)
+}
+
+export function deleteSession(id: string) {
+  sessions = sessions.filter((x) => x.id !== id)
+  emit()
+  remote?.deleteSession(id)
 }
 
 function subscribe(fn: () => void) {

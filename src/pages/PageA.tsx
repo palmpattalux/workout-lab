@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Icon, WorkoutIcon, WorkoutMark, WORKOUT_ICONS, BODY_LETTERS } from '../components/icons'
 import HoldPicker from '../components/HoldPicker'
 import type { Workout } from '../lib/store'
@@ -27,16 +27,25 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onCreat
   onOpenBook: () => void
   onCreate: (icon: string, letter: string) => void
 }) {
-  // "+" flow: first hold picks the workout icon, second hold picks the body-part letter.
+  // "+" flow: first drag up picks the workout icon, second drag up picks the body-part letter.
   const [pickedIcon, setPickedIcon] = useState<string | null>(null)
   // First tap on a workout dot arms it: it turns into a glowing fingerprint (tap again to start)
   // and a pen (edit) appears above it.
   const [chosen, setChosen] = useState<number | null>(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const lastTap = useRef(0)
+  // While an icon is picked, a double tap on "+" or a press anywhere else means "never mind".
+  function tapAdd() {
+    const now = Date.now()
+    if (pickedIcon && now - lastTap.current < 400) setPickedIcon(null)
+    lastTap.current = now
+  }
   const prefs = usePrefs()
 
   return (
-    <main className="page" aria-label="Page A" onClick={(e) => { if (e.target === e.currentTarget) { setChosen(null); setSettingsOpen(false) } }}>
+    <main className="page" aria-label="Page A"
+      onPointerDownCapture={(e) => { if (pickedIcon && !(e.target as Element).closest('.add')) setPickedIcon(null) }}
+      onClick={(e) => { if (e.target === e.currentTarget) { setChosen(null); setSettingsOpen(false) } }}>
       <button className="btn pill" id="a2" aria-label="Book (A2)" onClick={onOpenBook}>
         <Icon name="book" size="46%" />
       </button>
@@ -75,11 +84,12 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onCreat
       {pickedIcon === null ? (
         <HoldPicker
           options={iconOptions}
-          maxStep={36}
+          maxStep={40}
+          instant
           onPick={(i) => setPickedIcon(iconOptions[i].key)}
-          className="dot"
+          className="dot add"
           style={{ left: '26.9%', top: '80.1%' }}
-          ariaLabel="Add workout, press and hold to pick an icon"
+          ariaLabel="Add workout, drag up to pick an icon"
         >
           <Icon name="plus" strokeWidth={2.6} />
         </HoldPicker>
@@ -87,10 +97,12 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onCreat
         <HoldPicker
           options={letterOptions}
           maxStep={40}
+          instant
+          onTap={tapAdd}
           onPick={(i) => { const icon = pickedIcon; setPickedIcon(null); onCreate(icon, letterOptions[i].key) }}
-          className="dot in-progress"
+          className="dot add in-progress"
           style={{ left: '26.9%', top: '80.1%' }}
-          ariaLabel="Adding workout, press and hold to pick a body part"
+          ariaLabel="Adding workout, drag up to pick a body part, double tap to cancel"
         >
           <WorkoutIcon k={pickedIcon} size="40%" />
           <span className="badge" aria-hidden="true">?</span>

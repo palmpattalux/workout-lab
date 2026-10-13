@@ -52,6 +52,11 @@ export function endSession() {
   set(null)
 }
 
+// Throw the running session away without saving it.
+export function discardSession() {
+  set(null)
+}
+
 function subscribe(fn: () => void) {
   listeners.add(fn)
   return () => { listeners.delete(fn) }
