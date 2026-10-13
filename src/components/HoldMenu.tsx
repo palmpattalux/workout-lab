@@ -1,4 +1,5 @@
 import { useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from 'react'
+import { sound } from '../lib/sound'
 
 const HOLD_MS = 280
 const SIZE = 54 // px, each popped-up button
@@ -40,7 +41,7 @@ export default function HoldMenu({ items, onPick, onTap, className, style, ariaL
       return { x: cx + Math.max(-room, Math.min(room, radius * Math.cos(a))), y: cy - radius * Math.sin(a) }
     }))
     setHover(null)
-    try { navigator.vibrate?.(10) } catch { /* not supported */ }
+    sound.pop()
   }
 
   function onPointerDown(e: PointerEvent<HTMLButtonElement>) {
@@ -62,6 +63,7 @@ export default function HoldMenu({ items, onPick, onTap, className, style, ariaL
       const d = Math.hypot(s.x - x, s.y - y)
       if (d < bestD) { bestD = d; best = i }
     })
+    if (best !== hover && best !== null) sound.tick()
     setHover(best)
   }
 

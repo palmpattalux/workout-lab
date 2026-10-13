@@ -1,13 +1,10 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from 'react'
+import { sound } from '../lib/sound'
 
 const HOLD_MS = 280
 const SCROLL_MS = 130
 
 export type PickerOption = { key: string; node: ReactNode; label?: string }
-
-function buzz(ms: number) {
-  try { navigator.vibrate?.(ms) } catch { /* not supported */ }
-}
 
 // A round button that, when pressed and held, opens a vertical line of options
 // above itself. Sliding the finger up moves through them; letting go picks one.
@@ -48,7 +45,7 @@ export default function HoldPicker({ options, visible, side = 'above', onPick, o
     setLocal(nextLocal)
     if (nextOffset + nextLocal !== before) {
       onChange?.(nextOffset + nextLocal)
-      buzz(4)
+      sound.tick()
     }
   }
 
@@ -69,7 +66,7 @@ export default function HoldPicker({ options, visible, side = 'above', onPick, o
     setOffset(0)
     setLocal(0)
     onChange?.(0)
-    buzz(10)
+    sound.pop()
   }
 
   function stopScroll() {

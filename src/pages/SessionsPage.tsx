@@ -12,7 +12,7 @@ export default function SessionsList({ workouts }: { workouts: Workout[] }) {
   const rows: (Session & { live?: boolean })[] = [...(live ? [{ ...live, live: true }] : []), ...[...done].reverse()]
 
   if (rows.length === 0) {
-    return <p className="empty">No sessions yet. Open an exercise from the first page to start one.</p>
+    return <p className="empty-note">No sessions yet. Open an exercise from the first page to start one.</p>
   }
 
   return (

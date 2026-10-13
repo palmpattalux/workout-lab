@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Icon, WorkoutIcon, WorkoutMark, WORKOUT_ICONS, BODY_LETTERS } from '../components/icons'
 import HoldPicker from '../components/HoldPicker'
 import type { Workout } from '../lib/store'
+import { usePrefs, setPrefs } from '../lib/prefs'
 
 // Exercise dot positions, as % of the screen. The first four are traced from
 // sketch A; the rest fill open space once more than four workouts exist.
@@ -31,9 +32,11 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onCreat
   // First tap on a workout dot arms it: it turns into a glowing fingerprint (tap again to start)
   // and a pen (edit) appears above it.
   const [chosen, setChosen] = useState<number | null>(null)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const prefs = usePrefs()
 
   return (
-    <main className="page" aria-label="Page A" onClick={(e) => { if (e.target === e.currentTarget) setChosen(null) }}>
+    <main className="page" aria-label="Page A" onClick={(e) => { if (e.target === e.currentTarget) { setChosen(null); setSettingsOpen(false) } }}>
       <button className="btn pill" id="a2" aria-label="Book (A2)" onClick={onOpenBook}>
         <Icon name="book" size="46%" />
       </button>
@@ -44,7 +47,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onCreat
         return (
           <button
             key={w?.id ?? 'slot' + i}
-            className={`btn circle dot${w ? ' filled' : ''}${chosen === i ? ' armed' : ''}`}
+            className={`btn circle dot${w ? ' filled' : ' empty'}${chosen === i ? ' armed' : ''}`}
             style={{ left: `${s.left}%`, top: `${s.top}%` }}
             aria-label={w ? `${w.exercise || 'Workout'} ${w.letter}` : `Exercise ${i + 1}`}
             onClick={() => { if (!w) return; if (chosen === i) onOpenDot(w.id); else setChosen(i) }}
@@ -94,8 +97,28 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onCreat
         </HoldPicker>
       )}
 
-      <button className="btn circle big" style={{ left: '78%', top: '71.8%' }} aria-label="Home (A1)">
-        <Icon name="home" />
+      {settingsOpen && (
+        <div className="settings" role="dialog" aria-label="Settings">
+          <h2>Appearance</h2>
+          <div className="seg" role="radiogroup" aria-label="Theme">
+            {(['light', 'dark', 'auto'] as const).map((t) => (
+              <button key={t} role="radio" aria-checked={prefs.theme === t} className={prefs.theme === t ? 'on' : undefined}
+                onClick={() => setPrefs({ theme: t })}>{t[0].toUpperCase() + t.slice(1)}</button>
+            ))}
+          </div>
+          <div className="set-row">
+            <span>Sounds</span>
+            <button className={`switch${prefs.sound ? ' on' : ''}`} role="switch" aria-checked={prefs.sound} aria-label="Sounds"
+              onClick={() => setPrefs({ sound: !prefs.sound })}>
+              <span className="knob" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      <button className={`btn circle mid gear${settingsOpen ? ' open' : ''}`} style={{ left: '78%', top: '71.8%' }}
+        aria-label="Settings (A1)" aria-expanded={settingsOpen} onClick={() => setSettingsOpen(!settingsOpen)}>
+        <Icon name="gear" size="44%" />
       </button>
     </main>
   )

@@ -34,7 +34,7 @@ export default function BookPage({ workouts, view, openId, onOpen, onView }: {
       )}
 
       {open ? <Detail w={open} /> : view === 'sessions' ? <SessionsList workouts={workouts} /> : workouts.length === 0 ? (
-        <p className="empty">No workouts yet. Hold the + on the first page to make one.</p>
+        <p className="empty-note">No workouts yet. Hold the + on the first page to make one.</p>
       ) : (
         <div className="boxes">
           {workouts.map((w) => (
