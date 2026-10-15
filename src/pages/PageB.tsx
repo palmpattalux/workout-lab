@@ -7,6 +7,8 @@ import { useSession, switchTo, goToSet, record, endSession, discardSession } fro
 
 const MAX_SET = 5
 const repOptions = Array.from({ length: 25 }, (_, i) => ({ key: String(i + 1), node: i + 1 }))
+// timed holds: 5 s steps up to 3 minutes
+const secOptions = Array.from({ length: 36 }, (_, i) => ({ key: String((i + 1) * 5), node: (i + 1) * 5, label: `${(i + 1) * 5} sec` }))
 
 export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
   workout: Workout | null
@@ -37,6 +39,8 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
   const unit = workout?.unit ?? 'kg'
   const loadOptions = Array.from({ length: 30 }, (_, i) => ({ key: String(i + 1), node: i + 1, label: `${i + 1} ${unit}` }))
   const isProgression = workout?.mode === 'progression'
+  const timed = isProgression && workout?.count === 'sec'
+  const countValue = (i: number) => (timed ? (i + 1) * 5 : i + 1)
 
   const [setsOpen, setSetsOpen] = useState(false)
   const [confirmEnd, setConfirmEnd] = useState(false)
@@ -142,16 +146,18 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
         </HoldPicker>
       )}
       <HoldPicker
-        options={repOptions}
+        key={timed ? 'sec' : 'reps'}
+        options={timed ? secOptions : repOptions}
+        visible={timed ? 15 : undefined}
         maxStep={20}
         instant
-        onChange={(i) => put('reps', i + 1)}
-        onPick={(i) => put('reps', i + 1)}
+        onChange={(i) => put('reps', countValue(i))}
+        onPick={(i) => put('reps', countValue(i))}
         className="mid reps"
         style={{ left: '69%', top: '64.1%' }}
-        ariaLabel={`Reps (B4)${reps ? `: ${reps}` : ''}, drag up to set`}
+        ariaLabel={`${timed ? 'Seconds' : 'Reps'} (B4)${reps ? `: ${reps}` : ''}, drag up to set`}
       >
-        {reps ? <span className="val">{reps}</span> : <Icon name="numbers" />}
+        {reps ? <span className="val">{reps}{timed && <small>sec</small>}</span> : timed ? <span className="unit-label">sec</span> : <Icon name="numbers" />}
       </HoldPicker>
 
       {/* pen: hold to pick an exercise and start/continue a session; tap to end the session */}

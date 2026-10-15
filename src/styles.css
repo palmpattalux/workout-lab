@@ -112,7 +112,9 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 @keyframes led { 50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--active) 18%, transparent); } }
 #b2 { width: 20.4cqw; }
 .holdable { touch-action: none; -webkit-touch-callout: none; }
-.reps .val { font: 700 1.5rem var(--num); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.reps .val { font: 700 1.5rem var(--num); font-variant-numeric: tabular-nums; letter-spacing: -.02em; display: flex; flex-direction: column; align-items: center; line-height: 1; }
+.reps .val small { font: 600 .6rem var(--font); color: var(--muted); margin-top: 3px; letter-spacing: 0; }
+.reps .unit-label { font: 700 1rem var(--font); color: var(--muted); }
 .holding { background: var(--active-soft); color: var(--active); transform: translate(-50%, -50%) scale(1.06); box-shadow: var(--float); }
 
 /* hold number line: a floating lifted strip */

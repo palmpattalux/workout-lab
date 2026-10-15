@@ -21,7 +21,7 @@ export function setLines(s: Session, workoutId: string, current?: Workout) {
     .filter(([, e]) => e.reps !== null || e.weight !== null)
     .map(([n, e]) => {
       const load = progression ? '' : e.weight !== null ? `${e.weight} ${unit}` : ''
-      const reps = e.reps !== null ? `${e.reps} reps` : ''
+      const reps = e.reps !== null ? (progression && info?.count === 'sec' ? `${e.reps} sec` : `${e.reps} reps`) : ''
       return { set: Number(n), text: [load, reps].filter(Boolean).join(' × ') }
     })
 }

@@ -13,6 +13,7 @@ export type Workout = {
   focus: string           // shown on page B as a reminder
   notes: string           // general notes, shown only in the book
   progressions?: string[] // progression moves added on page B (progression workouts)
+  count?: 'reps' | 'sec'  // progression only: count reps or hold seconds on page B
   slot?: number           // where its dot sits on page A (index in SLOTS), set by dragging
   createdAt: number
 }
@@ -30,7 +31,7 @@ export type Session = {
   setOf: Record<string, number>                     // current set per workout
   sets: Record<string, Record<string, SetEntry>>     // workoutId -> set number -> entry
   // how each exercise was set up when the session ended, so history stays right after edits
-  snap?: Record<string, { exercise: string; icon: string; letter: string; mode: Workout['mode']; unit: Workout['unit']; move?: string }>
+  snap?: Record<string, { exercise: string; icon: string; letter: string; mode: Workout['mode']; unit: Workout['unit']; count?: Workout['count']; move?: string }>
 }
 
 // Speed: everything renders from memory right away. A copy is kept in this

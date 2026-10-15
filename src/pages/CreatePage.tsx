@@ -13,11 +13,12 @@ export default function CreatePage({ icon: icon0, letter: letter0, editing, onCl
   const [equipment, setEquipment] = useState(editing?.equipment ?? '')
   const [mode, setMode] = useState<'equipment' | 'progression'>(editing?.mode ?? 'equipment')
   const [unit, setUnit] = useState<'kg' | 'lbs'>(editing?.unit ?? 'kg')
+  const [count, setCount] = useState<'reps' | 'sec'>(editing?.count ?? 'reps')
   const [focus, setFocus] = useState(editing?.focus ?? '')
   const [notes, setNotes] = useState(editing?.notes ?? '')
 
   function save() {
-    const fields = { icon, letter, exercise: exercise.trim(), equipment: equipment.trim(), mode, unit, focus: focus.trim(), notes: notes.trim() }
+    const fields = { icon, letter, exercise: exercise.trim(), equipment: equipment.trim(), mode, unit, count, focus: focus.trim(), notes: notes.trim() }
     if (editing) updateWorkout(editing.id, fields)
     else addWorkout(fields)
     onClose()
@@ -85,7 +86,12 @@ export default function CreatePage({ icon: icon0, letter: letter0, editing, onCl
             <span className={unit === 'kg' ? 'on' : ''}>kg</span> / <span className={unit === 'lbs' ? 'on' : ''}>lbs</span>
           </button>
         ) : (
-          <p className="hint later">add later as you progress</p>
+          <>
+            <button className="unit" onClick={() => setCount(count === 'reps' ? 'sec' : 'reps')} aria-label={`Counting ${count}, tap to switch`}>
+              <span className={count === 'reps' ? 'on' : ''}>reps</span> / <span className={count === 'sec' ? 'on' : ''}>sec</span>
+            </button>
+            <p className="hint later">add later as you progress</p>
+          </>
         )}
 
         <textarea id="focus" className="field box" placeholder="Specific focus" value={focus} onChange={(e) => setFocus(e.target.value)} />

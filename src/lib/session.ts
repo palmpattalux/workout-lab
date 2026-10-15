@@ -46,7 +46,7 @@ export function endSession(): string | null {
   const snap: NonNullable<Session['snap']> = {}
   for (const w of getWorkouts()) {
     if (!active.order.includes(w.id)) continue
-    snap[w.id] = { exercise: w.exercise, icon: w.icon, letter: w.letter, mode: w.mode, unit: w.unit, move: w.progressions?.at(-1) }
+    snap[w.id] = { exercise: w.exercise, icon: w.icon, letter: w.letter, mode: w.mode, unit: w.unit, count: w.count, move: w.progressions?.at(-1) }
   }
   const id = active.id
   saveSession({ ...active, endedAt: Date.now(), snap })

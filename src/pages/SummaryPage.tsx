@@ -62,7 +62,8 @@ export default function SummaryPage({ id, workouts, onDone }: { id: string; work
   }).filter((r) => r.now)
 
   const totalSets = rows.reduce((n, r) => n + r.now!.sets, 0)
-  const totalReps = rows.reduce((n, r) => n + r.now!.reps, 0)
+  const isTimed = (r: { wid: string; info?: { mode?: string; count?: string } }) => r.info?.mode === 'progression' && r.info?.count === 'sec'
+  const totalReps = rows.filter((r) => !isTimed(r)).reduce((n, r) => n + r.now!.reps, 0)
   const START = 500 // header first, then the cards one after another
   const STAGGER = 260
 
@@ -95,9 +96,9 @@ export default function SummaryPage({ id, workouts, onDone }: { id: string; work
               <p className="sum-ex">{r.info && <WorkoutMark icon={r.info.icon} letter={r.info.letter} size="1em" />}<span className="nm">{r.info?.exercise || 'Untitled'}</span><small>{r.now!.sets} {r.now!.sets === 1 ? 'set' : 'sets'}</small></p>
               <div className="sum-stats">
                 <div className="sum-stat">
-                  <span className="lbl">Reps</span>
-                  <b><Count from={r.prev?.reps ?? 0} to={r.now!.reps} delay={delay} /></b>
-                  <Delta d={repDelta} delay={after} />
+                  <span className="lbl">{isTimed(r) ? 'Seconds' : 'Reps'}</span>
+                  <b><Count from={r.prev?.reps ?? 0} to={r.now!.reps} delay={delay} />{isTimed(r) && <small>sec</small>}</b>
+                  <Delta d={repDelta} unit={isTimed(r) ? 'sec' : undefined} delay={after} />
                 </div>
                 {!progression && r.now!.top !== null && (
                   <div className="sum-stat">
