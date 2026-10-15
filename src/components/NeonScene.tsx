@@ -1,7 +1,8 @@
 // Neon: a cyber city at night, kept minimal. Two flat skyline layers with a few
 // rooftops traced in neon, a perspective grid rolling toward you, light trails
 // gliding between the towers and the odd sign flickering, a crescent moon as the
-// top-right anchor. Light mode is the same city by day in black and white. Purely decorative.
+// top-right anchor. Light mode is the same city by day in black and white, under a
+// striped sun. Purely decorative.
 
 function rng(seed: number) {
   return () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646 }
@@ -66,8 +67,18 @@ export default function NeonScene() {
           <linearGradient id="ne-mg" x1="0" y1="0" x2="1" y2="1"><stop className="a" offset="0" /><stop className="b" offset="1" /></linearGradient>
           <mask id="ne-mm"><rect width="100" height="100" fill="#fff" /><circle cx="64" cy="38" r="31" fill="#000" /></mask>
         </defs>
-        <circle className="ne-ring" cx="50" cy="50" r="44" />
         <circle cx="50" cy="50" r="34" fill="url(#ne-mg)" mask="url(#ne-mm)" />
+      </svg>
+      {/* by day the moon gives way to a striped retro sun */}
+      <svg className="ne-sun" viewBox="0 0 100 100">
+        <defs>
+          <linearGradient id="ne-sg" x1="0" y1="0" x2="0" y2="1"><stop className="a" offset="0" /><stop className="b" offset="1" /></linearGradient>
+          <mask id="ne-sm">
+            <rect width="100" height="100" fill="#fff" />
+            {[56, 64, 71, 77, 82].map((y, i) => <rect key={y} y={y} width="100" height={1.6 + i * 0.7} fill="#000" />)}
+          </mask>
+        </defs>
+        <circle cx="50" cy="50" r="34" fill="url(#ne-sg)" mask="url(#ne-sm)" />
       </svg>
       <Layer towers={FAR} className="far" />
       {TRAILS.map((t, i) => <i key={i} className={`ne-trail c${t.c}${i % 2 ? ' rev' : ''}`} style={{ top: `${t.y}%`, animationDuration: `${t.dur}s`, animationDelay: `${t.delay}s` }} />)}

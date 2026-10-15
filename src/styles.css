@@ -486,6 +486,7 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .theme-count { margin: 0; font: 700 .72rem var(--font); letter-spacing: .14em; color: var(--muted); }
 .theme-info h2 { margin: 2px 0 0; font: 800 1.5rem var(--font); letter-spacing: -.03em; }
 .theme-blurb { margin: 0; color: var(--muted); font-size: .9rem; max-width: 26em; min-height: 2.6em; }
+.owned-tag.yes { color: var(--ink); border-color: var(--ink); }
 .owned-tag { margin-top: 6px; font: 700 .68rem var(--font); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; }
 .theme-view {
   margin-top: 12px; min-width: 9.5em; border: 0; border-radius: 999px; padding: 13px 26px; cursor: pointer;
@@ -672,45 +673,45 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
   --ne-far: #120f22; --ne-near: #07060e; --ne-halo: 1; --ne-win: .5; --ne-win-far: .28;
   --ne-floor: linear-gradient(180deg, #24103a, #0d0820 45%, #050409);
   --ne-grid: rgba(255, 79, 179, .38); --ne-gridline: rgba(255, 79, 179, .5); --ne-vig: rgba(0, 0, 0, .55);
-  --ne-moon-a: #f4f1ff; --ne-moon-b: #b9a8ff; --ne-moon-glow: rgba(163, 116, 255, .55); --ne-ring: .45;
+  --ne-moon-a: #f4f1ff; --ne-moon-b: #b9a8ff; --ne-moon-glow: rgba(163, 116, 255, .55); --ne-moon-o: 1; --ne-sun-o: 0;
   --ne-glass: rgba(16, 14, 28, .45); --ne-rim: rgba(59, 232, 255, .22); --ne-rim-glow: rgba(59, 232, 255, .45);
   --ne-armed: rgba(255, 79, 179, .6); --ne-armed-glow: rgba(255, 79, 179, .6);
   color-scheme: dark;
 }
 :root[data-skin="neon"][data-mode="light"], :root[data-mode="light"] .theme-art[data-skin="neon"] {
-  --bg: #e4e4e7; --stage: #efeff1; --surface: #ffffff; --sunk: #f2f2f4;
-  --ink: #0c0c0e; --muted: #6e6e75; --hair: rgba(0, 0, 0, .07); --line: rgba(0, 0, 0, .12);
-  --lift: inset 0 1px 0 rgba(255, 255, 255, .8), 0 1px 2px rgba(0, 0, 0, .06), 0 10px 22px -12px rgba(0, 0, 0, .25);
-  --float: 0 1px 2px rgba(0, 0, 0, .08), 0 18px 36px -14px rgba(0, 0, 0, .3);
-  --ne-a: #111113; --ne-b: #2a2a2e; --ne-c: #46464b; --ne-d: #1d1d20; --ne-e: #38383c;
-  --sun: #111113; --active: #111113; --active-soft: #e2e2e6;
-  --ne-sky: linear-gradient(180deg, #fbfbfc 0%, #f1f1f3 40%, #e3e3e6 58%, #d7d7da 72%);
-  --ne-glow: radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, .95), transparent 70%);
-  --ne-far: #c3c3c8; --ne-near: #8c8c92; --ne-halo: 0px; --ne-win: .55; --ne-win-far: .3;
-  --ne-floor: linear-gradient(180deg, #dadadd, #cbcbcf 45%, #bcbcc1);
-  --ne-grid: rgba(0, 0, 0, .26); --ne-gridline: rgba(0, 0, 0, .32); --ne-vig: rgba(0, 0, 0, .07);
-  --ne-moon-a: #d6d6db; --ne-moon-b: #9d9da4; --ne-moon-glow: rgba(0, 0, 0, .08); --ne-ring: .22;
-  --ne-glass: rgba(255, 255, 255, .55); --ne-rim: rgba(0, 0, 0, .12); --ne-rim-glow: rgba(0, 0, 0, 0);
-  --ne-armed: rgba(0, 0, 0, .7); --ne-armed-glow: rgba(0, 0, 0, .18);
+  --bg: #d9d9dc; --stage: #e9e9ec; --surface: #ffffff; --sunk: #efeff1;
+  --ink: #0c0c0e; --muted: #5f5f66; --hair: rgba(0, 0, 0, .08); --line: rgba(0, 0, 0, .14);
+  --lift: inset 0 1px 0 rgba(255, 255, 255, .8), 0 1px 2px rgba(0, 0, 0, .08), 0 10px 22px -12px rgba(0, 0, 0, .35);
+  --float: 0 1px 2px rgba(0, 0, 0, .1), 0 18px 36px -14px rgba(0, 0, 0, .4);
+  --ne-a: #0d0d0f; --ne-b: #232326; --ne-c: #3a3a3e; --ne-d: #18181b; --ne-e: #2e2e32;
+  --sun: #111113; --active: #111113; --active-soft: #dcdce0;
+  --ne-sky: linear-gradient(180deg, #fafafb 0%, #ececee 26%, #d4d4d8 44%, #b4b4ba 54%, #c4c4c9 62%, #dcdce0 72%);
+  --ne-glow: radial-gradient(50% 50% at 50% 50%, rgba(40, 40, 46, .32), transparent 70%), radial-gradient(40% 40% at 22% 60%, rgba(60, 60, 66, .2), transparent 70%), radial-gradient(35% 40% at 78% 55%, rgba(60, 60, 66, .2), transparent 70%);
+  --ne-far: #8e8e95; --ne-near: #2c2c31; --ne-halo: 0; --ne-win: .7; --ne-win-far: .45; --ne-wfill: #f2f2f4;
+  --ne-floor: linear-gradient(180deg, #b9b9be, #a2a2a8 45%, #8a8a91);
+  --ne-grid: rgba(0, 0, 0, .36); --ne-gridline: rgba(0, 0, 0, .45); --ne-vig: rgba(0, 0, 0, .14);
+  --ne-moon-o: 0; --ne-sun-o: 1; --ne-sun-a: #1a1a1d; --ne-sun-b: #707077; --ne-moon-glow: rgba(0, 0, 0, .12);
+  --ne-glass: rgba(255, 255, 255, .6); --ne-rim: rgba(0, 0, 0, .14); --ne-rim-glow: rgba(0, 0, 0, 0);
+  --ne-armed: rgba(0, 0, 0, .75); --ne-armed-glow: rgba(0, 0, 0, .22);
   color-scheme: light;
 }
 @media (prefers-color-scheme: light) {
   :root[data-skin="neon"]:not([data-mode="dark"]), :root:not([data-mode="dark"]) .theme-art[data-skin="neon"] {
-  --bg: #e4e4e7; --stage: #efeff1; --surface: #ffffff; --sunk: #f2f2f4;
-  --ink: #0c0c0e; --muted: #6e6e75; --hair: rgba(0, 0, 0, .07); --line: rgba(0, 0, 0, .12);
-  --lift: inset 0 1px 0 rgba(255, 255, 255, .8), 0 1px 2px rgba(0, 0, 0, .06), 0 10px 22px -12px rgba(0, 0, 0, .25);
-  --float: 0 1px 2px rgba(0, 0, 0, .08), 0 18px 36px -14px rgba(0, 0, 0, .3);
-  --ne-a: #111113; --ne-b: #2a2a2e; --ne-c: #46464b; --ne-d: #1d1d20; --ne-e: #38383c;
-  --sun: #111113; --active: #111113; --active-soft: #e2e2e6;
-  --ne-sky: linear-gradient(180deg, #fbfbfc 0%, #f1f1f3 40%, #e3e3e6 58%, #d7d7da 72%);
-  --ne-glow: radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, .95), transparent 70%);
-  --ne-far: #c3c3c8; --ne-near: #8c8c92; --ne-halo: 0px; --ne-win: .55; --ne-win-far: .3;
-  --ne-floor: linear-gradient(180deg, #dadadd, #cbcbcf 45%, #bcbcc1);
-  --ne-grid: rgba(0, 0, 0, .26); --ne-gridline: rgba(0, 0, 0, .32); --ne-vig: rgba(0, 0, 0, .07);
-  --ne-moon-a: #d6d6db; --ne-moon-b: #9d9da4; --ne-moon-glow: rgba(0, 0, 0, .08); --ne-ring: .22;
-  --ne-glass: rgba(255, 255, 255, .55); --ne-rim: rgba(0, 0, 0, .12); --ne-rim-glow: rgba(0, 0, 0, 0);
-  --ne-armed: rgba(0, 0, 0, .7); --ne-armed-glow: rgba(0, 0, 0, .18);
-  color-scheme: light;
+    --bg: #d9d9dc; --stage: #e9e9ec; --surface: #ffffff; --sunk: #efeff1;
+    --ink: #0c0c0e; --muted: #5f5f66; --hair: rgba(0, 0, 0, .08); --line: rgba(0, 0, 0, .14);
+    --lift: inset 0 1px 0 rgba(255, 255, 255, .8), 0 1px 2px rgba(0, 0, 0, .08), 0 10px 22px -12px rgba(0, 0, 0, .35);
+    --float: 0 1px 2px rgba(0, 0, 0, .1), 0 18px 36px -14px rgba(0, 0, 0, .4);
+    --ne-a: #0d0d0f; --ne-b: #232326; --ne-c: #3a3a3e; --ne-d: #18181b; --ne-e: #2e2e32;
+    --sun: #111113; --active: #111113; --active-soft: #dcdce0;
+    --ne-sky: linear-gradient(180deg, #fafafb 0%, #ececee 26%, #d4d4d8 44%, #b4b4ba 54%, #c4c4c9 62%, #dcdce0 72%);
+    --ne-glow: radial-gradient(50% 50% at 50% 50%, rgba(40, 40, 46, .32), transparent 70%), radial-gradient(40% 40% at 22% 60%, rgba(60, 60, 66, .2), transparent 70%), radial-gradient(35% 40% at 78% 55%, rgba(60, 60, 66, .2), transparent 70%);
+    --ne-far: #8e8e95; --ne-near: #2c2c31; --ne-halo: 0; --ne-win: .7; --ne-win-far: .45; --ne-wfill: #f2f2f4;
+    --ne-floor: linear-gradient(180deg, #b9b9be, #a2a2a8 45%, #8a8a91);
+    --ne-grid: rgba(0, 0, 0, .36); --ne-gridline: rgba(0, 0, 0, .45); --ne-vig: rgba(0, 0, 0, .14);
+    --ne-moon-o: 0; --ne-sun-o: 1; --ne-sun-a: #1a1a1d; --ne-sun-b: #707077; --ne-moon-glow: rgba(0, 0, 0, .12);
+    --ne-glass: rgba(255, 255, 255, .6); --ne-rim: rgba(0, 0, 0, .14); --ne-rim-glow: rgba(0, 0, 0, 0);
+    --ne-armed: rgba(0, 0, 0, .75); --ne-armed-glow: rgba(0, 0, 0, .22);
+    color-scheme: light;
   }
 }
 .theme-art[data-skin="neon"] { color: var(--ink); }
@@ -720,9 +721,10 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .ne-horizon { position: absolute; left: -10%; right: -10%; top: 50cqh; height: 18cqh; filter: blur(18px); background: var(--ne-glow);
   animation: ne-breathe 8s ease-in-out infinite alternate; }
 @keyframes ne-breathe { from { opacity: .7; } to { opacity: 1; } }
-.ne-moon { position: absolute; top: 8cqh; right: 7cqw; width: 30cqw; height: auto; filter: drop-shadow(0 0 16px var(--ne-moon-glow)); animation: ne-moon 12s ease-in-out infinite alternate; }
+.ne-moon, .ne-sun { position: absolute; top: 8cqh; right: 7cqw; width: 30cqw; height: auto; filter: drop-shadow(0 0 16px var(--ne-moon-glow)); animation: ne-moon 12s ease-in-out infinite alternate; }
+.ne-moon { opacity: var(--ne-moon-o); } .ne-sun { opacity: var(--ne-sun-o); }
 .ne-moon .a { stop-color: var(--ne-moon-a); } .ne-moon .b { stop-color: var(--ne-moon-b); }
-.neon-scene .ne-ring { fill: none; stroke: var(--ne-a); stroke-width: .6; opacity: var(--ne-ring); }
+.ne-sun .a { stop-color: var(--ne-sun-a, transparent); } .ne-sun .b { stop-color: var(--ne-sun-b, transparent); }
 @keyframes ne-moon { from { transform: translateY(0); } to { transform: translateY(1.2cqh); } }
 .ne-layer { position: absolute; left: -4%; width: 108%; bottom: 31cqh; height: 34cqh; }
 .ne-layer.far { fill: var(--ne-far); opacity: .9; height: 40cqh; }
@@ -731,7 +733,7 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .neon-scene .c4 { --n: var(--ne-d); } .neon-scene .c5 { --n: var(--ne-e); }
 .neon-scene .ne-edge { fill: none; stroke-width: 1.2; stroke-linecap: square; stroke: var(--n); filter: drop-shadow(0 0 calc(var(--ne-halo) * 3px) var(--n)); }
 .ne-layer.far .ne-edge { opacity: .55; }
-.ne-wins rect { fill: var(--n); opacity: var(--ne-win); }
+.ne-wins rect { fill: var(--ne-wfill, var(--n)); opacity: var(--ne-win); }
 .ne-layer.far .ne-wins rect { opacity: var(--ne-win-far); }
 .ne-wins rect.tw { animation: ne-tw 9s steps(1) infinite; }
 @keyframes ne-tw { 0%, 100% { opacity: .55; } 40% { opacity: .05; } 70% { opacity: .55; } }

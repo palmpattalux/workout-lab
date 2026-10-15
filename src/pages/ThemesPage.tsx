@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from '../components/icons'
 import ThemeScene from '../components/ThemeScene'
-import { THEMES, THEME_SLOTS, setPreview, usePreview } from '../lib/theme'
+import { THEMES, THEME_SLOTS, setPreview, usePreview, useOwner, useApplied, applyTheme } from '../lib/theme'
 import { sound } from '../lib/sound'
 
 // Swipe through the theme slots like a scenery picker: the centred card is big,
 // its neighbours shrink away. "View" tries the theme on without owning it.
 export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
   const preview = usePreview()
+  const owner = useOwner()
+  const applied = useApplied()
   const track = useRef<HTMLDivElement>(null)
   const [pos, setPos] = useState(0)
   const last = useRef(0)
@@ -89,8 +91,11 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
         <p className="theme-blurb">{theme ? theme.blurb : 'A new theme will land here.'}</p>
         {theme && (
           <>
-            <span className="owned-tag">Not owned</span>
-            {viewing
+            <span className={`owned-tag${owner ? ' yes' : ''}`}>{owner ? 'Owned' : 'Not owned'}</span>
+            {owner ? (applied === theme.key
+              ? <button className="theme-view on" onClick={() => { applyTheme(null); sound.tap() }}>In use · Turn off</button>
+              : <button className="theme-view" onClick={() => { applyTheme(theme.key); sound.pop(); onViewed() }}>Use</button>)
+            : viewing
               ? <button className="theme-view on" onClick={() => setPreview(null)}>Stop viewing</button>
               : <button className="theme-view" onClick={() => { setPreview(theme.key); sound.pop(); onViewed() }}>View</button>}
           </>

@@ -4,7 +4,7 @@ import HoldPicker from '../components/HoldPicker'
 import { updateWorkout, type Workout } from '../lib/store'
 import { sound } from '../lib/sound'
 import { usePrefs, setPrefs } from '../lib/prefs'
-import { usePreview, getPreview } from '../lib/theme'
+import { useSkin, getPreview } from '../lib/theme'
 import ThemeScene from '../components/ThemeScene'
 
 // Exercise dot positions, as % of the screen: low and toward the right, in easy reach of a
@@ -245,7 +245,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
     lastTap.current = now
   }
   const prefs = usePrefs()
-  const skin = usePreview()
+  const skin = useSkin()
 
   return (
     <main className="page" aria-label="Page A"

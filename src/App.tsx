@@ -10,7 +10,7 @@ import PreviewBar from './components/PreviewBar'
 import { useWorkouts, setScope } from './lib/store'
 import { supabase, useUser } from './lib/auth'
 import { switchTo } from './lib/session'
-import { getPreview } from './lib/theme'
+import { getPreview, checkOwnerEmail } from './lib/theme'
 
 // Every screen is swapped in memory, so nothing reloads and switching is instant.
 // The hash only mirrors where you are so the back gesture works.
@@ -38,6 +38,7 @@ function Screen() {
   // load the signed-in person's data (or this browser's, where there are no accounts)
   useEffect(() => {
     if (user !== undefined) setScope(user?.id ?? null)
+    if (supabase && user !== undefined) checkOwnerEmail(user?.email)
   }, [user])
 
   useEffect(() => {
