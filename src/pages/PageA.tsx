@@ -4,6 +4,8 @@ import HoldPicker from '../components/HoldPicker'
 import { updateWorkout, type Workout } from '../lib/store'
 import { sound } from '../lib/sound'
 import { usePrefs, setPrefs } from '../lib/prefs'
+import { usePreview, getPreview } from '../lib/theme'
+import SakuraScene from '../components/SakuraScene'
 
 // Exercise dot positions, as % of the screen: low and toward the right, in easy reach of a
 // right thumb. The first four are always shown; the rest fill in as more workouts exist.
@@ -36,11 +38,12 @@ function placeAll(workouts: Workout[]) {
 const iconOptions = WORKOUT_ICONS.map((i) => ({ key: i.key, label: i.name, node: <WorkoutIcon k={i.key} size="24px" strokeWidth={2} /> }))
 const letterOptions = BODY_LETTERS.map((l) => ({ key: l.key, label: l.name, node: <b className="letter">{l.key}</b> }))
 
-export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onCreate }: {
+export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onThemes, onCreate }: {
   workouts: Workout[]
   onOpenDot: (id: string) => void
   onEdit: (id: string) => void
   onOpenBook: () => void
+  onThemes: () => void
   onCreate: (icon: string, letter: string) => void
 }) {
   // "+" flow: first drag up picks the workout icon, second drag up picks the body-part letter.
@@ -62,6 +65,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onCreat
     return { x: e.clientX - r.left, y: e.clientY - r.top, w: r.width, h: r.height }
   }
   function onDotDown(e: PointerEvent<HTMLButtonElement>, id: string) {
+    if (getPreview()) return // previewing a theme: dots can be opened, not moved
     press.current = { id, x: e.clientX, y: e.clientY, moved: false }
     e.currentTarget.setPointerCapture(e.pointerId)
   }
@@ -107,11 +111,13 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onCreat
     lastTap.current = now
   }
   const prefs = usePrefs()
+  const skin = usePreview()
 
   return (
     <main className="page" aria-label="Page A"
       onPointerDownCapture={(e) => { if (pickedIcon && !(e.target as Element).closest('.add')) setPickedIcon(null) }}
       onClick={(e) => { if (e.target === e.currentTarget) { setChosen(null); setSettingsOpen(false) } }}>
+      {skin === 'sakura' && <SakuraScene />}
       <button className="btn pill" id="a2" aria-label="Book (A2)" onClick={onOpenBook}>
         <Icon name="book" size="46%" />
       </button>
@@ -205,6 +211,10 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onCreat
               <span className="knob" />
             </button>
           </div>
+          <button className="set-row themes-link" onClick={onThemes}>
+            <span>Themes</span>
+            <span className="chev"><Icon name="back" size="18px" /></span>
+          </button>
         </div>
       )}
 

@@ -5,9 +5,12 @@ import CreatePage from './pages/CreatePage'
 import BookPage from './pages/BookPage'
 import SummaryPage from './pages/SummaryPage'
 import LoginPage from './pages/LoginPage'
+import ThemesPage from './pages/ThemesPage'
+import PreviewBar from './components/PreviewBar'
 import { useWorkouts, setScope } from './lib/store'
 import { supabase, useUser } from './lib/auth'
 import { switchTo } from './lib/session'
+import { getPreview } from './lib/theme'
 
 // Every screen is swapped in memory, so nothing reloads and switching is instant.
 // The hash only mirrors where you are so the back gesture works.
@@ -16,12 +19,17 @@ import { switchTo } from './lib/session'
 //   new         create page (only while a draft exists)
 //   edit-<id>   edit page for a workout
 //   summary-<id> the summary shown right after a session ends
+//   themes      themes gallery (gear > Themes)
 //   book        book list, book-<id> one workout, sessions = all sessions
 function go(hash: string) {
   location.hash = hash
 }
 
 export default function App() {
+  return <><PreviewBar /><Screen /></>
+}
+
+function Screen() {
   const [hash, setHash] = useState(() => location.hash.slice(1))
   const [draft, setDraft] = useState<{ icon: string; letter: string } | null>(null)
   const workouts = useWorkouts()
@@ -41,6 +49,7 @@ export default function App() {
   if (supabase && user === undefined) return <main className="page" aria-busy="true" />
   if (supabase && !user) return <LoginPage />
 
+  if (hash === 'themes') return <ThemesPage onViewed={() => location.replace('#')} />
   if (hash.startsWith('b-')) {
     const key = hash.slice(2)
     return <PageB key={key} workout={workouts.find((w) => w.id === key) ?? null} workouts={workouts} onGo={(id) => location.replace('#b-' + id)} onHome={() => go('')} onEnded={(sid) => location.replace('#summary-' + sid)} />
@@ -75,9 +84,10 @@ export default function App() {
   return (
     <PageA
       workouts={workouts}
-      onOpenDot={(id) => { switchTo(id); go('b-' + id) }}
+      onOpenDot={(id) => { if (!getPreview()) switchTo(id); go('b-' + id) }}
       onEdit={(id) => go('edit-' + id)}
       onOpenBook={() => go('book')}
+      onThemes={() => go('themes')}
       onCreate={(icon, letter) => { setDraft({ icon, letter }); go('new') }}
     />
   )
