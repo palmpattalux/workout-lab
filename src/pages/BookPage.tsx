@@ -1,4 +1,4 @@
-import { Icon, WorkoutMark, WORKOUT_ICONS, BODY_LETTERS } from '../components/icons'
+import { Icon, WorkoutMark } from '../components/icons'
 import { useSessions, type Workout } from '../lib/store'
 import { day, time, setLines } from '../lib/format'
 import SessionsList from './SessionsPage'
@@ -52,13 +52,10 @@ export default function BookPage({ workouts, view, openId, onOpen, onView }: {
 function Detail({ w }: { w: Workout }) {
   const sessions = useSessions()
   const past = sessions.filter((s) => s.order.includes(w.id)).reverse()
-  const iconName = WORKOUT_ICONS.find((i) => i.key === w.icon)?.name
-  const part = BODY_LETTERS.find((l) => l.key === w.letter)?.name
   const rows: [string, string][] = [
     ['Exercise', w.exercise],
     [w.mode === 'equipment' ? 'Equipment' : 'Progression', w.equipment],
     ['Type', w.mode === 'equipment' ? `Equipment, ${w.unit}` : 'Progressions'],
-    ['Icon', [iconName, part].filter(Boolean).join(', ')],
     ['Specific focus', w.focus],
   ]
   return (
