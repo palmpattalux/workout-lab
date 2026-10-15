@@ -380,6 +380,16 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 
 /* removing a session */
 .page.scroll .scrim { position: fixed; }
+.detail-actions { display: flex; align-items: center; gap: 18px; }
+.edit-session { border: 0; background: var(--bg); color: var(--ink); font: 700 .88rem var(--font); padding: 8px 16px; border-radius: 999px; box-shadow: var(--lift); cursor: pointer; }
+.edit-session.primary { background: var(--ink); color: var(--bg); }
+.unit.small { align-self: flex-start; font-size: .85rem; padding: 6px 14px; margin-top: 0; }
+.set-edit input::-webkit-inner-spin-button, .set-edit input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.set-edit input { -moz-appearance: textfield; }
+.set-edit li { display: flex; align-items: center; gap: 10px; }
+.set-edit label { display: inline-flex; align-items: baseline; gap: 4px; }
+.set-edit input { width: 4.2em; font: 700 1rem var(--num); text-align: center; padding: 6px 4px; border: 1px solid var(--hair); border-radius: 10px; background: var(--bg); color: var(--ink); }
+.set-edit small { color: var(--muted); font-size: .78rem; }
 .remove { align-self: flex-start; border: 0; background: none; color: #d9480f; font: 700 .88rem var(--font); padding: 4px 0; cursor: pointer; }
 .confirm .yes.danger { background: #d9480f; }
 

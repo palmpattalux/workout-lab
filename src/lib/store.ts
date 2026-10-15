@@ -203,6 +203,13 @@ export function saveSession(x: Session) {
   remote?.saveSession(x)
 }
 
+// Fixing an ended session later (Book > Sessions > Edit).
+export function updateSession(x: Session) {
+  sessions = sessions.map((y) => (y.id === x.id ? x : y))
+  emit()
+  remote?.saveSession(x)
+}
+
 export function deleteWorkout(id: string) {
   workouts = workouts.filter((x) => x.id !== id)
   emit()
