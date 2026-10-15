@@ -41,15 +41,15 @@
       // apply the saved light/dark choice before anything paints
       try { var t = JSON.parse(localStorage.getItem('workout-lab:prefs') || '{}').theme; if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-mode', t) } catch (e) {}
     </script>
-    <title>Right Now</title>
+    <title>Jarvis</title>
   </head>
   <body>
     <div id="root"></div>
     <!-- Opening screen (first load only). To remove it: delete this block, the splash <style>, and hideSplash() in src/main.tsx. -->
-    <div id="splash" aria-label="Right Now, loading">
+    <div id="splash" aria-label="Jarvis, loading">
       <div class="rn">
         <div class="rn-num" aria-hidden="true"><span class="rn-val"><span class="rn-count">0</span>%</span><span class="rn-plus">20</span></div>
-        <div class="rn-name">Right Now</div>
+        <div class="rn-name">Jarvis</div>
       </div>
     </div>
     <script>
