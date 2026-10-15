@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from '../components/icons'
-import SakuraScene from '../components/SakuraScene'
+import ThemeScene from '../components/ThemeScene'
 import { THEMES, THEME_SLOTS, setPreview, usePreview } from '../lib/theme'
 import { sound } from '../lib/sound'
 
@@ -68,7 +68,7 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
               >
                 {t ? (
                   <div className={`theme-art skin-${t.key}`} data-skin={t.key}>
-                    <SakuraScene />
+                    <ThemeScene skin={t.key} />
                     <span className="mini-dot" style={{ left: '58%', top: '57%' }} />
                     <span className="mini-dot" style={{ left: '82%', top: '55%' }} />
                     <span className="mini-dot" style={{ left: '40%', top: '70%' }} />

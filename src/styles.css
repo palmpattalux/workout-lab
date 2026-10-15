@@ -576,3 +576,75 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
   100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .sk-fall, .sk-ripple, .sk-water, .pv-eye { animation: none; } }
+
+/* ---------- Night City theme (built on Sakura's pattern: corner motif, low band, light falling motion) ---------- */
+:root[data-skin="nightcity"], .theme-art[data-skin="nightcity"] {
+  --stage: #eceded; --bg: #dfe0e1; --surface: #f8f8f8; --sunk: #e3e4e5;
+  --ink: #141517; --muted: #6e7175;
+  --sun: #c8912e; --active: #b8832a; --active-soft: #f3e9d6;
+  --nc-moon: #c9ccd0; --nc-glow: rgba(255, 255, 255, .8); --nc-cloud: rgba(110, 114, 120, .32);
+  --nc-tower: #d2d4d7; --nc-lit: #d9a441; --nc-wet: rgba(70, 74, 80, .16);
+  --nc-rain: rgba(60, 64, 70, .35); --nc-ripple: rgba(60, 64, 70, .4); --stripe: rgba(255, 255, 255, .35);
+}
+:root[data-skin="nightcity"][data-mode="dark"], :root[data-mode="dark"] .theme-art[data-skin="nightcity"] {
+  --stage: #0e0f11; --bg: #08090a; --surface: #1a1b1e; --sunk: #0b0c0d;
+  --ink: #e8e8e6; --muted: #83868b;
+  --sun: #e2ac4c; --active: #e2ac4c; --active-soft: #2e2618;
+  --nc-moon: #e9e6dc; --nc-glow: rgba(233, 230, 220, .35); --nc-cloud: rgba(14, 15, 17, .85);
+  --nc-tower: #060607; --nc-lit: #e2ac4c; --nc-wet: rgba(90, 94, 102, .18);
+  --nc-rain: rgba(200, 205, 215, .3); --nc-ripple: rgba(200, 205, 215, .35); --stripe: rgba(255, 255, 255, .03);
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="nightcity"]:not([data-mode="light"]), :root:not([data-mode="light"]) .theme-art[data-skin="nightcity"] {
+    --stage: #0e0f11; --bg: #08090a; --surface: #1a1b1e; --sunk: #0b0c0d;
+    --ink: #e8e8e6; --muted: #83868b;
+    --sun: #e2ac4c; --active: #e2ac4c; --active-soft: #2e2618;
+    --nc-moon: #e9e6dc; --nc-glow: rgba(233, 230, 220, .35); --nc-cloud: rgba(14, 15, 17, .85);
+    --nc-tower: #060607; --nc-lit: #e2ac4c; --nc-wet: rgba(90, 94, 102, .18);
+    --nc-rain: rgba(200, 205, 215, .3); --nc-ripple: rgba(200, 205, 215, .35); --stripe: rgba(255, 255, 255, .03);
+  }
+}
+.theme-art[data-skin="nightcity"] { color: var(--ink); }
+.nightcity-scene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.nc-moon { position: absolute; top: 1cqh; right: -4cqw; width: 58cqw; height: auto; }
+.nc-moon-disc { fill: var(--nc-moon); filter: drop-shadow(0 0 10px var(--nc-glow)); }
+.nc-moon-cut { fill: var(--stage); }
+.nc-clouds rect { fill: var(--nc-cloud); }
+.nc-clouds { animation: nc-drift 26s ease-in-out infinite alternate; }
+@keyframes nc-drift { from { transform: translateX(-10px); } to { transform: translateX(14px); } }
+.nc-street { position: absolute; left: 0; right: 0; bottom: 0; height: 26cqh; }
+.nc-skyline { position: absolute; left: 0; bottom: 14cqh; width: 100%; height: 11cqh; }
+.nc-tower { fill: var(--nc-tower); }
+.nc-lit { fill: var(--nc-lit); opacity: .75; animation: nc-flicker 9s steps(1) infinite; }
+@keyframes nc-flicker { 0%, 100% { opacity: .75; } 46% { opacity: .2; } 52% { opacity: .75; } 80% { opacity: .45; } }
+.nc-wet {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 14cqh;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 9px, var(--stripe) 9px 10px),
+    linear-gradient(180deg, var(--nc-wet), transparent 120%);
+  animation: sk-shimmer 7s ease-in-out infinite alternate;
+}
+.nc-drop, .nc-ripple { position: absolute; display: block; animation-iteration-count: infinite; }
+.nc-drop {
+  left: var(--x); top: 0; width: 1.2px; height: 3.2cqh; border-radius: 1px;
+  background: linear-gradient(180deg, transparent, var(--nc-rain)); opacity: 0;
+  animation-name: nc-fall; animation-timing-function: linear;
+}
+@keyframes nc-fall {
+  0% { transform: translate(0, -5cqh) rotate(8deg); opacity: 0; }
+  8% { opacity: 1; }
+  80% { transform: translate(-2.4cqw, calc(var(--land) - 3cqh)) rotate(8deg); opacity: 1; }
+  82%, 100% { transform: translate(-2.4cqw, calc(var(--land) - 3cqh)) rotate(8deg); opacity: 0; }
+}
+.nc-ripple {
+  left: calc(var(--x) - 2.4cqw); top: var(--land); width: 9cqw; height: 2cqw;
+  border: 1px solid var(--nc-ripple); border-radius: 50%; opacity: 0;
+  animation-name: nc-ripple; animation-timing-function: ease-out;
+}
+@keyframes nc-ripple {
+  0%, 80% { transform: translate(-50%, -50%) scale(.15); opacity: 0; }
+  82% { opacity: .9; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .nc-drop, .nc-ripple, .nc-wet, .nc-clouds, .nc-lit { animation: none; } }
+.nightcity-scene svg * { stroke: none; }

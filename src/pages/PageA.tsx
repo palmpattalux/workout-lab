@@ -5,7 +5,7 @@ import { updateWorkout, type Workout } from '../lib/store'
 import { sound } from '../lib/sound'
 import { usePrefs, setPrefs } from '../lib/prefs'
 import { usePreview, getPreview } from '../lib/theme'
-import SakuraScene from '../components/SakuraScene'
+import ThemeScene from '../components/ThemeScene'
 
 // Exercise dot positions, as % of the screen: low and toward the right, in easy reach of a
 // right thumb. The first four are always shown; the rest fill in as more workouts exist.
@@ -118,7 +118,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
     <main className="page" aria-label="Page A"
       onPointerDownCapture={(e) => { if (pickedIcon && !(e.target as Element).closest('.add')) setPickedIcon(null) }}
       onClick={(e) => { if (e.target === e.currentTarget) { setChosen(null); setSettingsOpen(false) } }}>
-      {skin === 'sakura' && <SakuraScene />}
+      <ThemeScene skin={skin} />
       <button className="btn pill" id="a2" aria-label="Book (A2)" onClick={onOpenBook}>
         <Icon name="book" size="46%" />
       </button>
