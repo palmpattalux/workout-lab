@@ -130,11 +130,12 @@ export default function PageB({ workout, workouts, onGo, onHome }: {
           options={loadOptions}
           visible={15}
           maxStep={20}
+          instant
           onChange={(i) => put('weight', i + 1)}
           onPick={(i) => put('weight', i + 1)}
           className="mid load"
           style={{ left: '35.1%', top: '64.1%' }}
-          ariaLabel={`Load (B3)${weight ? `: ${weight} ${unit}` : ` in ${unit}`}, press and hold to set`}
+          ariaLabel={`Load (B3)${weight ? `: ${weight} ${unit}` : ` in ${unit}`}, drag up to set`}
         >
           {weight ? <span className="val">{weight}<small>{unit}</small></span> : <span className="unit-label">{unit}</span>}
         </HoldPicker>
@@ -142,11 +143,12 @@ export default function PageB({ workout, workouts, onGo, onHome }: {
       <HoldPicker
         options={repOptions}
         maxStep={20}
+        instant
         onChange={(i) => put('reps', i + 1)}
         onPick={(i) => put('reps', i + 1)}
         className="mid reps"
         style={{ left: '69%', top: '64.1%' }}
-        ariaLabel={`Reps (B4)${reps ? `: ${reps}` : ''}, press and hold to set`}
+        ariaLabel={`Reps (B4)${reps ? `: ${reps}` : ''}, drag up to set`}
       >
         {reps ? <span className="val">{reps}</span> : <Icon name="numbers" />}
       </HoldPicker>
