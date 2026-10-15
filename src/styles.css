@@ -659,97 +659,59 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 :root[data-skin="nightcity"] .page[aria-label="Page A"] .dot.empty { border-color: rgba(255, 255, 255, .14); }
 :root[data-skin="nightcity"] .page[aria-label="Page A"] .dot.armed { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), 0 0 0 1px rgba(240, 166, 60, .5), 0 0 30px -4px rgba(240, 166, 60, .55); }
 
-/* ---------- Castle theme: morning in light mode, torch-lit night in dark ---------- */
-:root[data-skin="castle"], .theme-art[data-skin="castle"] {
-  --stage: #eef1f3; --bg: #e3e7ea; --surface: #fbfcfc; --sunk: #e8ecef;
-  --ink: #1d2228; --muted: #6d7680;
-  --sun: #b4532a; --active: #3f6f8f; --active-soft: #e1ebf2;
-  --cs-sky-top: #c9dbe7; --cs-sky-bot: #f3ece0; --cs-orb: #fff6dc; --cs-orb-glow: rgba(255, 236, 190, .7);
-  --cs-cloud: rgba(255, 255, 255, .85); --cs-clouds: 1; --cs-stars: 0;
-  --cs-mount: #b9c6d0; --cs-fog: rgba(255, 255, 255, .55);
-  --cs-stone: #9aa4ae; --cs-keep: #8e98a3; --cs-shade: rgba(40, 50, 60, .16); --cs-roof: #5d6b7a; --cs-gate: #4b545e;
-  --cs-hill: #a9b49c; --cs-pine: #5f705f; --cs-win: #3e4750; --cs-torch: none; --cs-flag: #b4532a; --cs-pole: #4b545e;
-  --cs-glass: rgba(255, 255, 255, .45); --cs-glass-rim: rgba(255, 255, 255, .7);
-  color-scheme: light;
-}
-:root[data-skin="castle"][data-mode="dark"], :root[data-mode="dark"] .theme-art[data-skin="castle"] {
-  --stage: #0e1219; --bg: #090c11; --surface: #1a2029; --sunk: #10141b;
-  --ink: #e6e9ee; --muted: #8a93a0; --hair: rgba(255, 255, 255, .07); --line: rgba(255, 255, 255, .12);
+/* ---------- Neon theme: minimal cyber city, always night ---------- */
+:root[data-skin="neon"], .theme-art[data-skin="neon"] {
+  --bg: #04030a; --stage: #07060f; --surface: #15131f; --sunk: #0c0b14;
+  --ink: #ecebf5; --muted: #8b88a3; --hair: rgba(255, 255, 255, .07); --line: rgba(255, 255, 255, .12);
   --lift: inset 0 1px 0 rgba(255, 255, 255, .07), 0 1px 2px rgba(0, 0, 0, .5), 0 12px 26px -12px rgba(0, 0, 0, .9);
   --float: 0 1px 2px rgba(0, 0, 0, .6), 0 22px 46px -14px rgba(0, 0, 0, .95);
-  --sun: #f2a948; --active: #f2a948; --active-soft: #2e2416;
-  --cs-sky-top: #070a12; --cs-sky-bot: #1c2436; --cs-orb: #e9e6da; --cs-orb-glow: rgba(200, 210, 235, .3);
-  --cs-cloud: rgba(40, 48, 66, .6); --cs-clouds: .6; --cs-stars: 1;
-  --cs-mount: #1b2232; --cs-fog: rgba(60, 72, 96, .35);
-  --cs-stone: #232a36; --cs-keep: #1f2631; --cs-shade: rgba(0, 0, 0, .3); --cs-roof: #141922; --cs-gate: #0a0d12;
-  --cs-hill: #121822; --cs-pine: #0a0e14; --cs-win: #f2a948; --cs-torch: cs-torch; --cs-flag: #8f3a22; --cs-pole: #0a0d12;
-  --cs-glass: rgba(22, 28, 38, .42); --cs-glass-rim: rgba(255, 255, 255, .1);
+  --ne-a: #3be8ff; --ne-b: #ff4fb3;
+  --sun: #ff4fb3; --active: #3be8ff; --active-soft: #0f2a33;
   color-scheme: dark;
 }
-@media (prefers-color-scheme: dark) {
-  :root[data-skin="castle"]:not([data-mode="light"]), :root:not([data-mode="light"]) .theme-art[data-skin="castle"] {
-  --stage: #0e1219; --bg: #090c11; --surface: #1a2029; --sunk: #10141b;
-  --ink: #e6e9ee; --muted: #8a93a0; --hair: rgba(255, 255, 255, .07); --line: rgba(255, 255, 255, .12);
-  --lift: inset 0 1px 0 rgba(255, 255, 255, .07), 0 1px 2px rgba(0, 0, 0, .5), 0 12px 26px -12px rgba(0, 0, 0, .9);
-  --float: 0 1px 2px rgba(0, 0, 0, .6), 0 22px 46px -14px rgba(0, 0, 0, .95);
-  --sun: #f2a948; --active: #f2a948; --active-soft: #2e2416;
-  --cs-sky-top: #070a12; --cs-sky-bot: #1c2436; --cs-orb: #e9e6da; --cs-orb-glow: rgba(200, 210, 235, .3);
-  --cs-cloud: rgba(40, 48, 66, .6); --cs-clouds: .6; --cs-stars: 1;
-  --cs-mount: #1b2232; --cs-fog: rgba(60, 72, 96, .35);
-  --cs-stone: #232a36; --cs-keep: #1f2631; --cs-shade: rgba(0, 0, 0, .3); --cs-roof: #141922; --cs-gate: #0a0d12;
-  --cs-hill: #121822; --cs-pine: #0a0e14; --cs-win: #f2a948; --cs-torch: cs-torch; --cs-flag: #8f3a22; --cs-pole: #0a0d12;
-  --cs-glass: rgba(22, 28, 38, .42); --cs-glass-rim: rgba(255, 255, 255, .1);
-  color-scheme: dark;
-  }
-}
-.theme-art[data-skin="castle"] { color: var(--ink); }
-.castle-scene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
-.castle-scene svg * { stroke: none; }
-.cs-sky { position: absolute; inset: 0; background: linear-gradient(180deg, var(--cs-sky-top), var(--cs-sky-bot) 70%); transition: background .4s; }
-.cs-stars { position: absolute; inset: 0; opacity: var(--cs-stars); }
-.cs-stars i { position: absolute; border-radius: 50%; background: #fff; animation: cs-twinkle ease-in-out infinite alternate; }
-@keyframes cs-twinkle { from { opacity: .25; } to { opacity: 1; } }
-.cs-orb { position: absolute; right: 14cqw; top: 9cqh; width: 15cqw; aspect-ratio: 1; border-radius: 50%; background: var(--cs-orb);
-  box-shadow: 0 0 40px 14px var(--cs-orb-glow), 0 0 120px 50px var(--cs-orb-glow); }
-.cs-clouds { position: absolute; inset: 0; opacity: var(--cs-clouds); }
-.cs-clouds i { position: absolute; height: 5cqh; border-radius: 999px; background: var(--cs-cloud); filter: blur(4px); animation: cs-cloud linear infinite; }
-.cs-clouds i::before, .cs-clouds i::after { content: ""; position: absolute; border-radius: 50%; background: inherit; }
-.cs-clouds i::before { width: 45%; height: 160%; left: 18%; bottom: 30%; }
-.cs-clouds i::after { width: 32%; height: 120%; left: 52%; bottom: 30%; }
-.cs-clouds .a { top: 16cqh; width: 34cqw; animation-duration: 90s; animation-delay: -20s; }
-.cs-clouds .b { top: 28cqh; width: 24cqw; animation-duration: 120s; animation-delay: -70s; opacity: .8; }
-.cs-clouds .c { top: 8cqh; width: 20cqw; animation-duration: 105s; animation-delay: -45s; opacity: .7; }
-@keyframes cs-cloud { from { transform: translateX(-40cqw); } to { transform: translateX(130cqw); } }
-.cs-mountains { position: absolute; left: 0; width: 100%; bottom: 0; height: 52cqh; fill: var(--cs-mount); }
-.cs-fog { position: absolute; left: -30%; right: -30%; height: 10cqh; filter: blur(10px); background: radial-gradient(50% 50% at 50% 50%, var(--cs-fog), transparent 70%); }
-.cs-fog.back { bottom: 30cqh; animation: cs-fog 30s ease-in-out infinite alternate; }
-.cs-fog.front { bottom: 9cqh; animation: cs-fog 24s ease-in-out infinite alternate-reverse; }
-@keyframes cs-fog { from { transform: translateX(-12%); } to { transform: translateX(12%); } }
-.cs-castle { position: absolute; left: -4%; width: 108%; bottom: 0; height: auto; }
-.cs-hill { fill: var(--cs-hill); }
-.cs-stone { fill: var(--cs-stone); }
-.cs-stone.keep { fill: var(--cs-keep); }
-.cs-shade { fill: var(--cs-shade); }
-.cs-roof { fill: var(--cs-roof); }
-.cs-gate { fill: var(--cs-gate); }
-.castle-scene .cs-pole { fill: none; stroke: var(--cs-pole); stroke-width: 1; }
-.cs-flag { fill: var(--cs-flag); transform-box: fill-box; transform-origin: 0 50%; animation: cs-flag 1.6s ease-in-out infinite alternate; }
-@keyframes cs-flag { from { transform: scaleX(1) skewY(0deg); } to { transform: scaleX(.82) skewY(6deg); } }
-.cs-win { fill: var(--cs-win); }
-.cs-win { animation: var(--cs-torch, none) 3s steps(1) infinite; }
-@keyframes cs-torch { 0%, 100% { opacity: 1; } 40% { opacity: .55; } 46% { opacity: 1; } 78% { opacity: .75; } }
-.cs-pines { position: absolute; left: -2%; width: 104%; bottom: 0; height: 13cqh; fill: var(--cs-pine); }
-.cs-grade { position: absolute; inset: 0; background: radial-gradient(130% 90% at 50% 35%, transparent 60%, rgba(0, 0, 0, .12)); }
-@media (prefers-reduced-motion: reduce) { .castle-scene * { animation: none !important; } }
+.theme-art[data-skin="neon"] { color: var(--ink); }
+.neon-scene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; background: var(--stage); }
+.neon-scene svg * { stroke: none; }
+.ne-sky { position: absolute; inset: 0; background: linear-gradient(180deg, #06050d 0%, #0b0920 40%, #1a0f33 58%, #08070f 72%); }
+.ne-horizon { position: absolute; left: -10%; right: -10%; top: 50cqh; height: 18cqh; filter: blur(18px);
+  background: radial-gradient(50% 50% at 50% 50%, rgba(255, 79, 179, .35), transparent 70%), radial-gradient(40% 40% at 30% 60%, rgba(59, 232, 255, .18), transparent 70%);
+  animation: ne-breathe 8s ease-in-out infinite alternate; }
+@keyframes ne-breathe { from { opacity: .7; } to { opacity: 1; } }
+.ne-layer { position: absolute; left: -4%; width: 108%; bottom: 31cqh; height: 34cqh; }
+.ne-layer.far { fill: #120f22; opacity: .9; height: 40cqh; }
+.ne-layer.near { fill: #07060e; bottom: 31cqh; height: 26cqh; }
+.neon-scene .ne-edge { fill: none; stroke-width: 1.2; stroke-linecap: square; }
+.neon-scene .ne-edge.c1 { stroke: var(--ne-a); filter: drop-shadow(0 0 3px var(--ne-a)); }
+.neon-scene .ne-edge.c2 { stroke: var(--ne-b); filter: drop-shadow(0 0 3px var(--ne-b)); }
+.ne-layer.far .ne-edge { opacity: .55; }
+.ne-trail { position: absolute; left: 0; width: 22cqw; height: 1.5px; border-radius: 2px; opacity: .8; animation: ne-trail linear infinite; }
+.ne-trail.c1 { background: linear-gradient(90deg, transparent, var(--ne-a)); box-shadow: 0 0 8px var(--ne-a); }
+.ne-trail.c2 { background: linear-gradient(270deg, transparent, var(--ne-b)); box-shadow: 0 0 8px var(--ne-b); animation-direction: reverse; }
+@keyframes ne-trail { from { transform: translateX(-30cqw); } to { transform: translateX(130cqw); } }
+.ne-sign { position: absolute; width: 3px; border-radius: 2px; animation: ne-flicker 7s steps(1) infinite; }
+.ne-sign.c1 { background: var(--ne-a); box-shadow: 0 0 10px 1px var(--ne-a); }
+.ne-sign.c2 { background: var(--ne-b); box-shadow: 0 0 10px 1px var(--ne-b); }
+@keyframes ne-flicker { 0%, 100% { opacity: .95; } 61% { opacity: .2; } 63% { opacity: .95; } 65% { opacity: .3; } 67% { opacity: .95; } }
+.ne-floor { position: absolute; left: 0; right: 0; bottom: 0; height: 31cqh; overflow: hidden; background: linear-gradient(180deg, #140c26, #050409);
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, .5), #000 40%); mask-image: linear-gradient(180deg, rgba(0, 0, 0, .5), #000 40%); }
+.ne-rays { position: absolute; inset: 0; width: 100%; height: 100%; }
+.neon-scene .ne-rays path { fill: none; stroke: rgba(255, 79, 179, .38); stroke-width: .6; vector-effect: non-scaling-stroke; }
+.ne-line { position: absolute; left: 0; right: 0; top: 0; height: 1px; background: rgba(255, 79, 179, .5); box-shadow: 0 0 6px rgba(255, 79, 179, .5);
+  animation: ne-line 4s cubic-bezier(.55, 0, .9, .45) infinite; }
+@keyframes ne-line { from { transform: translateY(0); opacity: 0; } 15% { opacity: .6; } to { transform: translateY(31cqh); opacity: 1; } }
+.ne-vignette { position: absolute; inset: 0; background: radial-gradient(130% 90% at 50% 45%, transparent 55%, rgba(0, 0, 0, .55)); }
+@media (prefers-reduced-motion: reduce) { .neon-scene * { animation: none !important; } }
 
-/* glass controls over the castle (light or dark by mode) */
-:root[data-skin="castle"] .page[aria-label="Page A"] .btn:not(.empty),
-.theme-art[data-skin="castle"] .mini-dot {
-  background: var(--cs-glass);
-  -webkit-backdrop-filter: blur(12px) saturate(1.3); backdrop-filter: blur(12px) saturate(1.3);
-  border: 1px solid var(--cs-glass-rim);
-  box-shadow: inset 0 1px 0 var(--cs-glass-rim), 0 14px 30px -12px rgba(0, 0, 0, .45);
+/* dark glass with a neon rim */
+:root[data-skin="neon"] .page[aria-label="Page A"] .btn:not(.empty),
+.theme-art[data-skin="neon"] .mini-dot {
+  background: rgba(16, 14, 28, .45);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4); backdrop-filter: blur(12px) saturate(1.4);
+  border: 1px solid rgba(59, 232, 255, .22);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1), 0 0 18px -6px rgba(59, 232, 255, .45), 0 14px 30px -12px rgba(0, 0, 0, .9);
 }
+:root[data-skin="neon"] .page[aria-label="Page A"] .dot.empty { border-color: rgba(59, 232, 255, .25); }
+:root[data-skin="neon"] .page[aria-label="Page A"] .dot.armed { border-color: rgba(255, 79, 179, .6); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1), 0 0 28px -2px rgba(255, 79, 179, .6); }
 
 /* ---------- grouping exercises on page A ---------- */
 .dot.group .stack { position: relative; width: 74%; height: 74%; }
