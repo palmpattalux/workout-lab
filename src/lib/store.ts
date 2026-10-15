@@ -15,6 +15,7 @@ export type Workout = {
   progressions?: string[] // progression moves added on page B (progression workouts)
   count?: 'reps' | 'sec'  // progression only: count reps or hold seconds on page B
   slot?: number           // where its dot sits on page A (index in SLOTS), set by dragging
+  group?: string          // workouts sharing a group id sit together in one bubble on page A
   createdAt: number
 }
 

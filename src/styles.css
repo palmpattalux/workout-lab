@@ -748,3 +748,34 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .85), inset 0 -10px 22px -14px rgba(217, 134, 28, .4), 0 14px 30px -12px rgba(120, 70, 20, .4);
 }
 :root[data-skin="redemption"] .page[aria-label="Page A"] .dot.empty { border-color: rgba(80, 50, 15, .25); }
+
+/* ---------- grouping exercises on page A ---------- */
+.dot.group .stack { position: relative; width: 74%; height: 74%; }
+.dot.group .stack i { position: absolute; width: 50%; height: 50%; display: grid; place-items: center; border-radius: 50%;
+  background: var(--sunk); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 1px 3px rgba(0, 0, 0, .12); }
+.dot.group .stack.n2 i:nth-child(1) { left: 2%; top: 25%; } .dot.group .stack.n2 i:nth-child(2) { right: 2%; top: 25%; }
+.dot.group .stack.n3 i:nth-child(1) { left: 25%; top: 2%; } .dot.group .stack.n3 i:nth-child(2) { left: 3%; bottom: 6%; } .dot.group .stack.n3 i:nth-child(3) { right: 3%; bottom: 6%; }
+.dot.group .count {
+  position: absolute; right: 2%; top: 2%; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px;
+  display: grid; place-items: center; background: var(--ink); color: var(--stage); font: 800 .68rem var(--font);
+}
+.dot.group::before { content: ""; position: absolute; inset: -5px; border-radius: 50%; border: 1.5px solid var(--line); pointer-events: none; }
+.dot.merge { transform: translate(-50%, -50%) scale(1.12); box-shadow: var(--float), 0 0 0 3px color-mix(in srgb, var(--active) 35%, transparent); transition: transform .2s var(--ease), box-shadow .2s; }
+.dot.merge.ready { transform: translate(-50%, -50%) scale(1.2); box-shadow: var(--float), 0 0 0 4px var(--active), 0 0 26px 2px color-mix(in srgb, var(--active) 55%, transparent); animation: merge-pulse .9s ease-in-out infinite alternate; }
+@keyframes merge-pulse { to { box-shadow: var(--float), 0 0 0 6px var(--active), 0 0 34px 6px color-mix(in srgb, var(--active) 45%, transparent); } }
+.group-pop {
+  position: absolute; transform: translate(-50%, -100%) scale(.8); z-index: 9; opacity: 0; pointer-events: none;
+  padding: 6px 12px; border-radius: 999px; background: var(--ink); color: var(--stage); font: 800 .78rem var(--font); letter-spacing: .02em;
+  box-shadow: var(--float); transition: opacity .15s, transform .25s var(--ease);
+}
+.group-pop.on { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+.dot.fanned { transform: translate(-50%, -50%) scale(.9); opacity: .75; }
+.fan-dot { width: min(14cqw, 8cqh); z-index: 7; animation: fan-in .26s var(--ease) both; }
+.fan-dot.hover { transform: translate(-50%, -50%) scale(1.22); box-shadow: var(--float), 0 0 0 2.5px var(--active); }
+@keyframes fan-in { from { opacity: 0; transform: translate(-50%, -50%) scale(.3); } }
+.fan-name {
+  position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%); white-space: nowrap; pointer-events: none;
+  padding: 4px 10px; border-radius: 999px; background: var(--ink); color: var(--stage); font: 700 .74rem var(--font);
+}
+.choice.ungroup { color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .fan-dot, .dot.merge.ready { animation: none; } }

@@ -16,7 +16,7 @@ const listeners = new Set<() => void>()
 
 // Taps allowed while previewing: moving between pages, the preview bar, and the drag
 // controls (which can be felt, but set nothing: see HoldPicker/HoldMenu and dot drags).
-const NAV = '.holdable, .preview-bar, .themes, #a2, .gear, .settings, .dot.filled, .home-back, [aria-label="Back"], .book [role="tab"], .book .box, .session-row'
+const NAV = '.holdable, .fan-dot, .preview-bar, .themes, #a2, .gear, .settings, .dot.filled, .home-back, [aria-label="Back"], .book [role="tab"], .book .box, .session-row'
 let nudge: (() => void) | null = null
 function guard(e: Event) {
   if (!preview) return

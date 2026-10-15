@@ -20,19 +20,53 @@ const SLOTS = [
   { left: 65, top: 88 },
 ]
 
-// Each workout keeps the slot it was dragged to; the rest fill free slots in order.
-function placeAll(workouts: Workout[]) {
-  const taken = new Map<number, Workout>()
-  for (const w of workouts) if (w.slot !== undefined && w.slot < SLOTS.length && !taken.has(w.slot)) taken.set(w.slot, w)
+// A unit is what sits in one slot: a single workout, or a group of them in one bubble.
+type Unit = { key: string; members: Workout[] }
+function unitsOf(workouts: Workout[]): Unit[] {
+  const out: Unit[] = []
+  const byGroup = new Map<string, Unit>()
+  for (const w of workouts) {
+    if (w.group) {
+      const u = byGroup.get(w.group)
+      if (u) { u.members.push(w); continue }
+      const nu = { key: w.group, members: [w] }
+      byGroup.set(w.group, nu); out.push(nu)
+    } else out.push({ key: w.id, members: [w] })
+  }
+  // a group left with one member is just that workout again
+  return out.map((u) => (u.members.length === 1 ? { key: u.members[0].id, members: u.members } : u))
+}
+
+// Each unit keeps the slot it was dragged to; the rest fill free slots in order.
+function placeAll(units: Unit[]) {
+  const taken = new Map<number, Unit>()
+  for (const u of units) {
+    const s = u.members[0].slot
+    if (s !== undefined && s < SLOTS.length && !taken.has(s)) taken.set(s, u)
+  }
   const placed = new Set(taken.values())
   let free = 0
-  for (const w of workouts) {
-    if (placed.has(w)) continue
+  for (const u of units) {
+    if (placed.has(u)) continue
     while (free < SLOTS.length && taken.has(free)) free++
     if (free >= SLOTS.length) break
-    taken.set(free, w)
+    taken.set(free, u)
   }
   return taken
+}
+
+const setSlot = (u: Unit, slot: number) => u.members.forEach((w) => { if (w.slot !== slot) updateWorkout(w.id, { slot }) })
+const GROUP_DWELL = 220 // ms hovering over another exercise before letting go groups them
+
+// Where a group's exercises fan out around its bubble: an arc that opens toward the middle of the screen.
+function fan(slot: number, n: number) {
+  const s = SLOTS[slot]
+  const centre = s.left > 70 ? -125 : s.left < 42 ? -55 : -90
+  const step = n > 5 ? 34 : 44
+  return Array.from({ length: n }, (_, i) => {
+    const a = (centre + (i - (n - 1) / 2) * step) * Math.PI / 180
+    return { dx: Math.cos(a), dy: Math.sin(a) }
+  })
 }
 
 const iconOptions = WORKOUT_ICONS.map((i) => ({ key: i.key, label: i.name, node: <WorkoutIcon k={i.key} size="24px" strokeWidth={2} /> }))
@@ -51,32 +85,28 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
   // First tap on a workout dot arms it: it turns into a glowing fingerprint (tap again to start)
   // and a pen (edit) appears above it.
   const [chosen, setChosen] = useState<string | null>(null)
-  const bySlot = placeAll(workouts)
-  const slotOf = new Map([...bySlot].map(([i, w]) => [w.id, i]))
+  const units = unitsOf(workouts)
+  const bySlot = placeAll(units)
+  const slotOf = new Map<string, number>() // unit key and every member id -> slot
+  for (const [i, u] of bySlot) { slotOf.set(u.key, i); u.members.forEach((w) => slotOf.set(w.id, i)) }
+  const unitAt = (key: string) => [...bySlot.values()].find((u) => u.key === key)
 
   // Dragging a dot: it follows the finger, then glides into the nearest slot (swapping with whoever is there).
-  const [drag, setDrag] = useState<{ id: string; x: number; y: number } | null>(null)
-  const press = useRef<{ id: string; x: number; y: number; moved: boolean } | null>(null)
+  // Held over another exercise for a moment, it offers to group with it instead.
+  const [drag, setDrag] = useState<{ key: string; x: number; y: number } | null>(null)
+  const press = useRef<{ key: string; x: number; y: number; moved: boolean } | null>(null)
   const nearest = useRef<number | null>(null)
   const justDragged = useRef(false)
+  const [groupWith, setGroupWith] = useState<{ slot: number; ready: boolean } | null>(null)
+  const dwell = useRef<number | null>(null)
+
+  // A group bubble fans out its exercises the moment it's touched.
+  const [ring, setRing] = useState<{ key: string; hover: number | null } | null>(null)
+  const ringPress = useRef<{ key: string; cx: number; cy: number; w: number; h: number; dot: number } | null>(null)
 
   function pagePoint(e: PointerEvent<HTMLElement>) {
     const r = (e.currentTarget.offsetParent as HTMLElement).getBoundingClientRect()
     return { x: e.clientX - r.left, y: e.clientY - r.top, w: r.width, h: r.height }
-  }
-  function onDotDown(e: PointerEvent<HTMLButtonElement>, id: string) {
-    press.current = { id, x: e.clientX, y: e.clientY, moved: false }
-    e.currentTarget.setPointerCapture(e.pointerId)
-  }
-  function onDotMove(e: PointerEvent<HTMLButtonElement>) {
-    const p = press.current
-    if (!p) return
-    if (!p.moved && Math.hypot(e.clientX - p.x, e.clientY - p.y) < 8) return
-    if (!p.moved) { p.moved = true; nearest.current = slotOf.get(p.id) ?? null; sound.pop() }
-    const pt = pagePoint(e)
-    setDrag({ id: p.id, x: pt.x, y: pt.y })
-    const n = closest(pt)
-    if (n !== nearest.current) { nearest.current = n; sound.tick() }
   }
   function closest(pt: { x: number; y: number; w: number; h: number }) {
     let best = 0, bestD = Infinity
@@ -84,23 +114,126 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
       const d = Math.hypot(pt.x - (s.left / 100) * pt.w, pt.y - (s.top / 100) * pt.h)
       if (d < bestD) { bestD = d; best = i }
     })
-    return best
+    return { slot: best, dist: bestD }
+  }
+  function clearDwell() { if (dwell.current) { clearTimeout(dwell.current); dwell.current = null } }
+
+  function onDotDown(e: PointerEvent<HTMLButtonElement>, key: string) {
+    press.current = { key, x: e.clientX, y: e.clientY, moved: false }
+    e.currentTarget.setPointerCapture(e.pointerId)
+  }
+  function startDrag(key: string) {
+    nearest.current = slotOf.get(key) ?? null
+    setRing(null)
+    sound.pop()
+  }
+  function dragTo(e: PointerEvent<HTMLButtonElement>, key: string) {
+    const pt = pagePoint(e)
+    setDrag({ key, x: pt.x, y: pt.y })
+    const { slot: n, dist } = closest(pt)
+    if (n !== nearest.current) { nearest.current = n; sound.tick() }
+    // over another exercise (not an empty slot, not itself): wait a beat, then offer to group
+    const target = bySlot.get(n)
+    const dot = e.currentTarget.offsetWidth
+    const over = target && target.key !== key && dist < dot * 0.55
+    if (!over) { clearDwell(); if (groupWith) setGroupWith(null); return }
+    if (groupWith?.slot === n) return
+    clearDwell()
+    setGroupWith({ slot: n, ready: false })
+    dwell.current = window.setTimeout(() => { setGroupWith({ slot: n, ready: true }); sound.pop() }, GROUP_DWELL)
+  }
+  function onDotMove(e: PointerEvent<HTMLButtonElement>) {
+    const p = press.current
+    if (!p) return
+    if (!p.moved && Math.hypot(e.clientX - p.x, e.clientY - p.y) < 8) return
+    if (!p.moved) { p.moved = true; startDrag(p.key) }
+    dragTo(e, p.key)
+  }
+  function endDrag(e: PointerEvent<HTMLButtonElement>, key: string) {
+    justDragged.current = true
+    clearDwell()
+    const ready = groupWith?.ready ? groupWith.slot : null
+    setGroupWith(null)
+    // trying a theme on: the dot can be dragged around, then glides back home
+    if (getPreview()) { setDrag(null); sound.tap(); return }
+    const me = unitAt(key)
+    if (!me) { setDrag(null); return }
+    if (ready !== null) {
+      for (const [i, x] of bySlot) setSlot(x, i)
+      const target = bySlot.get(ready)!
+      const id = target.members.length > 1 ? target.key : me.members.length > 1 ? me.key : 'g' + Date.now().toString(36)
+      ;[...me.members, ...target.members].forEach((w) => updateWorkout(w.id, { group: id, slot: ready }))
+      setDrag(null); setChosen(null)
+      sound.tap()
+      return
+    }
+    const to = closest(pagePoint(e)).slot
+    const from = slotOf.get(key)
+    const other = bySlot.get(to)
+    // pin every unit to where it is now so nothing else shifts, then move/swap the two
+    for (const [i, u] of bySlot) setSlot(u, i)
+    if (other && other.key !== key && from !== undefined) setSlot(other, from)
+    setSlot(me, to)
+    setDrag(null)
+    sound.tap()
   }
   function onDotUp(e: PointerEvent<HTMLButtonElement>) {
     const p = press.current
     press.current = null
     if (!p?.moved) return
-    justDragged.current = true
-    // trying a theme on: the dot can be dragged around, then glides back home
-    if (getPreview()) { setDrag(null); sound.tap(); return }
-    const to = closest(pagePoint(e))
-    const from = slotOf.get(p.id)
-    const other = bySlot.get(to)
-    // pin every dot to where it is now so nothing else shifts, then move/swap the two
-    workouts.forEach((w) => { const s = slotOf.get(w.id); if (s !== undefined && w.slot !== s) updateWorkout(w.id, { slot: s }) })
-    if (other && other.id !== p.id && from !== undefined) updateWorkout(other.id, { slot: from })
-    updateWorkout(p.id, { slot: to })
-    setDrag(null)
+    endDrag(e, p.key)
+  }
+
+  // group bubble: touch fans it out; slide onto an exercise and let go to pick it;
+  // drag well past the fan to move the whole bubble instead
+  function onGroupDown(e: PointerEvent<HTMLButtonElement>, u: Unit) {
+    if (chosen && u.members.some((w) => w.id === chosen)) return // armed: a tap opens it
+    const el = e.currentTarget, page = el.offsetParent as HTMLElement
+    const r = page.getBoundingClientRect(), b = el.getBoundingClientRect()
+    ringPress.current = { key: u.key, cx: b.left + b.width / 2 - r.left, cy: b.top + b.height / 2 - r.top, w: r.width, h: r.height, dot: b.width }
+    press.current = { key: u.key, x: e.clientX, y: e.clientY, moved: false }
+    el.setPointerCapture(e.pointerId)
+    setChosen(null)
+    setRing({ key: u.key, hover: null })
+    sound.pop()
+  }
+  function onGroupMove(e: PointerEvent<HTMLButtonElement>, u: Unit) {
+    const p = press.current, rp = ringPress.current
+    if (!p) return
+    if (p.moved) { dragTo(e, u.key); return }
+    if (!rp) return
+    const pt = pagePoint(e)
+    const R = rp.dot * 1.15
+    const far = Math.hypot(pt.x - rp.cx, pt.y - rp.cy)
+    if (far > R + rp.dot * 0.9) { p.moved = true; ringPress.current = null; startDrag(u.key); dragTo(e, u.key); return }
+    const spots = fan(slotOf.get(u.key)!, u.members.length)
+    let hover: number | null = null, best = rp.dot * 0.45
+    spots.forEach((s, i) => {
+      const d = Math.hypot(pt.x - (rp.cx + s.dx * R), pt.y - (rp.cy + s.dy * R))
+      if (d < best) { best = d; hover = i }
+    })
+    if (hover !== ring?.hover) { if (hover !== null) sound.tick(); setRing({ key: u.key, hover }) }
+  }
+  function onGroupUp(e: PointerEvent<HTMLButtonElement>, u: Unit) {
+    const p = press.current
+    press.current = null
+    ringPress.current = null
+    if (p?.moved) { endDrag(e, u.key); return }
+    if (ring?.hover != null) { setChosen(u.members[ring.hover].id); setRing(null); justDragged.current = true; sound.tap() }
+    // let go on the bubble itself: the fan stays open, tap an exercise to pick it
+  }
+
+  // Take the armed exercise out of its group, into the nearest free slot.
+  function ungroup(id: string) {
+    const slot = slotOf.get(id)
+    if (slot === undefined) return
+    const u = bySlot.get(slot)!
+    const free = SLOTS.map((s, i) => ({ i, d: Math.hypot(s.left - SLOTS[slot].left, s.top - SLOTS[slot].top) }))
+      .filter((x) => !bySlot.has(x.i)).sort((a, b) => a.d - b.d)[0]
+    for (const [i, x] of bySlot) setSlot(x, i)
+    updateWorkout(id, { group: undefined, slot: free ? free.i : undefined })
+    if (u.members.length === 2) { const rest = u.members.find((w) => w.id !== id)!; updateWorkout(rest.id, { group: undefined }) }
+    setChosen(null)
     sound.tap()
   }
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -117,7 +250,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
   return (
     <main className="page" aria-label="Page A"
       onPointerDownCapture={(e) => { if (pickedIcon && !(e.target as Element).closest('.add')) setPickedIcon(null) }}
-      onClick={(e) => { if (e.target === e.currentTarget) { setChosen(null); setSettingsOpen(false) } }}>
+      onClick={(e) => { if (e.target === e.currentTarget) { setChosen(null); setSettingsOpen(false); setRing(null) } }}>
       <ThemeScene skin={skin} />
       <button className="btn pill" id="a2" aria-label="Book (A2)" onClick={onOpenBook}>
         <Icon name="book" size="46%" />
@@ -129,33 +262,86 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
           style={{ left: `${s.left}%`, top: `${s.top}%` }} aria-hidden="true" />
       ))}
 
-      {[...bySlot].map(([i, w]) => {
+      {[...bySlot].map(([i, u]) => {
         const s = SLOTS[i]
-        const dragging = drag?.id === w.id
-        const armed = chosen === w.id && !dragging
+        const dragging = drag?.key === u.key
+        const isGroup = u.members.length > 1
+        const armedMember = chosen !== null && !dragging ? u.members.find((w) => w.id === chosen) : undefined
+        const merging = groupWith?.slot === i && !dragging
+        const fanned = ring?.key === u.key && !dragging
+        const pos = { left: dragging ? drag.x : `${s.left}%`, top: dragging ? drag.y : `${s.top}%`, animationDelay: armedMember ? undefined : `${-i * 0.7}s` }
+        const cls = `btn circle dot filled float${armedMember ? ' armed' : ''}${dragging ? ' dragging' : ''}${isGroup ? ' group' : ''}${merging ? (groupWith!.ready ? ' merge ready' : ' merge') : ''}${fanned ? ' fanned' : ''}`
+        if (!isGroup) {
+          const w = u.members[0]
+          return (
+            <button
+              key={u.key}
+              className={cls}
+              style={pos}
+              aria-label={`${w.exercise || 'Workout'} ${w.letter}, drag to move or onto another to group`}
+              onPointerDown={(e) => onDotDown(e, u.key)}
+              onPointerMove={onDotMove}
+              onPointerUp={onDotUp}
+              onPointerCancel={() => { press.current = null; setDrag(null); clearDwell(); setGroupWith(null) }}
+              onClick={() => { if (justDragged.current) { justDragged.current = false; return } if (chosen === w.id) onOpenDot(w.id); else setChosen(w.id) }}
+            >
+              {armedMember
+                ? <Icon name="play" size="38%" strokeWidth={2} />
+                : <WorkoutMark icon={w.icon} letter={w.letter} size="1.15em" />}
+            </button>
+          )
+        }
         return (
           <button
-            key={w.id}
-            className={`btn circle dot filled float${armed ? ' armed' : ''}${dragging ? ' dragging' : ''}`}
-            style={{ left: dragging ? drag.x : `${s.left}%`, top: dragging ? drag.y : `${s.top}%`, animationDelay: armed ? undefined : `${-i * 0.7}s` }}
-            aria-label={`${w.exercise || 'Workout'} ${w.letter}, drag to move`}
-            onPointerDown={(e) => onDotDown(e, w.id)}
-            onPointerMove={onDotMove}
-            onPointerUp={onDotUp}
-            onPointerCancel={() => { press.current = null; setDrag(null) }}
-            onClick={() => { if (justDragged.current) { justDragged.current = false; return } if (chosen === w.id) onOpenDot(w.id); else setChosen(w.id) }}
+            key={u.key}
+            className={cls}
+            style={pos}
+            aria-label={`Group of ${u.members.length}: ${u.members.map((w) => w.exercise || 'Workout').join(', ')}. Touch to open, slide onto one to pick`}
+            onPointerDown={(e) => onGroupDown(e, u)}
+            onPointerMove={(e) => onGroupMove(e, u)}
+            onPointerUp={(e) => onGroupUp(e, u)}
+            onPointerCancel={() => { press.current = null; ringPress.current = null; setDrag(null); clearDwell(); setGroupWith(null) }}
+            onClick={() => { if (justDragged.current) { justDragged.current = false; return } if (armedMember) onOpenDot(armedMember.id) }}
           >
-            {armed
+            {armedMember
               ? <Icon name="play" size="38%" strokeWidth={2} />
-              : <WorkoutMark icon={w.icon} letter={w.letter} size="1.15em" />}
+              : (
+                <span className={`stack n${Math.min(3, u.members.length)}`}>
+                  {u.members.slice(0, 3).map((w) => <i key={w.id}><WorkoutIcon k={w.icon} size="62%" strokeWidth={2.2} /></i>)}
+                </span>
+              )}
+            {!armedMember && <span className="count">{u.members.length}</span>}
           </button>
         )
       })}
 
+      {groupWith && drag && (
+        <span className={`group-pop${groupWith.ready ? ' on' : ''}`} style={{ left: `${SLOTS[groupWith.slot].left}%`, top: `calc(${SLOTS[groupWith.slot].top}% - min(18.7cqw, 10.6cqh) / 2 - 22px)` }}>Group</span>
+      )}
+
+      {ring && !drag && (() => {
+        const slot = slotOf.get(ring.key)
+        const u = slot !== undefined ? bySlot.get(slot) : undefined
+        if (!u || slot === undefined) return null
+        return fan(slot, u.members.length).map((p, i) => {
+          const w = u.members[i]
+          return (
+            <button key={w.id} className={`btn circle fan-dot${ring.hover === i ? ' hover' : ''}`}
+              style={{ left: `calc(${SLOTS[slot].left}% + ${p.dx} * min(18.7cqw, 10.6cqh) * 1.15)`, top: `calc(${SLOTS[slot].top}% + ${p.dy} * min(18.7cqw, 10.6cqh) * 1.15)`, animationDelay: `${i * 30}ms` }}
+              aria-label={w.exercise || 'Workout'}
+              onClick={() => { setChosen(w.id); setRing(null); sound.tap() }}
+            >
+              <WorkoutMark icon={w.icon} letter={w.letter} size="1em" />
+              {ring.hover === i && <span className="fan-name">{w.exercise || 'Untitled'}</span>}
+            </button>
+          )
+        })
+      })()}
+
       {chosen !== null && !drag && slotOf.has(chosen) && (
         <>
         <span className="dot-name" style={{ right: `calc(${100 - SLOTS[slotOf.get(chosen)!].left}% + min(13cqw, 7.4cqh) / 2 + 8px)`, top: `calc(${SLOTS[slotOf.get(chosen)!].top}% - min(18.7cqw, 10.6cqh) / 2 - 34px)` }}>
-          {bySlot.get(slotOf.get(chosen)!)!.exercise || 'Untitled'}
+          {workouts.find((w) => w.id === chosen)?.exercise || 'Untitled'}
         </span>
         <button
           className="btn circle choice"
@@ -165,6 +351,16 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
         >
           <Icon name="write" size="48%" />
         </button>
+        {(bySlot.get(slotOf.get(chosen)!)?.members.length ?? 1) > 1 && (
+          <button
+            className="btn circle choice ungroup"
+            style={{ left: `calc(${SLOTS[slotOf.get(chosen)!].left}% + min(13cqw, 7.4cqh) + 6px)`, top: `calc(${SLOTS[slotOf.get(chosen)!].top}% - min(18.7cqw, 10.6cqh) / 2 - 34px)` }}
+            aria-label="Take out of group"
+            onClick={() => ungroup(chosen)}
+          >
+            <Icon name="ungroup" size="50%" />
+          </button>
+        )}
         </>
       )}
 
