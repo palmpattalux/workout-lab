@@ -6,7 +6,37 @@ const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
 
 // Set on the public site once Supabase is configured (see .env.example). Until then
 // accounts are kept on this device (below), so logging in works everywhere today.
-export const supabase: SupabaseClient | null = url && anonKey ? createClient(url, anonKey) : null
+// PKCE: the email link comes back as ?code=… rather than #access_token=…, which would
+// clash with the app's #page routing.
+export const supabase: SupabaseClient | null = url && anonKey
+  ? createClient(url, anonKey, { auth: { flowType: 'pkce', persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } })
+  : null
+
+// Where verification and reset links send people back to: this same page.
+const home = () => location.origin + location.pathname
+
+// Set when the page was opened from a verification link (?code=…). The link confirms
+// the email on Supabase's side; if it was opened in another browser no session comes
+// with it, so the login screen says the email is confirmed and asks to log in.
+export const arrivedFromEmailLink = new URLSearchParams(location.search).has('code')
+// A password reset link comes back as ?reset=1&code=…: once signed in from it, the app
+// asks for a new password before anything else.
+let recovering = new URLSearchParams(location.search).has('reset')
+const recoverListeners = new Set<() => void>()
+export function useRecovering() {
+  const [r, setR] = useState(recovering)
+  useEffect(() => { const fn = () => setR(recovering); recoverListeners.add(fn); return () => { recoverListeners.delete(fn) } }, [])
+  return r
+}
+export async function setNewPassword(password: string) {
+  const { error } = await supabase!.auth.updateUser({ password })
+  if (!error) { recovering = false; recoverListeners.forEach((fn) => fn()) }
+  return friendly(error?.message)
+}
+function dropCodeFromUrl() {
+  if (!location.search) return
+  history.replaceState(null, '', location.pathname + location.hash)
+}
 
 export type AppUser = { id: string; email?: string }
 
@@ -75,8 +105,11 @@ export function useUser(): AppUser | null | undefined {
       meListeners.add(fn)
       return () => { meListeners.delete(fn) }
     }
-    supabase.auth.getSession().then(({ data }) => setUser(data.session?.user ?? null))
-    const { data } = supabase.auth.onAuthStateChange((_e, session) => setUser(session?.user ?? null))
+    supabase.auth.getSession().then(({ data }) => { setUser(data.session?.user ?? null); dropCodeFromUrl() })
+    const { data } = supabase.auth.onAuthStateChange((e, session) => {
+      if (e === 'PASSWORD_RECOVERY') { recovering = true; recoverListeners.forEach((fn) => fn()) }
+      setUser(session?.user ?? null)
+    })
     return () => data.subscription.unsubscribe()
   }, [])
   return user
@@ -91,7 +124,9 @@ function friendly(msg?: string | null) {
   if (!msg) return null
   if (/fetch|network/i.test(msg)) return "Can't reach the server. Check your connection and try again."
   if (/invalid login/i.test(msg)) return 'That email and password don\'t match an account.'
-  if (/not confirmed/i.test(msg)) return 'Open the link we emailed you to finish signing up, then log in.'
+  if (/not confirmed/i.test(msg)) return 'Verify your email first: open the link we sent you, then log in.'
+  if (/rate limit|too many/i.test(msg)) return 'Too many emails sent. Wait a minute, then try again.'
+  if (/already registered/i.test(msg)) return 'There is already an account with that email. Log in instead.'
   return msg
 }
 
@@ -104,16 +139,23 @@ export async function signIn(email: string, password: string) {
 // Returns 'confirm' when Supabase sent a confirmation email before the account can be used.
 export async function signUp(email: string, password: string): Promise<{ error: string | null; confirm: boolean }> {
   if (!supabase) return { error: await localSignUp(email, password), confirm: false }
-  const { data, error } = await supabase!.auth.signUp({ email, password })
+  const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: home() } })
   return { error: friendly(error?.message), confirm: !error && !data.session }
 }
 
 export async function resetPassword(email: string) {
-  const { error } = await supabase!.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname })
+  const { error } = await supabase!.auth.resetPasswordForEmail(email, { redirectTo: home() + '?reset=1' })
   return friendly(error?.message)
 }
 
 export const canResetPassword = !!supabase
+export const verifiesEmail = !!supabase
+
+// Sends the verification email again (online accounts only).
+export async function resendVerification(email: string) {
+  const { error } = await supabase!.auth.resend({ type: 'signup', email, options: { emailRedirectTo: home() } })
+  return friendly(error?.message)
+}
 
 export function signOut() {
   if (!supabase) { setMe(null); return }

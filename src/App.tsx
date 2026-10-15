@@ -4,11 +4,11 @@ import PageB from './pages/PageB'
 import CreatePage from './pages/CreatePage'
 import BookPage from './pages/BookPage'
 import SummaryPage from './pages/SummaryPage'
-import LoginPage from './pages/LoginPage'
+import LoginPage, { NewPasswordPage } from './pages/LoginPage'
 import ThemesPage from './pages/ThemesPage'
 import PreviewBar from './components/PreviewBar'
 import { useWorkouts, setScope } from './lib/store'
-import { supabase, useUser } from './lib/auth'
+import { supabase, useUser, useRecovering } from './lib/auth'
 import { switchTo } from './lib/session'
 import { getPreview, checkOwnerEmail } from './lib/theme'
 
@@ -34,6 +34,7 @@ function Screen() {
   const [draft, setDraft] = useState<{ icon: string; letter: string } | null>(null)
   const workouts = useWorkouts()
   const user = useUser()
+  const recovering = useRecovering()
 
   // load the signed-in person's data (or this browser's, where there are no accounts)
   useEffect(() => {
@@ -50,6 +51,7 @@ function Screen() {
 
   if (user === undefined) return <main className="page" aria-busy="true" />
   if (!user) return <LoginPage />
+  if (recovering) return <NewPasswordPage />
 
   if (hash === 'themes') return <ThemesPage onViewed={() => location.replace('#')} />
   if (hash.startsWith('b-')) {

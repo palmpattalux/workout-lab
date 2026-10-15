@@ -319,6 +319,9 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .primary { height: 52px; border-radius: 999px; border: 0; background: var(--active); color: #fff; font: 700 1.05rem var(--font); cursor: pointer; box-shadow: 0 10px 22px -12px color-mix(in srgb, var(--active) 80%, transparent); transition: transform .2s var(--ease); }
 .primary:active { transform: scale(.97); }
 .primary:disabled { opacity: .6; }
+.login .small { font-size: .85rem; margin: -4px 0 0; }
+.link-btn { align-self: flex-start; border: 0; background: none; padding: 0; color: var(--ink); font: 600 .9rem var(--font); text-decoration: underline; cursor: pointer; }
+.link-btn:disabled { color: var(--muted); text-decoration: none; }
 .form-error { margin: 0; color: #d9480f; font-size: .92rem; }
 .form-info { margin: 0; color: var(--active); font-size: .92rem; }
 .login-links { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
