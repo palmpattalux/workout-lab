@@ -7,6 +7,7 @@ const ui = {
   book: <><path d="M12 6.5C10.2 5 7.5 4.5 4 4.8v13.5c3.5-.3 6.2.2 8 1.7 1.8-1.5 4.5-2 8-1.7V4.8c-3.5-.3-6.2.2-8 1.7z" /><path d="M12 6.5V20" /></>,
   weights: <path d="M6.5 7v10M17.5 7v10M3.5 9.5v5M20.5 9.5v5M6.5 12h11" />,
   arrowRight: <path d="M5 12h14M13 6l6 6-6 6" />,
+  play: <path d="M8.5 5.5v13l10-6.5z" />,
   fingerprint: <path d="M12 11.5v3.5M8.6 9.4A4 4 0 0 1 16 11.5v2.2M6.2 12.2a6 6 0 0 1 10.9-4.6M9.3 17c.4-1.3.6-3 .6-5a2.1 2.1 0 0 1 4.2 0c0 2.4-.3 4.6-1 6.5M18 13.6c0 2-.4 3.9-1 5.6M4.6 14.6a8 8 0 0 1 12-9.7M6.8 18.4c.5-.9.9-2 1.1-3.2" />,
   gear: <><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></>,
   swap: <path d="M4 8h15M15 4l4 4-4 4M20 16H5M9 12l-4 4 4 4" />,
@@ -20,22 +21,28 @@ const ui = {
   write: <><path d="M15.5 4.5 19.5 8.5 9 19H5v-4z" /><path d="M13.5 6.5l4 4" /></>,
 }
 
-// The 10 workout icons offered when dragging up from "+" on page A: bodybuilding and calisthenics only.
+// The 8 workout icons offered when dragging up from "+" on page A: body parts, then equipment.
 export const WORKOUT_ICONS: { key: string; name: string; svg: ReactNode }[] = [
+  { key: 'arm', name: 'Arm', svg: <path d="M3 12.5c2.5-3.5 7-4.5 10-1.5.5-1.5.7-3 .7-4.6M13.7 6.4c-.2-1.9 1-3.2 2.7-3.2 1.8 0 3 1.3 2.8 3.2l-.3 2.3c.4 3.4.2 6-.9 7.6-1.1 1.6-3 2.2-5.4 2.2H3M9 13.2c1.3.4 2.5 1.2 3.4 2.3" /> },
+  { key: 'leg', name: 'Leg', svg: <path d="M9 2.5c.5 3 2 5.5 4 8 .8 1 .9 2 .6 3.2L12.5 19l6 1.2c.7.2 1 .7 1 1.3H9.5c-.6 0-1-.5-.9-1.1l.3-2.2c-1.6-1.6-2.1-3.8-1.2-6-.6-1.2-1.2-2.5-1.6-3.6C5.5 7 5.2 4.8 5.2 2.5" /> },
+  { key: 'torso', name: 'Torso front', svg: <><path d="M2.5 8c0-2.5 1.8-4.5 4.5-4.5h10c2.7 0 4.5 2 4.5 4.5v3.5L19 13v8H5v-8l-2.5-1.5z" /><path d="M12 4v7M6.5 9c2 1.8 3.8 2.2 5.5 1 1.7 1.2 3.5.8 5.5-1M9 14.5h6M9 18h6M12 12.5V21" /></> },
+  { key: 'back', name: 'Torso back', svg: <><path d="M2.5 8c0-2.5 1.8-4.5 4.5-4.5h10c2.7 0 4.5 2 4.5 4.5v3.5L19 13v8H5v-8l-2.5-1.5z" /><path d="M12 4v17M6.5 6.5c1 3 3 4.8 5.5 5.3 2.5-.5 4.5-2.3 5.5-5.3M8 17.5l4-2.5 4 2.5" /></> },
   { key: 'dumbbell', name: 'Dumbbell', svg: <path d="M6.5 7v10M17.5 7v10M3.5 9.5v5M20.5 9.5v5M6.5 12h11" /> },
   { key: 'barbell', name: 'Barbell', svg: <path d="M2 12h20M5 8v8M7.5 6.5v11M16.5 6.5v11M19 8v8" /> },
-  { key: 'kettlebell', name: 'Kettlebell', svg: <><path d="M9.5 7.5a2.5 2.5 0 1 1 5 0" /><path d="M7.2 9h9.6l2 10.5H5.2z" /></> },
-  { key: 'bench', name: 'Bench press', svg: <path d="M2 7h20M5 4v6M19 4v6M4 15h12M6 15v5M14 15v5M18 13v7" /> },
-  { key: 'cable', name: 'Cable', svg: <><path d="M3 21h18M6 21V3h8M18 6.5v8.5M15.5 15.5h5M8.5 13h3v8h-3z" /><circle cx="16" cy="5" r="2" /></> },
-  { key: 'pullup', name: 'Pull-up', svg: <><path d="M3 4h18M8 4v3l4 3 4-3V4M12 13v4M12 17l-2.5 4M12 17l2.5 4" /><circle cx="12" cy="11.5" r="1.6" /></> },
-  { key: 'dips', name: 'Dips', svg: <><path d="M2.5 11h6M15.5 11h6M4.5 11v10M19.5 11v10M8.5 11l3.5 3 3.5-3M12 14v3.5M12 17.5l-2 3.5M12 17.5l2 3.5" /><circle cx="12" cy="7.5" r="1.8" /></> },
-  { key: 'rings', name: 'Rings', svg: <><path d="M7 2v8.5M17 2v8.5M3 2h18" /><circle cx="7" cy="14" r="3.2" /><circle cx="17" cy="14" r="3.2" /></> },
-  { key: 'pushup', name: 'Push-up', svg: <><path d="M17 11.5 4 17.5M15 12.5v6M2 20h20" /><circle cx="19.2" cy="10" r="1.8" /></> },
-  { key: 'handstand', name: 'Handstand', svg: <><path d="M12 15.5V9M12 9l-2.5-6M12 9l2.5-6M8.5 21l3.5-5.5 3.5 5.5M6 21h12" /><circle cx="12" cy="17.6" r="1.7" /></> },
+  { key: 'pullbar', name: 'Pull-up bar', svg: <path d="M2.5 5h19M5 5v15M19 5v15M3 20h4M17 20h4" /> },
+  { key: 'dipbar', name: 'Dip bar', svg: <path d="M5 21V5.5M19 21V5.5M5 9h5.5M19 9h-5.5M3 21h4M17 21h4" /> },
 ]
 
 // Icons from the first version, kept so workouts made with them still draw.
 const OLD_ICONS: { key: string; svg: ReactNode }[] = [
+  { key: 'kettlebell', svg: <><path d="M9.5 7.5a2.5 2.5 0 1 1 5 0" /><path d="M7.2 9h9.6l2 10.5H5.2z" /></> },
+  { key: 'bench', svg: <path d="M2 7h20M5 4v6M19 4v6M4 15h12M6 15v5M14 15v5M18 13v7" /> },
+  { key: 'cable', svg: <><path d="M3 21h18M6 21V3h8M18 6.5v8.5M15.5 15.5h5M8.5 13h3v8h-3z" /><circle cx="16" cy="5" r="2" /></> },
+  { key: 'pullup', svg: <><path d="M3 4h18M8 4v3l4 3 4-3V4M12 13v4M12 17l-2.5 4M12 17l2.5 4" /><circle cx="12" cy="11.5" r="1.6" /></> },
+  { key: 'dips', svg: <><path d="M2.5 11h6M15.5 11h6M4.5 11v10M19.5 11v10M8.5 11l3.5 3 3.5-3M12 14v3.5M12 17.5l-2 3.5M12 17.5l2 3.5" /><circle cx="12" cy="7.5" r="1.8" /></> },
+  { key: 'rings', svg: <><path d="M7 2v8.5M17 2v8.5M3 2h18" /><circle cx="7" cy="14" r="3.2" /><circle cx="17" cy="14" r="3.2" /></> },
+  { key: 'pushup', svg: <><path d="M17 11.5 4 17.5M15 12.5v6M2 20h20" /><circle cx="19.2" cy="10" r="1.8" /></> },
+  { key: 'handstand', svg: <><path d="M12 15.5V9M12 9l-2.5-6M12 9l2.5-6M8.5 21l3.5-5.5 3.5 5.5M6 21h12" /><circle cx="12" cy="17.6" r="1.7" /></> },
   { key: 'run', svg: <><circle cx="15.5" cy="4.5" r="1.8" /><path d="M7 21l3.5-5 3 2v4M10.5 16l2-6.5 4 2.5 3-1M12.5 9.5 9 10.5l-2 3" /></> },
   { key: 'cycle', svg: <><circle cx="6" cy="16" r="3.5" /><circle cx="18" cy="16" r="3.5" /><path d="M6 16l4-7h5l3 7M10 9l2 7h-6M14 6h2.5" /></> },
   { key: 'swim', svg: <><circle cx="17" cy="7" r="1.8" /><path d="M4 12.5l5-4 4 3 3-1.5M2 17c2 0 2-1.5 4-1.5s2 1.5 4 1.5 2-1.5 4-1.5 2 1.5 4 1.5 2-1.5 4-1.5" /></> },
@@ -48,17 +55,8 @@ const OLD_ICONS: { key: string; svg: ReactNode }[] = [
   { key: 'timer', svg: <><circle cx="12" cy="13.5" r="7" /><path d="M12 13.5V9.5M10 3h4M12 3v3.5M18 6.5l1.5-1.5" /></> },
 ]
 
-// Body-part letters offered on the second hold.
-export const BODY_LETTERS: { key: string; name: string }[] = [
-  { key: 'C', name: 'Chest' },
-  { key: 'B', name: 'Back' },
-  { key: 'S', name: 'Shoulders' },
-  { key: 'A', name: 'Arms' },
-  { key: 'Ab', name: 'Core' },
-  { key: 'G', name: 'Glutes' },
-  { key: 'L', name: 'Legs' },
-  { key: 'F', name: 'Full body' },
-]
+// Letters A–H offered on the second drag (just labels, not body parts).
+export const BODY_LETTERS: { key: string; name: string }[] = 'ABCDEFGH'.split('').map((k) => ({ key: k, name: k }))
 
 export type IconName = keyof typeof ui
 

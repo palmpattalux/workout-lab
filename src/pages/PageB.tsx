@@ -3,7 +3,7 @@ import { Icon, WorkoutMark } from '../components/icons'
 import HoldPicker from '../components/HoldPicker'
 import HoldMenu from '../components/HoldMenu'
 import { updateWorkout, type Workout } from '../lib/store'
-import { useSession, switchTo, goToSet, record, endSession } from '../lib/session'
+import { useSession, switchTo, goToSet, record, endSession, discardSession } from '../lib/session'
 
 const MAX_SET = 5
 const repOptions = Array.from({ length: 25 }, (_, i) => ({ key: String(i + 1), node: i + 1 }))
@@ -70,6 +70,7 @@ export default function PageB({ workout, workouts, onGo, onHome }: {
               <button onClick={() => setConfirmEnd(false)}>No</button>
               <button className="yes" onClick={() => { endSession(); setConfirmEnd(false) }}>Yes</button>
             </div>
+            <button className="cancel-session" onClick={() => { discardSession(); setConfirmEnd(false) }}>Cancel session, record nothing</button>
           </div>
         </div>
       )}

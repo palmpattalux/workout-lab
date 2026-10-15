@@ -5,17 +5,17 @@ import { updateWorkout, type Workout } from '../lib/store'
 import { sound } from '../lib/sound'
 import { usePrefs, setPrefs } from '../lib/prefs'
 
-// Exercise dot positions, as % of the screen. The first four are traced from
-// sketch A; the rest fill open space once more than four workouts exist.
+// Exercise dot positions, as % of the screen: low and toward the right, in easy reach of a
+// right thumb. The first four are always shown; the rest fill in as more workouts exist.
 const SLOTS = [
-  { left: 54.9, top: 42.8 },
-  { left: 78.5, top: 40.1 },
-  { left: 36.6, top: 53.0 },
-  { left: 24.6, top: 66.7 },
-  { left: 78.5, top: 28.0 },
-  { left: 56.0, top: 59.5 },
-  { left: 52.0, top: 76.0 },
-  { left: 85.0, top: 87.0 },
+  { left: 58, top: 57 },
+  { left: 82, top: 55 },
+  { left: 40, top: 70 },
+  { left: 63, top: 72 },
+  { left: 85, top: 72.5 },
+  { left: 34, top: 55.5 },
+  { left: 43, top: 86 },
+  { left: 65, top: 88 },
 ]
 
 // Each workout keeps the slot it was dragged to; the rest fill free slots in order.
@@ -139,13 +139,17 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onCreat
             onClick={() => { if (justDragged.current) { justDragged.current = false; return } if (chosen === w.id) onOpenDot(w.id); else setChosen(w.id) }}
           >
             {armed
-              ? <Icon name="fingerprint" size="52%" strokeWidth={1.9} />
+              ? <Icon name="play" size="38%" strokeWidth={2} />
               : <WorkoutMark icon={w.icon} letter={w.letter} size="1.15em" />}
           </button>
         )
       })}
 
       {chosen !== null && !drag && slotOf.has(chosen) && (
+        <>
+        <span className="dot-name" style={{ right: `calc(${100 - SLOTS[slotOf.get(chosen)!].left}% + min(13cqw, 7.4cqh) / 2 + 8px)`, top: `calc(${SLOTS[slotOf.get(chosen)!].top}% - min(18.7cqw, 10.6cqh) / 2 - 34px)` }}>
+          {bySlot.get(slotOf.get(chosen)!)!.exercise || 'Untitled'}
+        </span>
         <button
           className="btn circle choice"
           style={{ left: `${SLOTS[slotOf.get(chosen)!].left}%`, top: `calc(${SLOTS[slotOf.get(chosen)!].top}% - min(18.7cqw, 10.6cqh) / 2 - 34px)` }}
@@ -154,6 +158,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onCreat
         >
           <Icon name="write" size="48%" />
         </button>
+        </>
       )}
 
       {pickedIcon === null ? (
@@ -163,7 +168,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onCreat
           instant
           onPick={(i) => setPickedIcon(iconOptions[i].key)}
           className="dot add float"
-          style={{ left: '26.9%', top: '80.1%' }}
+          style={{ left: '20%', top: '87%' }}
           ariaLabel="Add workout, drag up to pick an icon"
         >
           <Icon name="plus" strokeWidth={2.6} />
@@ -176,7 +181,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onCreat
           onTap={tapAdd}
           onPick={(i) => { const icon = pickedIcon; setPickedIcon(null); onCreate(icon, letterOptions[i].key) }}
           className="dot add float in-progress"
-          style={{ left: '26.9%', top: '80.1%' }}
+          style={{ left: '20%', top: '87%' }}
           ariaLabel="Adding workout, drag up to pick a body part, double tap to cancel"
         >
           <WorkoutIcon k={pickedIcon} size="40%" />
@@ -203,7 +208,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onCreat
         </div>
       )}
 
-      <button className={`btn circle mid gear${settingsOpen ? ' open' : ''}`} style={{ left: '78%', top: '71.8%' }}
+      <button className={`btn circle mid gear${settingsOpen ? ' open' : ''}`} style={{ left: '86%', top: '90%' }}
         aria-label="Settings (A1)" aria-expanded={settingsOpen} onClick={() => setSettingsOpen(!settingsOpen)}>
         <Icon name="gear" size="44%" />
       </button>
