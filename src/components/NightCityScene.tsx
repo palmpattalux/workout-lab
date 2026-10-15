@@ -59,7 +59,7 @@ const MID = city(31, 40, 115, true, 0.12)
 const NEAR = city(97, 16, 70, true, 0.08)
 
 const RAIN = Array.from({ length: 34 }, (_, i) => {
-  const r = rng(i * 131 + 17)
+  const r = rng(i * 7919 + 104729)
   const near = i % 3 === 0
   return { x: r() * 110 - 5, near, dur: near ? 0.55 + r() * 0.2 : 0.9 + r() * 0.4, delay: -r() * 2 }
 })
