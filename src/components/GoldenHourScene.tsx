@@ -32,8 +32,7 @@ function hills(seed: number, lo: number, hi: number) {
   return d + 'L410 100 Z'
 }
 
-const CEILING = [...clouds(5, 22, 12, 22), ...clouds(6, 38, 10, 20), ...clouds(9, 54, 9, 17), ...clouds(10, 66, 7, 13)]
-const BACK = [...clouds(13, 66, 7, 14), ...clouds(19, 78, 6, 12), ...clouds(21, 88, 5, 9)]
+const BACK = [...clouds(13, 74, 7, 13), ...clouds(19, 86, 5, 10)]
 const FRONT = clouds(23, 92, 7, 14)
 const FAR_HILLS = hills(3, 30, 55)
 const MID_HILLS = hills(11, 45, 70)
@@ -75,28 +74,19 @@ export default function GoldenHourScene() {
       <div className="gh-sky" />
       <div className="gh-rays" />
       <div className="gh-sun" />
-      <svg className="gh-clouds ceiling" viewBox="0 0 400 100" preserveAspectRatio="xMidYMax slice">
-        <defs>
-          <linearGradient id="gh-cc" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#3f2438" /><stop offset=".55" stopColor="#8a3f45" /><stop offset=".85" stopColor="#e07a3e" /><stop offset="1" stopColor="#ffc56a" />
-          </linearGradient>
-        </defs>
-        {CEILING.map((p, i) => <circle key={i} cx={p.cx} cy={p.cy} r={p.r} fill="url(#gh-cc)" />)}
-      </svg>
       <Flock className="far" />
       <svg className="gh-clouds back" viewBox="0 0 400 100" preserveAspectRatio="xMidYMax slice">
         <defs>
           <linearGradient id="gh-cb" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#7a3a44" /><stop offset=".6" stopColor="#d46a3c" /><stop offset="1" stopColor="#ffd27a" />
+            <stop offset="0" stopColor="#fff6e6" /><stop offset=".7" stopColor="#fbe0b8" /><stop offset="1" stopColor="#f6c88e" />
           </linearGradient>
         </defs>
         {BACK.map((p, i) => <circle key={i} cx={p.cx} cy={p.cy} r={p.r} fill="url(#gh-cb)" />)}
       </svg>
-      <div className="gh-beams" />
       <svg className="gh-clouds front" viewBox="0 0 400 100" preserveAspectRatio="xMidYMax slice">
         <defs>
           <linearGradient id="gh-cf" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#a8483a" /><stop offset="1" stopColor="#ffb85c" />
+            <stop offset="0" stopColor="#f7d2a4" /><stop offset="1" stopColor="#f0b277" />
           </linearGradient>
         </defs>
         {FRONT.map((p, i) => <ellipse key={i} cx={p.cx} cy={p.cy + p.r * .5} rx={p.r * 2.2} ry={p.r * .45} fill="url(#gh-cf)" />)}

@@ -674,49 +674,38 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .golden-scene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
 .golden-scene svg * { stroke: none; }
 .gh-sky { position: absolute; inset: 0; background:
-  linear-gradient(180deg, #4a2a44 0%, #7d3a4c 16%, #c45a44 34%, #ee8a3e 50%, #ffbe5c 62%, #ffe08e 69%, #f6a254 80%, #c8653a 100%); }
-.gh-sun { position: absolute; left: 64%; top: 67cqh; width: 22cqw; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%;
-  background: radial-gradient(circle, #fffef4 0 40%, #fff0b8 52%, rgba(255, 214, 120, .6) 64%, rgba(255, 190, 100, 0) 74%);
-  box-shadow: 0 0 60px 30px rgba(255, 226, 150, .7), 0 0 180px 90px rgba(255, 170, 80, .45), 0 0 320px 160px rgba(255, 130, 60, .25);
-  animation: gh-breathe 6s ease-in-out infinite alternate; }
-@keyframes gh-breathe { to { box-shadow: 0 0 72px 36px rgba(255, 226, 150, .78), 0 0 200px 100px rgba(255, 170, 80, .5), 0 0 340px 170px rgba(255, 130, 60, .28); } }
-.gh-rays { position: absolute; left: 64%; top: 67cqh; width: 300cqw; aspect-ratio: 1; transform: translate(-50%, -50%);
-  background: repeating-conic-gradient(from 0deg, rgba(255, 240, 200, .26) 0 3deg, transparent 3deg 11deg);
-  -webkit-mask-image: radial-gradient(circle, #000 3%, transparent 34%); mask-image: radial-gradient(circle, #000 3%, transparent 34%);
-  animation: gh-spin 160s linear infinite; mix-blend-mode: screen; }
-@keyframes gh-spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
-/* crepuscular beams breaking through the clouds above the sun */
-.gh-beams { position: absolute; left: 64%; top: 67cqh; width: 140cqw; height: 70cqh; transform: translate(-50%, -100%);
-  background: repeating-conic-gradient(from 300deg at 50% 100%, rgba(255, 230, 170, .22) 0 2.5deg, transparent 2.5deg 9deg, rgba(255, 230, 170, .12) 9deg 11deg, transparent 11deg 18deg);
-  -webkit-mask-image: linear-gradient(0deg, #000 10%, transparent 85%); mask-image: linear-gradient(0deg, #000 10%, transparent 85%);
-  mix-blend-mode: screen; filter: blur(2px); animation: gh-beam 9s ease-in-out infinite alternate; }
-@keyframes gh-beam { from { opacity: .6; } to { opacity: 1; } }
+  linear-gradient(180deg, #f6ead8 0%, #f8e2c2 30%, #fbd9a8 52%, #fcd096 64%, #f6c48c 76%, #efb98a 100%); }
+.gh-sun { position: absolute; left: 64%; top: 64cqh; width: 16cqw; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%;
+  background: radial-gradient(circle, #fffaf0 0 45%, rgba(255, 236, 190, .7) 60%, rgba(255, 220, 160, 0) 72%);
+  box-shadow: 0 0 60px 30px rgba(255, 230, 180, .45), 0 0 160px 70px rgba(255, 210, 150, .22);
+  animation: gh-breathe 7s ease-in-out infinite alternate; }
+@keyframes gh-breathe { to { box-shadow: 0 0 70px 34px rgba(255, 230, 180, .5), 0 0 175px 78px rgba(255, 210, 150, .26); } }
+.gh-rays { display: none; }
 .gh-clouds { position: absolute; left: -12%; width: 124%; }
-.gh-clouds.ceiling { top: -3cqh; height: 36cqh; filter: blur(2.4px); animation: gh-drift 90s ease-in-out infinite alternate; }
-.gh-clouds.back { top: 32cqh; height: 24cqh; filter: blur(1.8px); opacity: .95; animation: gh-drift 60s ease-in-out infinite alternate-reverse; }
-.gh-clouds.front { top: 52cqh; height: 16cqh; filter: blur(.8px); opacity: .9; animation: gh-drift 34s ease-in-out infinite alternate; }
+.gh-clouds.back { top: 40cqh; height: 20cqh; filter: blur(2px); opacity: .75; animation: gh-drift 70s ease-in-out infinite alternate; }
+.gh-clouds.front { top: 56cqh; height: 12cqh; filter: blur(1.4px); opacity: .55; animation: gh-drift 40s ease-in-out infinite alternate-reverse; }
 @keyframes gh-drift { from { transform: translateX(-5%); } to { transform: translateX(5%); } }
 .gh-hills { position: absolute; left: 0; width: 100%; bottom: 0; }
-.gh-hills.far { height: 31cqh; fill: #e08a4c; opacity: .85; }
-.gh-hills.mid { height: 22cqh; fill: #8e3f26; }
-.gh-hills.near { height: 13cqh; fill: #331509; }
+.gh-hills.far { height: 29cqh; fill: #f1c49a; }
+.gh-hills.mid { height: 20cqh; fill: #e2a77a; }
+.gh-hills.near { height: 12cqh; fill: #c98a62; }
 .gh-tree { position: absolute; left: -9cqw; bottom: 6cqh; width: 52cqw; height: auto; }
-.gh-trunk { fill: #24100a; }
-.gh-canopy { fill: #24100a; transform-origin: 52% 100%; transform-box: view-box; animation: gh-sway 5.5s ease-in-out infinite alternate; }
+.gh-trunk { fill: #a8714f; }
+.gh-canopy { fill: #b97c55; opacity: .9; transform-origin: 52% 100%; transform-box: view-box; animation: gh-sway 5.5s ease-in-out infinite alternate; }
 @keyframes gh-sway { from { transform: rotate(-1.4deg); } to { transform: rotate(1.6deg); } }
 .gh-flock { position: absolute; left: 0; animation: gh-fly linear infinite; }
 .gh-flock svg { display: block; width: 100%; height: auto; overflow: visible; }
-.gh-flock.far { top: 25cqh; width: 18cqw; animation-duration: 36s; animation-delay: -6s; opacity: .6; }
-.gh-flock.near { top: 15cqh; width: 34cqw; animation-duration: 21s; animation-delay: -9s; opacity: .95; }
+.gh-flock.far { top: 26cqh; width: 14cqw; animation-duration: 40s; animation-delay: -6s; opacity: .35; }
+.gh-flock.near { top: 18cqh; width: 22cqw; animation-duration: 26s; animation-delay: -9s; opacity: .5; }
 @keyframes gh-fly {
   0% { transform: translate(-30cqw, 0); } 50% { transform: translate(50cqw, -3cqh); } 100% { transform: translate(130cqw, 1cqh); }
 }
-.golden-scene .gh-bird { fill: none; stroke: #1e0d07; stroke-width: .8; stroke-linecap: round; transform-box: fill-box; transform-origin: 50% 100%; animation: gh-flap .42s ease-in-out infinite alternate; }
+.golden-scene .gh-bird { fill: none; stroke: #7a4a30; stroke-width: .7; stroke-linecap: round; transform-box: fill-box; transform-origin: 50% 100%; animation: gh-flap .42s ease-in-out infinite alternate; }
 @keyframes gh-flap { from { transform: scaleY(1); } to { transform: scaleY(-.5); } }
 .gh-leaves { position: absolute; inset: 0; }
 .gh-leaf { position: absolute; width: 0; height: 0; animation: gh-blow linear infinite; }
 .gh-leaf i { position: absolute; width: 13px; height: 7px; border-radius: 0 100% 0 100%; animation: gh-tumble ease-in-out infinite alternate; }
-.gh-leaf i.h0 { background: #b4471a; } .gh-leaf i.h1 { background: #e8962e; } .gh-leaf i.h2 { background: #5e2410; }
+.gh-leaf i.h0 { background: #d9773a; } .gh-leaf i.h1 { background: #eda548; } .gh-leaf i.h2 { background: #b85a2a; }
 @keyframes gh-blow {
   0% { transform: translate(0, 0); opacity: 0; }
   6% { opacity: 1; }
@@ -727,14 +716,13 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 }
 @keyframes gh-tumble { from { rotate: -40deg; scale: 1 1; } to { rotate: 220deg; scale: 1 -.4; } }
 .gh-haze { position: absolute; inset: 0; background:
-  radial-gradient(80% 40% at 64% 66%, rgba(255, 236, 190, .3), transparent 70%),
-  radial-gradient(140% 100% at 50% 45%, transparent 55%, rgba(60, 20, 20, .4)); }
+  radial-gradient(70% 35% at 64% 64%, rgba(255, 244, 220, .35), transparent 70%); }
 @media (prefers-reduced-motion: reduce) { .golden-scene * { animation: none !important; } }
 
 /* warm frosted glass over the sunset */
 :root[data-skin="golden"] .page[aria-label="Page A"] .btn:not(.empty),
 .theme-art[data-skin="golden"] .mini-dot {
-  background: rgba(255, 240, 220, .3);
+  background: rgba(255, 249, 240, .5);
   -webkit-backdrop-filter: blur(12px) saturate(1.4); backdrop-filter: blur(12px) saturate(1.4);
   border: 1px solid rgba(255, 255, 255, .55);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .85), inset 0 -10px 22px -14px rgba(229, 128, 31, .45), 0 14px 30px -12px rgba(140, 60, 20, .45);
