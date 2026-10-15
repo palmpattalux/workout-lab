@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from 'react'
 import { sound } from '../lib/sound'
+import { getPreview, previewBlocked } from '../lib/theme'
 
 const HOLD_MS = 280
 const SCROLL_MS = 130
@@ -46,7 +47,7 @@ export default function HoldPicker({ options, visible, side = 'above', instant, 
     setOffset(nextOffset)
     setLocal(nextLocal)
     if (nextOffset + nextLocal !== before) {
-      onChange?.(nextOffset + nextLocal)
+      if (!getPreview()) onChange?.(nextOffset + nextLocal)
       sound.tick()
     }
   }
@@ -67,7 +68,7 @@ export default function HoldPicker({ options, visible, side = 'above', instant, 
     pos.current = { offset: 0, local: 0 }
     setOffset(0)
     setLocal(0)
-    onChange?.(0)
+    if (!getPreview()) onChange?.(0)
     sound.pop()
   }
 
@@ -118,6 +119,8 @@ export default function HoldPicker({ options, visible, side = 'above', instant, 
     const picked = ruler ? pos.current.offset + pos.current.local : null
     const held = !!timer.current
     cancel()
+    // trying a theme on: the drag can be felt, but nothing is set
+    if (getPreview()) { if (picked !== null) previewBlocked(); return }
     if (picked !== null) onPick(picked)
     else if (instant || held) onTap?.()
   }

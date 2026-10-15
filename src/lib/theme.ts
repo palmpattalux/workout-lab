@@ -12,8 +12,9 @@ export const THEMES: (Theme | null)[] = [
 let preview: string | null = null
 const listeners = new Set<() => void>()
 
-// Taps allowed while previewing: moving between pages, and the preview bar itself.
-const NAV = '.preview-bar, .themes, #a2, .gear, .settings, .dot.filled, .home-back, [aria-label="Back"], .book [role="tab"], .book .box, .session-row'
+// Taps allowed while previewing: moving between pages, the preview bar, and the drag
+// controls (which can be felt, but set nothing: see HoldPicker/HoldMenu and dot drags).
+const NAV = '.holdable, .preview-bar, .themes, #a2, .gear, .settings, .dot.filled, .home-back, [aria-label="Back"], .book [role="tab"], .book .box, .session-row'
 let nudge: (() => void) | null = null
 function guard(e: Event) {
   if (!preview) return
@@ -27,6 +28,7 @@ for (const type of ['pointerdown', 'click', 'touchstart', 'keydown', 'input', 'c
   document.addEventListener(type, guard, { capture: true, passive: false })
 }
 export function onBlockedTap(fn: () => void) { nudge = fn }
+export function previewBlocked() { nudge?.() }
 
 export function setPreview(key: string | null) {
   preview = key

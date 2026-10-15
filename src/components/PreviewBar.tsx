@@ -17,7 +17,7 @@ export default function PreviewBar() {
   return (
     <div className={`preview-bar${nudged ? ' nudge' : ''}`} key={nudged} role="status">
       <span className="pv-eye" aria-hidden="true" />
-      <span className="pv-text">{nudged ? 'Preview only, exit to use the app' : <>Trying <b>{name}</b></>}</span>
+      <span className="pv-text">{nudged ? 'Preview only, nothing is saved' : <>Trying <b>{name}</b></>}</span>
       <span className="pv-tag">Not owned</span>
       <button className="pv-exit" onClick={() => setPreview(null)}>Exit</button>
     </div>

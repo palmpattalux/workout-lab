@@ -1,5 +1,6 @@
 import { useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from 'react'
 import { sound } from '../lib/sound'
+import { getPreview, previewBlocked } from '../lib/theme'
 
 const HOLD_MS = 280
 const SIZE = 54 // px, each popped-up button
@@ -77,6 +78,7 @@ export default function HoldMenu({ items, onPick, onTap, className, style, ariaL
     const wasTap = timer.current !== null
     const picked = spots && hover !== null ? items[hover].key : null
     cancel()
+    if (getPreview()) { if (picked) previewBlocked(); return }
     if (picked) onPick(picked)
     else if (wasTap) onTap?.()
   }

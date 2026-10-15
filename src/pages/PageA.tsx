@@ -65,7 +65,6 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
     return { x: e.clientX - r.left, y: e.clientY - r.top, w: r.width, h: r.height }
   }
   function onDotDown(e: PointerEvent<HTMLButtonElement>, id: string) {
-    if (getPreview()) return // previewing a theme: dots can be opened, not moved
     press.current = { id, x: e.clientX, y: e.clientY, moved: false }
     e.currentTarget.setPointerCapture(e.pointerId)
   }
@@ -92,6 +91,8 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
     press.current = null
     if (!p?.moved) return
     justDragged.current = true
+    // trying a theme on: the dot can be dragged around, then glides back home
+    if (getPreview()) { setDrag(null); sound.tap(); return }
     const to = closest(pagePoint(e))
     const from = slotOf.get(p.id)
     const other = bySlot.get(to)
