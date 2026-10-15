@@ -1,9 +1,10 @@
 import { useState, type FormEvent } from 'react'
-import { signIn, signUp, resetPassword } from '../lib/auth'
+import { signIn, signUp, resetPassword, canResetPassword } from '../lib/auth'
 
-// Log in / sign up, shown on the public site to anyone not signed in.
+// Log in / sign up: the first screen for anyone not signed in. Once signed in,
+// the account is remembered until Log out (gear on page A).
 export default function LoginPage() {
-  const [mode, setMode] = useState<'login' | 'signup'>('login')
+  const [mode, setMode] = useState<'login' | 'signup'>(() => { try { return localStorage.getItem('workout-lab:accounts') ? 'login' : 'signup' } catch { return 'signup' } })
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
@@ -37,7 +38,7 @@ export default function LoginPage() {
   return (
     <main className="page scroll login" aria-label={isLogin ? 'Log in' : 'Sign up'}>
       <form className="login-form" onSubmit={submit}>
-        <h1>Workout Lab</h1>
+        <h1>Sidekick</h1>
         <p className="muted">{isLogin ? 'Log in to your notes.' : 'Make an account to keep your notes.'}</p>
 
         <input id="email" className="field" type="email" autoComplete="email" placeholder="Email" required
@@ -54,7 +55,7 @@ export default function LoginPage() {
           <button type="button" onClick={() => { setMode(isLogin ? 'signup' : 'login'); setError(null); setInfo(null) }}>
             {isLogin ? 'New here? Sign up' : 'Have an account? Log in'}
           </button>
-          {isLogin && <button type="button" onClick={forgot}>Forgot password</button>}
+          {isLogin && canResetPassword && <button type="button" onClick={forgot}>Forgot password</button>}
         </div>
       </form>
     </main>

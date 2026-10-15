@@ -460,6 +460,10 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 /* ---------- themes gallery (gear > Themes) ---------- */
 .themes { display: flex; flex-direction: column; }
 .themes .create-head h1 { font: 800 1.6rem var(--font); letter-spacing: -.03em; margin: 0; }
+.set-row.account { border-top: 1px solid var(--hair); padding-top: 10px; gap: 10px; }
+.set-row.account .who { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-weight: 500; font-size: .85rem; }
+.logout-btn { flex: none; border: 1px solid var(--line); background: none; color: var(--ink); font: 700 .82rem var(--font); padding: 7px 14px; border-radius: 999px; cursor: pointer; }
+.logout-btn:active { transform: scale(.95); }
 .themes-link { width: 100%; border: 0; background: none; color: var(--ink); cursor: pointer; padding-top: 4px; }
 .themes-link .chev { display: grid; color: var(--muted); transform: rotate(180deg); }
 .theme-track {

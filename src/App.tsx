@@ -37,7 +37,8 @@ function Screen() {
 
   // load the signed-in person's data (or this browser's, where there are no accounts)
   useEffect(() => {
-    if (user !== undefined) setScope(user?.id ?? null)
+    if (user) setScope(user.id)
+    // device accounts can't prove an email, so only online accounts are checked for ownership
     if (supabase && user !== undefined) checkOwnerEmail(user?.email)
   }, [user])
 
@@ -47,8 +48,8 @@ function Screen() {
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
 
-  if (supabase && user === undefined) return <main className="page" aria-busy="true" />
-  if (supabase && !user) return <LoginPage />
+  if (user === undefined) return <main className="page" aria-busy="true" />
+  if (!user) return <LoginPage />
 
   if (hash === 'themes') return <ThemesPage onViewed={() => location.replace('#')} />
   if (hash.startsWith('b-')) {

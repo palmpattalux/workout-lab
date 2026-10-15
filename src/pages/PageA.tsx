@@ -6,6 +6,7 @@ import { sound } from '../lib/sound'
 import { usePrefs, setPrefs } from '../lib/prefs'
 import { useSkin, getPreview } from '../lib/theme'
 import ThemeScene from '../components/ThemeScene'
+import { useEmail, signOut } from '../lib/auth'
 
 // Exercise dot positions, as % of the screen: low and toward the right, in easy reach of a
 // right thumb. The first four are always shown; the rest fill in as more workouts exist.
@@ -245,6 +246,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
     lastTap.current = now
   }
   const prefs = usePrefs()
+  const email = useEmail()
   const skin = useSkin()
 
   return (
@@ -412,6 +414,10 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
             <span>Themes</span>
             <span className="chev"><Icon name="back" size="18px" /></span>
           </button>
+          <div className="set-row account">
+            <span className="who">{email ?? 'Signed in'}</span>
+            <button className="logout-btn" onClick={() => { setSettingsOpen(false); signOut() }}>Log out</button>
+          </div>
         </div>
       )}
 
