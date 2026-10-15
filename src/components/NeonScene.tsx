@@ -9,12 +9,16 @@ function rng(seed: number) {
 // five neon hues: c1 cyan, c2 magenta, c3 violet, c4 amber, c5 mint
 type Win = { x: number; y: number; c: number; tw: boolean }
 type Tower = { x: number; w: number; top: number; neon: number; wins: Win[] }
-function skyline(seed: number, minH: number, maxH: number, neonShare: number, lit: number): Tower[] {
+function skyline(seed: number, minH: number, maxH: number, neonShare: number, lit: number, gap: number): Tower[] {
   const r = rng(seed * 7919 + 104729)
   const out: Tower[] = []
   let x = -6
   while (x < 406) {
-    const w = 16 + r() * 30, h = minH + r() * (maxH - minH), top = 200 - h
+    // mix of slim spires, mid towers and wide low blocks so the sizes contrast
+    const kind = r()
+    const w = kind < 0.3 ? 14 + r() * 8 : kind < 0.7 ? 26 + r() * 14 : 46 + r() * 22
+    const hf = kind < 0.3 ? 0.75 + r() * 0.25 : kind < 0.7 ? 0.35 + r() * 0.4 : 0.05 + r() * 0.25
+    const h = minH + hf * (maxH - minH), top = 200 - h
     const neon = r() < neonShare ? 1 + Math.floor(r() * 5) : 0
     // each tower has one window tint, with the odd stray colour
     const tint = [4, 4, 1, 3, 5, 2][Math.floor(r() * 6)]
@@ -25,12 +29,12 @@ function skyline(seed: number, minH: number, maxH: number, neonShare: number, li
       for (let c = 0; c < cols; c++)
         if (r() < lit) wins.push({ x: x + gx + c * 5, y, c: r() < 0.12 ? 1 + Math.floor(r() * 5) : tint, tw: r() < 0.04 })
     out.push({ x, w, top, neon, wins })
-    x += w + r() * 3
+    x += w + gap * (0.4 + r())
   }
   return out
 }
-const FAR = skyline(3, 50, 140, 0.2, 0.22)
-const NEAR = skyline(11, 26, 96, 0.24, 0.3)
+const FAR = skyline(3, 40, 160, 0.25, 0.22, 16)
+const NEAR = skyline(11, 18, 110, 0.3, 0.3, 26)
 
 const SIGNS = [{ x: 18, y: 50, h: 9, c: 1 }, { x: 44, y: 53, h: 5, c: 4 }, { x: 71, y: 47, h: 7, c: 2 }, { x: 86, y: 55, h: 6, c: 5 }, { x: 58, y: 49, h: 4, c: 3 }]
 const TRAILS = [{ y: 52, dur: 7, delay: -1, c: 1 }, { y: 57, dur: 11, delay: -6, c: 2 }, { y: 49, dur: 15, delay: -9, c: 4 }, { y: 54, dur: 13, delay: -3, c: 3 }]
