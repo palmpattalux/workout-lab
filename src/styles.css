@@ -659,85 +659,92 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 :root[data-skin="nightcity"] .page[aria-label="Page A"] .dot.empty { border-color: rgba(255, 255, 255, .14); }
 :root[data-skin="nightcity"] .page[aria-label="Page A"] .dot.armed { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), 0 0 0 1px rgba(240, 166, 60, .5), 0 0 30px -4px rgba(240, 166, 60, .55); }
 
-/* ---------- Golden Hour theme: always sunset ----------
-   Low sun through two cloud banks, hills in warm haze, a tree shedding leaves,
-   flocks crossing. Home-page controls turn to warm frosted glass. */
-:root[data-skin="golden"], .theme-art[data-skin="golden"] {
-  --bg: #e9b77a; --stage: #f7dfb8; --surface: #fff6e8; --sunk: #f6e3c6;
-  --ink: #3b2416; --muted: #8c6548; --hair: rgba(90, 50, 20, .08); --line: rgba(90, 50, 20, .16);
-  --lift: inset 0 1px 0 rgba(255, 255, 255, .8), 0 1px 2px rgba(120, 60, 20, .1), 0 10px 24px -12px rgba(150, 70, 20, .45);
-  --float: 0 1px 2px rgba(120, 60, 20, .12), 0 20px 44px -14px rgba(150, 70, 20, .5);
-  --sun: #e5801f; --active: #d4711a; --active-soft: #fde4c4;
+/* ---------- Redemption theme: hazy golden afternoon, painted soft ----------
+   Sun blooming behind a close tree trunk, foliage hanging in from the top, a big
+   soft cloud, a glowing field and dark leaves on the wind. Glass controls on top. */
+:root[data-skin="redemption"], .theme-art[data-skin="redemption"] {
+  --bg: #d9a95a; --stage: #f3d79a; --surface: #fff5df; --sunk: #f5e3bd;
+  --ink: #33281a; --muted: #85694a; --hair: rgba(80, 55, 20, .08); --line: rgba(80, 55, 20, .16);
+  --lift: inset 0 1px 0 rgba(255, 255, 255, .8), 0 1px 2px rgba(110, 70, 20, .1), 0 10px 24px -12px rgba(130, 80, 20, .45);
+  --float: 0 1px 2px rgba(110, 70, 20, .12), 0 20px 44px -14px rgba(130, 80, 20, .5);
+  --sun: #d9861c; --active: #c97a16; --active-soft: #fbe6c0;
   color-scheme: light;
 }
-.theme-art[data-skin="golden"] { color: var(--ink); }
-.golden-scene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
-.golden-scene svg * { stroke: none; }
-.gh-sky { position: absolute; inset: 0; background:
-  linear-gradient(200deg, #fff3dc 0%, #fbe4bc 30%, #f6d39c 55%, #efc283 75%, #e5b072 100%); }
-/* the sun is off-frame, top right: only its light spills in */
-.gh-light { position: absolute; inset: 0; background:
-  radial-gradient(60% 45% at 100% 0%, rgba(255, 252, 238, .95), rgba(255, 238, 200, .45) 45%, transparent 75%),
-  repeating-conic-gradient(from 200deg at 105% -5%, rgba(255, 248, 225, .18) 0 3deg, transparent 3deg 10deg);
-  -webkit-mask-image: radial-gradient(120% 100% at 100% 0%, #000 20%, transparent 80%); mask-image: radial-gradient(120% 100% at 100% 0%, #000 20%, transparent 80%);
-  animation: gh-breathe 8s ease-in-out infinite alternate; }
-@keyframes gh-breathe { from { opacity: .85; } to { opacity: 1; } }
-.gh-field { position: absolute; left: 0; right: 0; bottom: 0; height: 40cqh; filter: blur(1px); background:
-  linear-gradient(180deg, rgba(240, 200, 130, 0), #ecc27c 14%, #e2b064 40%, #d39d50 100%); }
-.gh-wheat { position: absolute; left: -2%; width: 104%; bottom: 0; height: auto; }
-.gh-wheat.mid { height: 44cqh; opacity: .9; }
-.gh-wheat.near { height: 60cqh; filter: blur(.9px); }
-.gh-wheat.mid .gh-stem { fill: none; stroke: #c99a4c; stroke-width: .55; }
-.gh-wheat.near .gh-stem { fill: none; stroke: #b88737; stroke-width: 1.1; }
-.gh-head { fill: #d9a24c; }
-.gh-head.lit { fill: #e8b964; }
-.gh-wheat.near .gh-head { fill: #c98d36; } .gh-wheat.near .gh-head.lit { fill: #ecbd62; }
-.gh-awn { fill: none; stroke: #e6bb6c; stroke-width: .35; stroke-linecap: round; }
-.golden-scene .gh-stem, .golden-scene .gh-awn { stroke-linecap: round; }
-.golden-scene .gh-wheat .gh-stem { stroke: #c99a4c; }
-.golden-scene .gh-wheat.near .gh-stem { stroke: #b88737; }
-.golden-scene .gh-awn { stroke: #e6bb6c; }
-.gh-sway { transform-box: fill-box; transform-origin: 50% 100%; animation: gh-sway 5s ease-in-out infinite alternate; }
-.gh-sway.s1 { animation-duration: 6.2s; animation-delay: -2s; } .gh-sway.s2 { animation-duration: 4.4s; animation-delay: -3.5s; }
-.gh-wheat.near .gh-sway { animation-name: gh-sway-near; }
-@keyframes gh-sway { from { transform: skewX(-2.5deg); } to { transform: skewX(3deg); } }
-@keyframes gh-sway-near { from { transform: skewX(-4deg); } to { transform: skewX(5deg); } }
-.gh-canopy { position: absolute; left: -4%; top: -1cqh; width: 108%; height: auto; filter: blur(.6px) drop-shadow(0 6px 10px rgba(120, 80, 20, .18)); }
-.golden-scene .gh-wood { fill: none; stroke: #5d4526; stroke-width: 3.2; stroke-linecap: round; }
-.golden-scene .gh-wood.thin { stroke-width: 1.4; }
-.gh-branch { transform-box: view-box; animation: gh-branch 6s ease-in-out infinite alternate; }
-@keyframes gh-branch { from { transform: rotate(-1.2deg); } to { transform: rotate(1.4deg); } }
-.gh-motes { position: absolute; inset: 0; }
-.gh-motes i { position: absolute; border-radius: 50%; background: #fffbe8; box-shadow: 0 0 6px 2px rgba(255, 245, 210, .8); opacity: 0; animation: gh-mote ease-in-out infinite; }
-@keyframes gh-mote { 0% { transform: translate(0, 0); opacity: 0; } 20% { opacity: .9; } 80% { opacity: .6; } 100% { transform: translate(8cqw, -14cqh); opacity: 0; } }
-.gh-flock { position: absolute; left: 0; top: 30cqh; width: 14cqw; opacity: .35; animation: gh-fly 40s linear infinite -12s; }
-.gh-flock svg { display: block; width: 100%; height: auto; overflow: visible; }
-@keyframes gh-fly { 0% { transform: translate(-30cqw, 0); } 50% { transform: translate(50cqw, -3cqh); } 100% { transform: translate(130cqw, 1cqh); } }
-.golden-scene .gh-bird { fill: none; stroke: #7a4a30; stroke-width: .7; stroke-linecap: round; transform-box: fill-box; transform-origin: 50% 100%; animation: gh-flap .42s ease-in-out infinite alternate; }
-@keyframes gh-flap { from { transform: scaleY(1); } to { transform: scaleY(-.5); } }
-.gh-leaves { position: absolute; inset: 0; }
-.gh-leaf { position: absolute; width: 0; height: 0; animation: gh-blow linear infinite; }
-.gh-leaf i { position: absolute; width: 13px; height: 7px; border-radius: 0 100% 0 100%; animation: gh-tumble ease-in-out infinite alternate; }
-.gh-leaf i.h0 { background: #9a8f3e; } .gh-leaf i.h1 { background: #e0a446; } .gh-leaf i.h2 { background: #c27a34; }
-@keyframes gh-blow {
+.theme-art[data-skin="redemption"] { color: var(--ink); }
+.redemption-scene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.redemption-scene svg * { stroke: none; }
+.rd-sky { position: absolute; inset: 0; background:
+  linear-gradient(180deg, #f2d9a6 0%, #f6dd9c 25%, #f4cf7e 45%, #eeba5c 60%, #e3a548 70%, #d79a44 100%); }
+.rd-haze { position: absolute; inset: 0; background:
+  radial-gradient(60% 25% at 30% 30%, rgba(255, 246, 220, .55), transparent 70%),
+  radial-gradient(70% 20% at 60% 52%, rgba(255, 236, 190, .5), transparent 70%),
+  radial-gradient(50% 18% at 20% 58%, rgba(250, 220, 160, .45), transparent 70%);
+  filter: blur(8px); animation: rd-haze 40s ease-in-out infinite alternate; }
+@keyframes rd-haze { from { transform: translateX(-4%); } to { transform: translateX(4%); } }
+.rd-cloud { position: absolute; border-radius: 50%; filter: blur(9px); }
+.rd-cloud.big { right: -8cqw; top: 15cqh; width: 70cqw; height: 16cqh; background:
+  radial-gradient(35% 55% at 30% 55%, #fffaf0 0 40%, transparent 72%),
+  radial-gradient(30% 60% at 55% 40%, #fffcf4 0 45%, transparent 75%),
+  radial-gradient(35% 50% at 78% 60%, #fff6e4 0 38%, transparent 72%),
+  radial-gradient(60% 40% at 50% 85%, rgba(250, 226, 180, .9), transparent 75%);
+  animation: rd-cloud 60s ease-in-out infinite alternate; }
+.rd-cloud.small { left: 18cqw; top: 8cqh; width: 40cqw; height: 8cqh; opacity: .6; background:
+  radial-gradient(50% 60% at 40% 50%, #fff8ea, transparent 75%); animation: rd-cloud 48s ease-in-out infinite alternate-reverse; }
+@keyframes rd-cloud { from { transform: translateX(-5cqw); } to { transform: translateX(4cqw); } }
+.rd-sun { position: absolute; left: 14cqw; top: 24cqh; width: 75cqw; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%;
+  background: radial-gradient(circle, #fffef6 0 18%, rgba(255, 246, 210, .85) 34%, rgba(255, 228, 160, .35) 58%, transparent 72%);
+  animation: rd-bloom 7s ease-in-out infinite alternate; }
+@keyframes rd-bloom { from { opacity: .85; transform: translate(-50%, -50%) scale(.96); } to { opacity: 1; transform: translate(-50%, -50%) scale(1.04); } }
+.rd-beam { position: absolute; left: 12cqw; top: 22cqh; width: 120cqw; height: 26cqh; transform-origin: 0 0; transform: rotate(14deg);
+  background: linear-gradient(180deg, transparent, rgba(255, 248, 225, .32) 35%, rgba(255, 248, 225, .18) 55%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, #000, transparent 85%); mask-image: linear-gradient(90deg, #000, transparent 85%);
+  filter: blur(6px); animation: rd-beam 9s ease-in-out infinite alternate; }
+@keyframes rd-beam { from { opacity: .55; } to { opacity: 1; } }
+.rd-field { position: absolute; left: 0; right: 0; bottom: 0; height: 40cqh; background:
+  linear-gradient(180deg, rgba(255, 236, 190, 0), rgba(255, 238, 196, .95) 4%, #ecbd6c 12%, #d99a43 35%, #c98634 70%, #b97a2e 100%); filter: blur(1.5px); }
+.rd-grass { position: absolute; left: 0; width: 100%; bottom: 0; }
+.rd-grass.far { height: 34cqh; fill: #b97d30; filter: blur(.5px); opacity: .85; }
+.rd-grass.far .lit { fill: #f3cd7a; }
+.rd-grass.near { height: 22cqh; fill: #a96f27; filter: blur(1.4px); }
+.rd-grass.near .lit { fill: #dca350; }
+.rd-wave { transform-box: fill-box; transform-origin: 50% 100%; animation: rd-wave 5.5s ease-in-out infinite alternate; }
+.rd-wave.near { animation-duration: 4.2s; animation-delay: -1.5s; }
+@keyframes rd-wave { from { transform: skewX(-3deg); } to { transform: skewX(3.5deg); } }
+/* the close trunk on the left, soft with distance-of-field, rim-lit by the sun */
+.rd-trunk { position: absolute; left: -2cqw; top: -2cqh; bottom: -2cqh; width: 11cqw; filter: blur(2.2px);
+  background: linear-gradient(90deg, #2a1f14 0%, #3a2b1a 55%, #6b4a26 82%, rgba(214, 160, 80, .6) 100%);
+  border-radius: 0 40% 0 0 / 0 6% 0 0; }
+.rd-trunk i { position: absolute; inset: 0; background: repeating-linear-gradient(180deg, transparent 0 22px, rgba(0, 0, 0, .12) 22px 26px); mix-blend-mode: multiply; }
+.rd-canopy { position: absolute; left: -2%; top: -3cqh; width: 104%; height: auto; filter: blur(1.3px); }
+.rd-rustle { transform-box: view-box; transform-origin: 50% 0; animation: rd-rustle 6s ease-in-out infinite alternate; }
+@keyframes rd-rustle { from { transform: rotate(-.6deg) translateY(0); } to { transform: rotate(.7deg) translateY(1.5px); } }
+.rd-sparks { position: absolute; inset: 0; }
+.rd-sparks i { position: absolute; border-radius: 50%; background: #fffbe6; box-shadow: 0 0 6px 2px rgba(255, 240, 200, .85); opacity: 0; animation: rd-spark ease-in-out infinite; }
+@keyframes rd-spark { 0% { transform: translate(0, 0); opacity: 0; } 25% { opacity: .95; } 75% { opacity: .5; } 100% { transform: translate(10cqw, -16cqh); opacity: 0; } }
+.rd-leaves { position: absolute; inset: 0; }
+.rd-leaf { position: absolute; width: 0; height: 0; animation: rd-blow linear infinite; }
+.rd-leaf i { position: absolute; border-radius: 0 100% 0 100%; background: #8a6a36; animation: rd-tumble ease-in-out infinite alternate; filter: blur(.3px); }
+.rd-leaf i.dark { background: #3e3420; }
+@keyframes rd-blow {
   0% { transform: translate(0, 0); opacity: 0; }
-  6% { opacity: 1; }
-  30% { transform: translate(28cqw, calc(var(--drop) * .2)); }
-  55% { transform: translate(55cqw, calc(var(--drop) * .7)); }
-  80% { transform: translate(82cqw, calc(var(--drop) * .55)); opacity: 1; }
-  100% { transform: translate(112cqw, var(--drop)); opacity: 0; }
+  6% { opacity: .9; }
+  35% { transform: translate(34cqw, calc(var(--drop) * .25)); }
+  60% { transform: translate(62cqw, calc(var(--drop) * .7)); }
+  85% { transform: translate(90cqw, calc(var(--drop) * .6)); opacity: .9; }
+  100% { transform: translate(115cqw, var(--drop)); opacity: 0; }
 }
-@keyframes gh-tumble { from { rotate: -40deg; scale: 1 1; } to { rotate: 220deg; scale: 1 -.4; } }
-.gh-glow { position: absolute; inset: 0; background:
-  radial-gradient(140% 100% at 70% 30%, transparent 60%, rgba(150, 95, 30, .18)); }
-@media (prefers-reduced-motion: reduce) { .golden-scene * { animation: none !important; } }
+@keyframes rd-tumble { from { rotate: -50deg; scale: 1 1; } to { rotate: 230deg; scale: 1 -.35; } }
+.rd-grade { position: absolute; inset: 0; background:
+  radial-gradient(130% 90% at 25% 25%, transparent 50%, rgba(120, 80, 25, .22)),
+  linear-gradient(180deg, rgba(255, 240, 210, .12), transparent 40%); }
+@media (prefers-reduced-motion: reduce) { .redemption-scene * { animation: none !important; } }
 
-/* warm frosted glass over the sunset */
-:root[data-skin="golden"] .page[aria-label="Page A"] .btn:not(.empty),
-.theme-art[data-skin="golden"] .mini-dot {
-  background: rgba(255, 249, 240, .5);
-  -webkit-backdrop-filter: blur(12px) saturate(1.4); backdrop-filter: blur(12px) saturate(1.4);
+/* warm frosted glass over the field */
+:root[data-skin="redemption"] .page[aria-label="Page A"] .btn:not(.empty),
+.theme-art[data-skin="redemption"] .mini-dot {
+  background: rgba(255, 249, 236, .42);
+  -webkit-backdrop-filter: blur(12px) saturate(1.3); backdrop-filter: blur(12px) saturate(1.3);
   border: 1px solid rgba(255, 255, 255, .55);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .85), inset 0 -10px 22px -14px rgba(229, 128, 31, .45), 0 14px 30px -12px rgba(140, 60, 20, .45);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .85), inset 0 -10px 22px -14px rgba(217, 134, 28, .4), 0 14px 30px -12px rgba(120, 70, 20, .4);
 }
-:root[data-skin="golden"] .page[aria-label="Page A"] .dot.empty { border-color: rgba(90, 40, 15, .25); }
+:root[data-skin="redemption"] .page[aria-label="Page A"] .dot.empty { border-color: rgba(80, 50, 15, .25); }
