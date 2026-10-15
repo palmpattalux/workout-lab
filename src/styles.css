@@ -665,34 +665,38 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
   --ink: #ecebf5; --muted: #8b88a3; --hair: rgba(255, 255, 255, .07); --line: rgba(255, 255, 255, .12);
   --lift: inset 0 1px 0 rgba(255, 255, 255, .07), 0 1px 2px rgba(0, 0, 0, .5), 0 12px 26px -12px rgba(0, 0, 0, .9);
   --float: 0 1px 2px rgba(0, 0, 0, .6), 0 22px 46px -14px rgba(0, 0, 0, .95);
-  --ne-a: #3be8ff; --ne-b: #ff4fb3;
+  --ne-a: #3be8ff; --ne-b: #ff4fb3; --ne-c: #a374ff; --ne-d: #ffb44d; --ne-e: #5dffb4;
   --sun: #ff4fb3; --active: #3be8ff; --active-soft: #0f2a33;
   color-scheme: dark;
 }
 .theme-art[data-skin="neon"] { color: var(--ink); }
 .neon-scene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; background: var(--stage); }
 .neon-scene svg * { stroke: none; }
-.ne-sky { position: absolute; inset: 0; background: linear-gradient(180deg, #06050d 0%, #0b0920 40%, #1a0f33 58%, #08070f 72%); }
+.ne-sky { position: absolute; inset: 0; background: linear-gradient(180deg, #05060f 0%, #0a0b26 26%, #1d0f3c 44%, #3a1240 54%, #1a0c2a 62%, #08070f 72%); }
 .ne-horizon { position: absolute; left: -10%; right: -10%; top: 50cqh; height: 18cqh; filter: blur(18px);
-  background: radial-gradient(50% 50% at 50% 50%, rgba(255, 79, 179, .35), transparent 70%), radial-gradient(40% 40% at 30% 60%, rgba(59, 232, 255, .18), transparent 70%);
+  background: radial-gradient(50% 50% at 50% 50%, rgba(255, 79, 179, .38), transparent 70%), radial-gradient(40% 40% at 22% 60%, rgba(59, 232, 255, .22), transparent 70%), radial-gradient(35% 40% at 78% 55%, rgba(255, 180, 77, .22), transparent 70%), radial-gradient(45% 50% at 60% 30%, rgba(163, 116, 255, .25), transparent 70%);
   animation: ne-breathe 8s ease-in-out infinite alternate; }
 @keyframes ne-breathe { from { opacity: .7; } to { opacity: 1; } }
 .ne-layer { position: absolute; left: -4%; width: 108%; bottom: 31cqh; height: 34cqh; }
 .ne-layer.far { fill: #120f22; opacity: .9; height: 40cqh; }
 .ne-layer.near { fill: #07060e; bottom: 31cqh; height: 26cqh; }
 .neon-scene .ne-edge { fill: none; stroke-width: 1.2; stroke-linecap: square; }
-.neon-scene .ne-edge.c1 { stroke: var(--ne-a); filter: drop-shadow(0 0 3px var(--ne-a)); }
-.neon-scene .ne-edge.c2 { stroke: var(--ne-b); filter: drop-shadow(0 0 3px var(--ne-b)); }
+.neon-scene .c1 { --n: var(--ne-a); } .neon-scene .c2 { --n: var(--ne-b); } .neon-scene .c3 { --n: var(--ne-c); }
+.neon-scene .c4 { --n: var(--ne-d); } .neon-scene .c5 { --n: var(--ne-e); }
+.neon-scene .ne-edge { stroke: var(--n); filter: drop-shadow(0 0 3px var(--n)); }
+.ne-wins rect { fill: var(--n); opacity: .5; }
+.ne-layer.far .ne-wins rect { opacity: .28; }
+.ne-wins rect.tw { animation: ne-tw 9s steps(1) infinite; }
+@keyframes ne-tw { 0%, 100% { opacity: .55; } 40% { opacity: .05; } 70% { opacity: .55; } }
 .ne-layer.far .ne-edge { opacity: .55; }
 .ne-trail { position: absolute; left: 0; width: 22cqw; height: 1.5px; border-radius: 2px; opacity: .8; animation: ne-trail linear infinite; }
-.ne-trail.c1 { background: linear-gradient(90deg, transparent, var(--ne-a)); box-shadow: 0 0 8px var(--ne-a); }
-.ne-trail.c2 { background: linear-gradient(270deg, transparent, var(--ne-b)); box-shadow: 0 0 8px var(--ne-b); animation-direction: reverse; }
+.ne-trail { background: linear-gradient(90deg, transparent, var(--n)); box-shadow: 0 0 8px var(--n); }
+.ne-trail.rev { background: linear-gradient(270deg, transparent, var(--n)); animation-direction: reverse; }
 @keyframes ne-trail { from { transform: translateX(-30cqw); } to { transform: translateX(130cqw); } }
 .ne-sign { position: absolute; width: 3px; border-radius: 2px; animation: ne-flicker 7s steps(1) infinite; }
-.ne-sign.c1 { background: var(--ne-a); box-shadow: 0 0 10px 1px var(--ne-a); }
-.ne-sign.c2 { background: var(--ne-b); box-shadow: 0 0 10px 1px var(--ne-b); }
+.ne-sign { background: var(--n); box-shadow: 0 0 10px 1px var(--n); }
 @keyframes ne-flicker { 0%, 100% { opacity: .95; } 61% { opacity: .2; } 63% { opacity: .95; } 65% { opacity: .3; } 67% { opacity: .95; } }
-.ne-floor { position: absolute; left: 0; right: 0; bottom: 0; height: 31cqh; overflow: hidden; background: linear-gradient(180deg, #140c26, #050409);
+.ne-floor { position: absolute; left: 0; right: 0; bottom: 0; height: 31cqh; overflow: hidden; background: linear-gradient(180deg, #24103a, #0d0820 45%, #050409);
   -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, .5), #000 40%); mask-image: linear-gradient(180deg, rgba(0, 0, 0, .5), #000 40%); }
 .ne-rays { position: absolute; inset: 0; width: 100%; height: 100%; }
 .neon-scene .ne-rays path { fill: none; stroke: rgba(255, 79, 179, .38); stroke-width: .6; vector-effect: non-scaling-stroke; }
