@@ -8,11 +8,12 @@ import { useSession, switchTo, goToSet, record, endSession, discardSession } fro
 const MAX_SET = 5
 const repOptions = Array.from({ length: 25 }, (_, i) => ({ key: String(i + 1), node: i + 1 }))
 
-export default function PageB({ workout, workouts, onGo, onHome }: {
+export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
   workout: Workout | null
   workouts: Workout[]
   onGo: (id: string) => void
   onHome: () => void
+  onEnded: (sessionId: string) => void
 }) {
   const session = useSession()
   const id = workout?.id ?? null
@@ -68,7 +69,7 @@ export default function PageB({ workout, workouts, onGo, onHome }: {
             <p>End session?</p>
             <div>
               <button onClick={() => setConfirmEnd(false)}>No</button>
-              <button className="yes" onClick={() => { endSession(); setConfirmEnd(false) }}>Yes</button>
+              <button className="yes" onClick={() => { const sid = endSession(); setConfirmEnd(false); if (sid) onEnded(sid) }}>Yes</button>
             </div>
             <button className="cancel-session" onClick={() => { discardSession(); setConfirmEnd(false) }}>Cancel session, record nothing</button>
           </div>

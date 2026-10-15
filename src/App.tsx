@@ -3,6 +3,7 @@ import PageA from './pages/PageA'
 import PageB from './pages/PageB'
 import CreatePage from './pages/CreatePage'
 import BookPage from './pages/BookPage'
+import SummaryPage from './pages/SummaryPage'
 import LoginPage from './pages/LoginPage'
 import { useWorkouts, setScope } from './lib/store'
 import { supabase, useUser } from './lib/auth'
@@ -14,6 +15,7 @@ import { switchTo } from './lib/session'
 //   b-<key>     page B for a workout (or an empty dot)
 //   new         create page (only while a draft exists)
 //   edit-<id>   edit page for a workout
+//   summary-<id> the summary shown right after a session ends
 //   book        book list, book-<id> one workout, sessions = all sessions
 function go(hash: string) {
   location.hash = hash
@@ -41,7 +43,10 @@ export default function App() {
 
   if (hash.startsWith('b-')) {
     const key = hash.slice(2)
-    return <PageB key={key} workout={workouts.find((w) => w.id === key) ?? null} workouts={workouts} onGo={(id) => location.replace('#b-' + id)} onHome={() => go('')} />
+    return <PageB key={key} workout={workouts.find((w) => w.id === key) ?? null} workouts={workouts} onGo={(id) => location.replace('#b-' + id)} onHome={() => go('')} onEnded={(sid) => location.replace('#summary-' + sid)} />
+  }
+  if (hash.startsWith('summary-')) {
+    return <SummaryPage key={hash} id={hash.slice(8)} workouts={workouts} onDone={() => location.replace('#')} />
   }
   if (hash === 'new' && draft) {
     return (

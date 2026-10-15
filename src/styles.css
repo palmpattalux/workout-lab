@@ -407,3 +407,40 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 
 /* page B: throw a session away instead of ending it */
 .confirm .cancel-session { display: block; width: 100%; height: auto; margin-top: 10px; padding: 8px 0 2px; background: none; border: 0; color: #d9480f; font: 700 .88rem var(--font); }
+
+/* session summary, right after ending a session */
+.summary { padding-bottom: 130px; }
+.sum-head { padding: 34px 7% 8px; display: flex; flex-direction: column; gap: 4px; animation: rise .5s var(--ease) both; }
+.sum-kicker { margin: 0; font: 800 .7rem var(--font); letter-spacing: .14em; text-transform: uppercase; color: var(--active); }
+.sum-num { margin: 0; font: 800 4.2rem/1 var(--font); letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
+.sum-when { margin: 2px 0 0; color: var(--muted); font-size: .92rem; }
+.sum-totals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 18px; }
+.sum-totals div { padding: 12px 14px; border-radius: 18px; background: var(--sunk); display: flex; flex-direction: column; gap: 2px; }
+.sum-totals b { font: 800 1.5rem var(--font); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.sum-totals span { font-size: .78rem; color: var(--muted); font-weight: 600; }
+.sum-list { list-style: none; margin: 0; padding: 14px 5.7% 0; display: flex; flex-direction: column; gap: 10px; }
+.sum-card {
+  padding: 16px; border-radius: 22px; background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--lift);
+  animation: card-in .55s var(--ease) var(--in-delay, 0s) both, gain-glow 1.4s ease-out var(--glow-delay, 0s) both;
+}
+.sum-card:not(.gain) { animation: card-in .55s var(--ease) var(--in-delay, 0s) both; }
+@keyframes card-in { from { opacity: 0; transform: translateY(16px) scale(.98); } }
+@keyframes gain-glow {
+  0%, 100% { box-shadow: var(--lift); }
+  25% { box-shadow: var(--lift), 0 0 0 2px color-mix(in srgb, var(--sun) 60%, transparent), 0 0 26px 2px color-mix(in srgb, var(--sun) 40%, transparent); }
+}
+.sum-ex { margin: 0 0 12px; display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.02rem; }
+.sum-ex .nm { flex: 1; text-align: left; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sum-ex small { color: var(--muted); font-weight: 600; font-size: .8rem; }
+.sum-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sum-stat { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 16px; background: var(--sunk); }
+.sum-stat .lbl { font-size: .7rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.sum-stat b { font: 800 2rem/1.1 var(--font); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.sum-stat b small { font-size: .9rem; font-weight: 700; color: var(--muted); margin-left: 3px; letter-spacing: 0; }
+.sum-stat b.move { font-size: 1rem; line-height: 1.3; overflow-wrap: anywhere; }
+.delta { align-self: flex-start; margin-top: 4px; padding: 3px 9px; border-radius: 999px; font: 800 .75rem var(--font); animation: delta-in .45s cubic-bezier(.3,1.5,.5,1) both; }
+.delta.up { background: color-mix(in srgb, var(--sun) 18%, transparent); color: color-mix(in srgb, var(--sun) 80%, var(--ink)); }
+.delta.down { background: var(--surface); color: var(--muted); }
+.delta.same, .delta.new { background: var(--surface); color: var(--muted); }
+@keyframes delta-in { from { opacity: 0; transform: scale(.4); } }
+@media (prefers-reduced-motion: reduce) { .sum-head, .sum-card, .delta { animation: none; } }

@@ -41,15 +41,17 @@ export function record(field: keyof SetEntry, value: number) {
   set({ ...active, sets: { ...active.sets, [w]: { ...active.sets[w], [n]: entry } } })
 }
 
-export function endSession() {
-  if (!active) return
+export function endSession(): string | null {
+  if (!active) return null
   const snap: NonNullable<Session['snap']> = {}
   for (const w of getWorkouts()) {
     if (!active.order.includes(w.id)) continue
     snap[w.id] = { exercise: w.exercise, icon: w.icon, letter: w.letter, mode: w.mode, unit: w.unit, move: w.progressions?.at(-1) }
   }
+  const id = active.id
   saveSession({ ...active, endedAt: Date.now(), snap })
   set(null)
+  return id
 }
 
 // Throw the running session away without saving it.
