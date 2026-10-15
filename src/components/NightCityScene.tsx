@@ -1,48 +1,103 @@
-// Night City theme backdrop, built like Sakura's: a moon with drifting cloud wisps in
-// the corner, a low skyline over wet street, and a light drizzle that lands on the
-// street in small ripples. Purely decorative.
-const DROPS = [
-  { x: 10, land: 89, dur: 2.1, delay: 0 }, { x: 24, land: 92, dur: 2.5, delay: -1.3 },
-  { x: 37, land: 94, dur: 2.2, delay: -0.6 }, { x: 51, land: 95, dur: 2.7, delay: -2.0 },
-  { x: 63, land: 88, dur: 2.0, delay: -1.6 }, { x: 74, land: 90, dur: 2.4, delay: -0.3 },
-  { x: 86, land: 92, dur: 2.3, delay: -1.0 }, { x: 95, land: 93, dur: 2.6, delay: -2.3 },
-  { x: 45, land: 91, dur: 2.9, delay: -0.9 },
-]
-// skyline: [x, width, height] in a 400 × 80 box, plus windows that are lit
-const TOWERS: [number, number, number][] = [
-  [0, 34, 34], [30, 22, 52], [50, 40, 28], [88, 26, 64], [112, 18, 44], [128, 46, 36], [172, 24, 72],
-  [194, 30, 48], [222, 44, 30], [264, 20, 58], [282, 36, 40], [316, 26, 66], [340, 34, 34], [372, 28, 50],
-]
-const LIT: [number, number][] = [[94, 24], [101, 34], [178, 18], [184, 30], [178, 42], [270, 30], [322, 22], [329, 36], [36, 36], [200, 40], [378, 38]]
+// Night City: a gothic noir skyline in three depths. Far towers fade into fog, a
+// searchlight sweeps the clouds, lightning now and then lights the sky behind the
+// spires, rain falls in two depths and lamp light smears across the wet street.
+// The layers sway at different speeds, so the city feels deep. Purely decorative.
+
+// small deterministic random, so the city is the same every time
+function rng(seed: number) {
+  return () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646 }
+}
+
+type Tower = { d: string; windows: { x: number; y: number; lit: boolean; delay: number }[] }
+
+// One layer of towers across a 400-wide box, `base` tall, with gothic tops.
+function city(seed: number, minH: number, maxH: number, withWindows: boolean, litShare: number): Tower[] {
+  const r = rng(seed)
+  const out: Tower[] = []
+  let x = -10
+  while (x < 410) {
+    const w = 14 + r() * 26
+    const h = minH + r() * (maxH - minH)
+    const top = 200 - h
+    const kind = r()
+    let d = `M${x} 200 V${top} `
+    if (kind < 0.28) {
+      // spire with a narrow shoulder
+      const s = w * 0.22
+      d += `H${x + s} L${x + w / 2} ${top - 18 - r() * 26} L${x + w - s} ${top} H${x + w} `
+    } else if (kind < 0.5) {
+      // twin pinnacles
+      d += `L${x + w * 0.18} ${top - 10} L${x + w * 0.36} ${top} H${x + w * 0.64} L${x + w * 0.82} ${top - 10} L${x + w} ${top} `
+    } else if (kind < 0.68) {
+      // stepped crown
+      d += `H${x + w * 0.2} V${top - 6} H${x + w * 0.35} V${top - 12} H${x + w * 0.65} V${top - 6} H${x + w * 0.8} V${top} H${x + w} `
+    } else if (kind < 0.8) {
+      // gable
+      d += `L${x + w / 2} ${top - w * 0.45} L${x + w} ${top} `
+    } else {
+      // flat with a mast
+      const m = x + w * (0.3 + r() * 0.4)
+      d += `H${m - 0.8} V${top - 14 - r() * 10} H${m + 0.8} V${top} H${x + w} `
+    }
+    d += 'V200 Z'
+    const windows: Tower['windows'] = []
+    if (withWindows) {
+      for (let wy = top + 8; wy < 196; wy += 9) {
+        for (let wx = x + 4; wx < x + w - 5; wx += 6) {
+          if (r() < litShare) windows.push({ x: wx, y: wy, lit: r() < 0.85, delay: r() * 20 })
+        }
+      }
+    }
+    out.push({ d, windows })
+    x += w - 2 + r() * 6
+  }
+  return out
+}
+
+const FAR = city(7, 70, 170, false, 0)
+const MID = city(31, 40, 115, true, 0.12)
+const NEAR = city(97, 16, 70, true, 0.08)
+
+const RAIN = Array.from({ length: 34 }, (_, i) => {
+  const r = rng(i * 131 + 17)
+  const near = i % 3 === 0
+  return { x: r() * 110 - 5, near, dur: near ? 0.55 + r() * 0.2 : 0.9 + r() * 0.4, delay: -r() * 2 }
+})
+const LAMPS = [12, 34, 58, 81]
+
+function Layer({ towers, className, span }: { towers: Tower[]; className: string; span: number }) {
+  return (
+    <svg className={`nc-layer ${className}`} viewBox={`${(400 - span) / 2} 0 ${span} 200`} preserveAspectRatio="xMidYMax meet">
+      {towers.map((t, i) => <path key={i} d={t.d} />)}
+      {towers.flatMap((t, i) => t.windows.map((w, j) => (
+        <rect key={`${i}-${j}`} x={w.x} y={w.y} width="2.4" height="3.4" className={w.lit ? 'nc-win' : 'nc-win off'} style={{ animationDelay: `${-w.delay}s` }} />
+      )))}
+    </svg>
+  )
+}
 
 export default function NightCityScene() {
   return (
     <div className="nightcity-scene" aria-hidden="true">
-      <svg className="nc-moon" viewBox="0 0 200 140">
-        <circle cx="128" cy="58" r="30" className="nc-moon-disc" />
-        <circle cx="140" cy="50" r="27" className="nc-moon-cut" />
-        <g className="nc-clouds">
-          <rect x="60" y="70" width="110" height="5" rx="2.5" />
-          <rect x="96" y="80" width="90" height="4" rx="2" />
-          <rect x="44" y="88" width="70" height="3.5" rx="1.75" />
-        </g>
-      </svg>
+      <div className="nc-sky" />
+      <div className="nc-moon"><i /></div>
+      <div className="nc-veil" />
+      <div className="nc-flash" />
+      <div className="nc-beam" />
+      <Layer towers={FAR} className="far" span={250} />
+      <div className="nc-fog one" />
+      <Layer towers={MID} className="mid" span={310} />
+      <div className="nc-fog two" />
+      <Layer towers={NEAR} className="near" span={400} />
       <div className="nc-street">
-        <svg className="nc-skyline" viewBox="0 0 400 80" preserveAspectRatio="none">
-          {TOWERS.map(([x, w, h], i) => <rect key={i} x={x} y={80 - h} width={w + 1} height={h} className="nc-tower" />)}
-          {LIT.map(([x, y], i) => <rect key={i} x={x} y={y} width="3" height="4" className="nc-lit" style={{ animationDelay: `${-i * 1.7}s` }} />)}
-        </svg>
-        <div className="nc-wet" />
+        {LAMPS.map((x) => <i key={x} style={{ left: `${x}%`, animationDelay: `${-x / 10}s` }} />)}
       </div>
-      {DROPS.map((d, i) => {
-        const vars = { ['--x' as string]: `${d.x}%`, ['--land' as string]: `${d.land}cqh`, animationDuration: `${d.dur}s`, animationDelay: `${d.delay}s` }
-        return (
-          <span key={i}>
-            <i className="nc-drop" style={vars} />
-            <i className="nc-ripple" style={vars} />
-          </span>
-        )
-      })}
+      <div className="nc-rain">
+        {RAIN.map((d, i) => (
+          <i key={i} className={d.near ? 'near' : undefined} style={{ left: `${d.x}%`, animationDuration: `${d.dur}s`, animationDelay: `${d.delay}s` }} />
+        ))}
+      </div>
+      <div className="nc-vignette" />
     </div>
   )
 }
