@@ -9,29 +9,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
     <style>
       /* opening screen: shows before the app's own code arrives */
-      #splash { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: #f3f4f2; transition: opacity .5s ease, transform .6s cubic-bezier(.2,.8,.2,1); }
-      :root[data-mode="dark"] #splash { background: #121514; }
-      @media (prefers-color-scheme: dark) { :root:not([data-mode="light"]) #splash { background: #121514; } }
+      #splash { --sp-bg: #f3f4f2; --sp-ink: #1b201d; position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: var(--sp-bg); transition: opacity .5s ease, transform .6s cubic-bezier(.2,.8,.2,1); }
+      :root[data-mode="dark"] #splash { --sp-bg: #121514; --sp-ink: #e9ece9; }
+      @media (prefers-color-scheme: dark) { :root:not([data-mode="light"]) #splash { --sp-bg: #121514; --sp-ink: #e9ece9; } }
       #splash.out { opacity: 0; transform: scale(1.04); pointer-events: none; }
-      .sp-brand { display: flex; align-items: center; gap: 4px; }
-      .sp-word { font: 800 2.6rem "Manrope", system-ui, sans-serif; letter-spacing: -.045em; color: #b3215b; animation: sp-word .8s cubic-bezier(.2,.8,.2,1) .25s both; }
-      :root[data-mode="dark"] .sp-word { color: #ff8fb1; }
-      @media (prefers-color-scheme: dark) { :root:not([data-mode="light"]) .sp-word { color: #ff8fb1; } }
-      #splash .sp-flower { width: 76px; height: 76px; overflow: visible; margin-top: -14px; stroke: none; }
-      .sp-stem { fill: none; stroke: #3d9a5f; stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 32; stroke-dashoffset: 32; animation: sp-draw .6s ease-out .1s forwards; }
-      .sp-leaf { fill: #4cb878; transform-box: fill-box; transform: scale(0); animation: sp-pop .5s cubic-bezier(.3,1.5,.5,1) forwards; }
-      .sp-leaf.l { transform-origin: 100% 100%; animation-delay: .45s; }
-      .sp-leaf.r { transform-origin: 0% 100%; animation-delay: .55s; }
-      .sp-bloom { transform-box: view-box; transform-origin: 32px 30px; animation: sp-sway 3.2s ease-in-out 1.6s infinite; }
-      .p { transform-box: view-box; transform-origin: 32px 24px; transform: scale(0); animation: sp-pop .7s cubic-bezier(.3,1.45,.5,1) forwards; }
-      .p.o { fill: url(#sp-petal); }
-      .p.i { fill: url(#sp-inner); }
-      .sp-core { fill: #ffc94d; transform-box: fill-box; transform-origin: center; transform: scale(0); animation: sp-pop .45s cubic-bezier(.3,1.6,.5,1) 1.4s forwards; }
-      @keyframes sp-draw { to { stroke-dashoffset: 0; } }
-      @keyframes sp-pop { to { transform: scale(1); } }
+      .sp-brand { display: flex; align-items: center; gap: 10px; }
+      .sp-word { font: 800 2.6rem "Manrope", system-ui, sans-serif; letter-spacing: -.045em; color: var(--sp-ink); animation: sp-word .8s cubic-bezier(.2,.8,.2,1) .2s both; }
+      #splash .sp-flower { width: 52px; height: 52px; overflow: visible; stroke: var(--sp-ink); stroke-width: 1.5; stroke-linejoin: round; }
+      .sp-bloom { transform-box: view-box; transform-origin: 32px 24px; animation: sp-turn 6s ease-in-out 1.5s infinite; }
+      .p { transform-box: view-box; transform-origin: 32px 24px; transform: scale(0) rotate(-30deg); animation: sp-pop .8s cubic-bezier(.3,1.35,.5,1) forwards; }
+      .p.o { fill: var(--sp-bg); }
+      .p.i { fill: color-mix(in srgb, var(--sp-ink) 12%, var(--sp-bg)); }
+      .sp-core { fill: var(--sp-ink); stroke: none; transform-box: fill-box; transform-origin: center; transform: scale(0); animation: sp-core .45s cubic-bezier(.3,1.6,.5,1) 1.15s forwards; }
+      @keyframes sp-pop { to { transform: scale(1) rotate(0); } }
+      @keyframes sp-core { to { transform: scale(1); } }
       @keyframes sp-word { from { opacity: 0; transform: translateX(14px); filter: blur(4px); } }
-      @keyframes sp-sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
-      @media (prefers-reduced-motion: reduce) { .sp-stem, .sp-leaf, .p, .sp-core, .sp-word, .sp-bloom { animation: none; transform: none; stroke-dashoffset: 0; } }
+      @keyframes sp-turn { 0%, 100% { transform: rotate(-4deg) scale(1); } 50% { transform: rotate(4deg) scale(1.03); } }
+      @media (prefers-reduced-motion: reduce) { .p, .sp-core, .sp-word, .sp-bloom { animation: none; transform: none; } }
     </style>
     <script>
       // apply the saved light/dark choice before anything paints
@@ -45,15 +39,8 @@
     <div id="splash" aria-label="Lipstick, loading">
       <div class="sp-brand">
         <span class="sp-word">Lipstick</span>
-        <svg class="sp-flower" viewBox="0 0 64 64" aria-hidden="true">
-          <defs>
-            <radialGradient id="sp-petal" cx="50%" cy="85%" r="90%"><stop offset="0" stop-color="#ff8fb1"/><stop offset=".55" stop-color="#e64980"/><stop offset="1" stop-color="#b3215b"/></radialGradient>
-            <radialGradient id="sp-inner" cx="50%" cy="90%" r="90%"><stop offset="0" stop-color="#ffd6e3"/><stop offset="1" stop-color="#f06595"/></radialGradient>
-          </defs>
-          <path class="sp-stem" d="M32 63c0-10-2.5-18 0-30"/>
-          <path class="sp-leaf l" d="M31.2 50c-6-1-10.5-4.5-12-9.5 5.5-.5 10 2.5 12 9.5z"/>
-          <path class="sp-leaf r" d="M31.6 44c5.5-.5 9.5-3.5 11-8-5-.5-9 2-11 8z"/>
-          <g class="sp-bloom"><g transform="rotate(0 32 24)"><ellipse class="p o" style="animation-delay:0.70s" cx="32" cy="13.5" rx="6.2" ry="10.5"/></g><g transform="rotate(45 32 24)"><ellipse class="p o" style="animation-delay:0.75s" cx="32" cy="13.5" rx="6.2" ry="10.5"/></g><g transform="rotate(90 32 24)"><ellipse class="p o" style="animation-delay:0.80s" cx="32" cy="13.5" rx="6.2" ry="10.5"/></g><g transform="rotate(135 32 24)"><ellipse class="p o" style="animation-delay:0.85s" cx="32" cy="13.5" rx="6.2" ry="10.5"/></g><g transform="rotate(180 32 24)"><ellipse class="p o" style="animation-delay:0.90s" cx="32" cy="13.5" rx="6.2" ry="10.5"/></g><g transform="rotate(225 32 24)"><ellipse class="p o" style="animation-delay:0.95s" cx="32" cy="13.5" rx="6.2" ry="10.5"/></g><g transform="rotate(270 32 24)"><ellipse class="p o" style="animation-delay:1.00s" cx="32" cy="13.5" rx="6.2" ry="10.5"/></g><g transform="rotate(315 32 24)"><ellipse class="p o" style="animation-delay:1.05s" cx="32" cy="13.5" rx="6.2" ry="10.5"/></g><g transform="rotate(36 32 24)"><ellipse class="p i" style="animation-delay:1.10s" cx="32" cy="17.5" rx="4.2" ry="7"/></g><g transform="rotate(108 32 24)"><ellipse class="p i" style="animation-delay:1.16s" cx="32" cy="17.5" rx="4.2" ry="7"/></g><g transform="rotate(180 32 24)"><ellipse class="p i" style="animation-delay:1.22s" cx="32" cy="17.5" rx="4.2" ry="7"/></g><g transform="rotate(252 32 24)"><ellipse class="p i" style="animation-delay:1.28s" cx="32" cy="17.5" rx="4.2" ry="7"/></g><g transform="rotate(324 32 24)"><ellipse class="p i" style="animation-delay:1.34s" cx="32" cy="17.5" rx="4.2" ry="7"/></g><circle class="sp-core" cx="32" cy="24" r="3.6"/></g>
+        <svg class="sp-flower" viewBox="10 2 44 44" aria-hidden="true">
+          <g class="sp-bloom"><g transform="rotate(0 32 24)"><ellipse class="p o" style="animation-delay:0.25s" cx="32" cy="13.5" rx="6.2" ry="10.5"/></g><g transform="rotate(45 32 24)"><ellipse class="p o" style="animation-delay:0.30s" cx="32" cy="13.5" rx="6.2" ry="10.5"/></g><g transform="rotate(90 32 24)"><ellipse class="p o" style="animation-delay:0.35s" cx="32" cy="13.5" rx="6.2" ry="10.5"/></g><g transform="rotate(135 32 24)"><ellipse class="p o" style="animation-delay:0.40s" cx="32" cy="13.5" rx="6.2" ry="10.5"/></g><g transform="rotate(180 32 24)"><ellipse class="p o" style="animation-delay:0.45s" cx="32" cy="13.5" rx="6.2" ry="10.5"/></g><g transform="rotate(225 32 24)"><ellipse class="p o" style="animation-delay:0.50s" cx="32" cy="13.5" rx="6.2" ry="10.5"/></g><g transform="rotate(270 32 24)"><ellipse class="p o" style="animation-delay:0.55s" cx="32" cy="13.5" rx="6.2" ry="10.5"/></g><g transform="rotate(315 32 24)"><ellipse class="p o" style="animation-delay:0.60s" cx="32" cy="13.5" rx="6.2" ry="10.5"/></g><g transform="rotate(36 32 24)"><ellipse class="p i" style="animation-delay:0.65s" cx="32" cy="17.5" rx="4.2" ry="7"/></g><g transform="rotate(108 32 24)"><ellipse class="p i" style="animation-delay:0.71s" cx="32" cy="17.5" rx="4.2" ry="7"/></g><g transform="rotate(180 32 24)"><ellipse class="p i" style="animation-delay:0.77s" cx="32" cy="17.5" rx="4.2" ry="7"/></g><g transform="rotate(252 32 24)"><ellipse class="p i" style="animation-delay:0.83s" cx="32" cy="17.5" rx="4.2" ry="7"/></g><g transform="rotate(324 32 24)"><ellipse class="p i" style="animation-delay:0.89s" cx="32" cy="17.5" rx="4.2" ry="7"/></g><circle class="sp-core" cx="32" cy="24" r="3.6"/></g>
         </svg>
       </div>
     </div>
