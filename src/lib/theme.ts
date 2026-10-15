@@ -7,7 +7,8 @@ export const THEME_SLOTS = 15
 export const THEMES: (Theme | null)[] = [
   { key: 'sakura', name: 'Sakura', blurb: 'Blossom branches, petals drifting onto still water.' },
   { key: 'nightcity', name: 'Night City', blurb: 'A gothic skyline in the rain. Searchlights, fog, the odd flash of lightning.' },
-  ...Array.from({ length: THEME_SLOTS - 2 }, () => null),
+  { key: 'golden', name: 'Golden Hour', blurb: 'A gold sunset through the clouds. Leaves on the wind, birds heading home.' },
+  ...Array.from({ length: THEME_SLOTS - 3 }, () => null),
 ]
 
 let preview: string | null = null
