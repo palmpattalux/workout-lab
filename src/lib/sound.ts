@@ -53,7 +53,7 @@ function buzz(ms: number) {
 
 // A short burst of filtered noise: paper, swords, impacts (Manga theme).
 let noiseBuf: AudioBuffer | null = null
-function noise(dur: number, gain: number, type: BiquadFilterType, from: number, to: number, at = 0) {
+function noise(dur: number, gain: number, type: BiquadFilterType, from: number, to: number, at = 0, q = 0.9) {
   const c = audio()
   if (!c || c.state !== 'running') return
   if (!noiseBuf) {
@@ -67,7 +67,7 @@ function noise(dur: number, gain: number, type: BiquadFilterType, from: number, 
   const g = c.createGain()
   src.buffer = noiseBuf
   f.type = type
-  f.Q.value = 0.9
+  f.Q.value = q
   f.frequency.setValueAtTime(from, t)
   f.frequency.exponentialRampToValueAtTime(to, t + dur)
   g.gain.setValueAtTime(0.0001, t)
@@ -84,7 +84,8 @@ export const sound = {
   tick() { tone(2200, 1700, 0.018, 0.1, 'triangle'); buzz(4) },
   // Manga theme
   flip() { noise(0.16, 0.22, 'bandpass', 900, 3600); noise(0.1, 0.12, 'bandpass', 2400, 1200, 0.12) },
-  slash() { noise(0.13, 0.12, 'highpass', 1800, 6500); tone(2900, 2700, 0.32, 0.025, 'sine') },
+  // a blade cutting the air (a fast swish rising in pitch), then the bite of the cut
+  slash() { noise(0.2, 0.26, 'bandpass', 420, 3800, 0, 0.6); noise(0.06, 0.2, 'highpass', 5200, 2600, 0.16, 0.7); noise(0.12, 0.08, 'bandpass', 1800, 900, 0.18, 1.5) },
   bubble() { tone(420, 880, 0.09, 0.08, 'sine') },
   impact() { tone(140, 42, 0.32, 0.3, 'sine'); noise(0.18, 0.16, 'lowpass', 1400, 200); buzz(18) },
 }
