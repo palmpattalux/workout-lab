@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { t } from './i18n'
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined
 const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
@@ -75,11 +76,11 @@ function failedTry() {
 
 async function localSignIn(email: string, password: string) {
   const wait = lockedFor()
-  if (wait) return `Too many tries. Wait ${Math.ceil(wait / 1000)} seconds, then try again.`
+  if (wait) return t('Too many tries. Wait {n} seconds, then try again.', { n: Math.ceil(wait / 1000) })
   const acc = read<Record<string, Account>>(ACCOUNTS, {})[email.toLowerCase()]
   if (!acc || (await digest(acc.salt + password)) !== acc.hash) {
     const left = failedTry()
-    return left > 0 ? `That email and password don't match an account. ${left} ${left === 1 ? 'try' : 'tries'} left.` : 'Too many tries. Wait 30 seconds, then try again.'
+    return left > 0 ? `${t("That email and password don't match an account.")} ${left === 1 ? t('1 try left.') : t('{n} tries left.', { n: left })}` : t('Too many tries. Wait {n} seconds, then try again.', { n: 30 })
   }
   write(TRIES, null)
   setMe({ id: acc.id, email: email.toLowerCase() })
@@ -88,7 +89,7 @@ async function localSignIn(email: string, password: string) {
 async function localSignUp(email: string, password: string) {
   const all = read<Record<string, Account>>(ACCOUNTS, {})
   const k = email.toLowerCase()
-  if (all[k]) return 'There is already an account with that email. Log in instead.'
+  if (all[k]) return t('There is already an account with that email. Log in instead.')
   const salt = crypto.randomUUID()
   all[k] = { id: crypto.randomUUID(), salt, hash: await digest(salt + password) }
   write(ACCOUNTS, all)
@@ -122,11 +123,11 @@ export function useEmail(): string | null {
 // Supabase's raw messages, in plainer words where they're unclear.
 function friendly(msg?: string | null) {
   if (!msg) return null
-  if (/fetch|network/i.test(msg)) return "Can't reach the server. Check your connection and try again."
-  if (/invalid login/i.test(msg)) return 'That email and password don\'t match an account.'
-  if (/not confirmed/i.test(msg)) return 'Verify your email first: open the link we sent you, then log in.'
-  if (/rate limit|too many/i.test(msg)) return 'Too many emails sent. Wait a minute, then try again.'
-  if (/already registered/i.test(msg)) return 'There is already an account with that email. Log in instead.'
+  if (/fetch|network/i.test(msg)) return t("Can't reach the server. Check your connection and try again.")
+  if (/invalid login/i.test(msg)) return t("That email and password don't match an account.")
+  if (/not confirmed/i.test(msg)) return t('Verify your email first: open the link we sent you, then log in.')
+  if (/rate limit|too many/i.test(msg)) return t('Too many emails sent. Wait a minute, then try again.')
+  if (/already registered/i.test(msg)) return t('There is already an account with that email. Log in instead.')
   return msg
 }
 

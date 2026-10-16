@@ -4,11 +4,12 @@ import HoldPicker from '../components/HoldPicker'
 import HoldMenu from '../components/HoldMenu'
 import { updateWorkout, type Workout } from '../lib/store'
 import { useSession, switchTo, goToSet, record, endSession, discardSession } from '../lib/session'
+import { t } from '../lib/i18n'
 
 const MAX_SET = 5
 const repOptions = Array.from({ length: 25 }, (_, i) => ({ key: String(i + 1), node: i + 1 }))
 // timed holds: 5 s steps up to 3 minutes
-const secOptions = Array.from({ length: 36 }, (_, i) => ({ key: String((i + 1) * 5), node: (i + 1) * 5, label: `${(i + 1) * 5} sec` }))
+const secOptions = Array.from({ length: 36 }, (_, i) => ({ key: String((i + 1) * 5), node: (i + 1) * 5, label: t('{n} sec', { n: (i + 1) * 5 }) }))
 
 export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
   workout: Workout | null
@@ -57,41 +58,41 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
   return (
     <main className="page" aria-label="Page B">
       <div className="tabs">
-        <button className={`btn pill${session ? ' live' : ''}`} id="b1" aria-label={session ? 'Session active, tap to end' : 'No session'} onClick={() => session && setConfirmEnd(true)}>
-          <span className="led" />Active
+        <button className={`btn pill${session ? ' live' : ''}`} id="b1" aria-label={session ? t('Active session: tap to end') : t('Active')} onClick={() => session && setConfirmEnd(true)}>
+          <span className="led" />{t('Active')}
         </button>
-        <button className="btn pill" id="b2" aria-label="Notes (B2)">Notes</button>
+        <button className="btn pill" id="b2" aria-label={t('Notes')}>{t('Notes')}</button>
       </div>
 
-      <button className="icon-btn home-back" aria-label="Back to home" onClick={onHome}>
+      <button className="icon-btn home-back" aria-label={t('Back to home')} onClick={onHome}>
         <Icon name="arrowLeft" size="24px" />
       </button>
 
       {confirmEnd && (
         <div className="scrim" onClick={(e) => { if (e.target === e.currentTarget) setConfirmEnd(false) }}>
-          <div className="confirm" role="alertdialog" aria-label="End session?">
-            <p>End session?</p>
+          <div className="confirm" role="alertdialog" aria-label={t('End session?')}>
+            <p>{t('End session?')}</p>
             <div>
-              <button onClick={() => setConfirmEnd(false)}>No</button>
-              <button className="yes" onClick={() => { const sid = endSession(); setConfirmEnd(false); if (sid) onEnded(sid) }}>Yes</button>
+              <button onClick={() => setConfirmEnd(false)}>{t('No')}</button>
+              <button className="yes" onClick={() => { const sid = endSession(); setConfirmEnd(false); if (sid) onEnded(sid) }}>{t('Yes')}</button>
             </div>
-            <button className="cancel-session" onClick={() => { discardSession(); setConfirmEnd(false) }}>Cancel session, record nothing</button>
+            <button className="cancel-session" onClick={() => { discardSession(); setConfirmEnd(false) }}>{t('Cancel session, record nothing')}</button>
           </div>
         </div>
       )}
 
       {workout?.focus && (
-        <p className="focus-reminder"><span>Focus</span>{workout.focus}</p>
+        <p className="focus-reminder"><span>{t('Focus')}</span>{workout.focus}</p>
       )}
 
       {/* set number, only while a session is running */}
       {inSession && (
         <>
           <button className="set-num" aria-label={`Set ${set}, tap to choose`} aria-expanded={setsOpen} onClick={() => setSetsOpen(!setsOpen)}>
-            <small>set</small>{set}
+            <small>{t('set')}</small>{set}
           </button>
           {setsOpen && (
-            <div className="set-menu" role="listbox" aria-label="Choose set">
+            <div className="set-menu" role="listbox" aria-label={t('Choose set')}>
               {Array.from({ length: MAX_SET }, (_, i) => i + 1).map((n) => (
                 <button key={n} role="option" aria-selected={n === set} className={n === set ? 'on' : undefined}
                   onClick={() => { goToSet(n); setSetsOpen(false) }}>{n}</button>
@@ -102,12 +103,12 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
       )}
 
       {inSession && set > 1 && (
-        <button className="btn circle big" style={{ left: '14.9%', top: '43.2%' }} aria-label="Previous set" onClick={() => goToSet(set - 1)}>
+        <button className="btn circle big" style={{ left: '14.9%', top: '43.2%' }} aria-label={t('Previous set')} onClick={() => goToSet(set - 1)}>
           <Icon name="arrowLeft" />
         </button>
       )}
       {set < MAX_SET && (
-        <button className="btn circle big" style={{ left: '85.1%', top: '43.2%' }} aria-label="Next set" onClick={() => inSession && goToSet(set + 1)}>
+        <button className="btn circle big" style={{ left: '85.1%', top: '43.2%' }} aria-label={t('Next set')} onClick={() => inSession && goToSet(set + 1)}>
           <Icon name="arrowRight" />
         </button>
       )}
@@ -116,7 +117,7 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
       {isProgression ? (
         <>
           {(workout.progressions?.length ?? 0) > 0 && (
-            <ul className="moves" aria-label="Progressions">
+            <ul className="moves" aria-label={t('Progressions')}>
               {workout.progressions!.slice(-4).map((m, i) => <li key={i}>{m}</li>)}
             </ul>
           )}
@@ -125,8 +126,8 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
           </button>
           {adding && (
             <form className="move-form" onSubmit={(e) => { e.preventDefault(); addMove() }}>
-              <input id="move" autoFocus placeholder="New move" value={move} onChange={(e) => setMove(e.target.value)} />
-              <button type="submit">Add</button>
+              <input id="move" autoFocus placeholder={t('New move')} value={move} onChange={(e) => setMove(e.target.value)} />
+              <button type="submit">{t('Add')}</button>
             </form>
           )}
         </>
@@ -157,14 +158,14 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
         style={{ left: '69%', top: '64.1%' }}
         ariaLabel={`${timed ? 'Seconds' : 'Reps'} (B4)${reps ? `: ${reps}` : ''}, drag up to set`}
       >
-        {reps ? <span className="val">{reps}{timed && <small>sec</small>}</span> : timed ? <span className="unit-label">sec</span> : <Icon name="numbers" />}
+        {reps ? <span className="val">{reps}{timed && <small>{t('sec')}</small>}</span> : timed ? <span className="unit-label">{t('sec')}</span> : <Icon name="numbers" />}
       </HoldPicker>
 
       {/* pen: hold to pick an exercise and start/continue a session; tap to end the session */}
       <HoldMenu
         items={workouts.map((w) => ({
           key: w.id,
-          label: w.exercise || 'Untitled',
+          label: w.exercise || t('Untitled'),
           current: w.id === id,
           node: <WorkoutMark icon={w.icon} letter={w.letter} size="1.1em" />,
         }))}

@@ -345,7 +345,7 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .session-detail { padding: 12px 16px 14px; display: flex; flex-direction: column; gap: 12px; border-top: 1px solid var(--hair); }
 .ex-name { margin: 0 0 4px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
 .session-detail ul, .past-row ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; font-variant-numeric: tabular-nums; }
-.session-detail li span, .past-row li span { display: inline-block; width: 4em; color: var(--muted); font-size: .85rem; }
+.session-detail li span, .past-row li span { display: inline-block; min-width: 4em; margin-right: .5em; white-space: nowrap; color: var(--muted); font-size: .85rem; }
 .past { display: flex; flex-direction: column; gap: 12px; }
 .past h2 { margin: 0; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--active); }
 .past-row { border-top: 1px solid var(--hair); padding-top: 10px; display: flex; flex-direction: column; gap: 4px; }
@@ -459,6 +459,12 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .delta.same, .delta.new { background: var(--surface); color: var(--muted); }
 @keyframes delta-in { from { opacity: 0; transform: scale(.4); } }
 @media (prefers-reduced-motion: reduce) { .sum-head, .sum-card, .delta { animation: none; } }
+/* session history: the same chips, still */
+.delta.static { animation: none; margin-top: 0; }
+.delta.static.down, .delta.static.same, .delta.static.new { background: var(--sunk); }
+.session-detail .changes { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 8px; }
+.gain-badge { flex: none; margin-left: auto; padding: 3px 9px; border-radius: 999px; font: 800 .75rem var(--font);
+  background: color-mix(in srgb, var(--sun) 18%, transparent); color: color-mix(in srgb, var(--sun) 80%, var(--ink)); }
 
 /* ---------- themes gallery (gear > Themes) ---------- */
 .themes { display: flex; flex-direction: column; }
@@ -585,7 +591,7 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 }
 @media (prefers-reduced-motion: reduce) { .sk-fall, .sk-ripple, .sk-water, .pv-eye { animation: none; } }
 
-/* ---------- Night City theme: its own look, always night ----------
+/* ---------- Night City theme: its own look. Dark = night, light = dawn ----------
    Gothic skyline in three depths, fog, searchlight, lightning, rain, wet street.
    Home-page controls turn to smoked glass so the city shows through them. */
 :root[data-skin="nightcity"], .theme-art[data-skin="nightcity"] {
@@ -666,6 +672,83 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 }
 :root[data-skin="nightcity"] .page[aria-label="Page A"] .dot.empty { border-color: rgba(255, 255, 255, .14); }
 :root[data-skin="nightcity"] .page[aria-label="Page A"] .dot.armed { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), 0 0 0 1px rgba(240, 166, 60, .5), 0 0 30px -4px rgba(240, 166, 60, .55); }
+
+/* Night City by day: dawn, the sun about to rise behind the towers (light mode) */
+.nc-sun { position: absolute; left: 50%; bottom: 33cqh; width: 46cqw; aspect-ratio: 1; transform: translate(-50%, 50%); border-radius: 50%; opacity: 0;
+  background: radial-gradient(circle, #fff3dc 0 22%, #ffd39a 34%, rgba(255, 170, 110, .55) 50%, transparent 70%);
+  animation: nc-rise 16s ease-in-out infinite alternate; }
+@keyframes nc-rise { from { transform: translate(-50%, 54%); } to { transform: translate(-50%, 44%); } }
+:root[data-skin="nightcity"][data-mode="light"], :root[data-mode="light"] .theme-art[data-skin="nightcity"] {
+  --bg: #e6e1e3; --stage: #eee8e6; --surface: #fbf8f6; --sunk: #ede6e3;
+  --ink: #1e1d27; --muted: #6d6a77; --hair: rgba(30, 25, 40, .08); --line: rgba(30, 25, 40, .14);
+  --lift: inset 0 1px 0 rgba(255, 255, 255, .8), 0 1px 2px rgba(40, 30, 50, .08), 0 10px 22px -12px rgba(40, 30, 50, .3);
+  --lift-press: inset 0 1px 0 rgba(255, 255, 255, .6), 0 1px 1px rgba(40, 30, 50, .12);
+  --float: 0 1px 2px rgba(40, 30, 50, .1), 0 18px 36px -14px rgba(40, 30, 50, .35);
+  --sun: #de7438; --active: #de7438; --active-soft: #f8e1d1; --stripe: rgba(40, 30, 50, .03);
+  color-scheme: light;
+}
+:root[data-skin="nightcity"][data-mode="light"] .nc-sky, :root[data-mode="light"] .theme-art[data-skin="nightcity"] .nc-sky { background:
+  radial-gradient(90% 45% at 50% 78%, rgba(255, 196, 140, .85), transparent 70%),
+  linear-gradient(180deg, #4b5874 0%, #8a8ea8 30%, #c9a7ae 52%, #f2bf9e 66%, #f6d2b2 78%, #e8c2a8 100%); }
+:root[data-skin="nightcity"][data-mode="light"] .nc-sun, :root[data-mode="light"] .theme-art[data-skin="nightcity"] .nc-sun { opacity: 1; }
+:root[data-skin="nightcity"][data-mode="light"] .nc-moon, :root[data-mode="light"] .theme-art[data-skin="nightcity"] .nc-moon { opacity: .32; box-shadow: none; }
+:root[data-skin="nightcity"][data-mode="light"] .nc-veil, :root[data-mode="light"] .theme-art[data-skin="nightcity"] .nc-veil { opacity: .45; background: radial-gradient(40% 30% at 30% 50%, rgba(120, 110, 140, .55), transparent 70%), radial-gradient(35% 22% at 70% 35%, rgba(140, 120, 150, .5), transparent 70%); }
+:root[data-skin="nightcity"][data-mode="light"] .nc-flash, :root[data-mode="light"] .theme-art[data-skin="nightcity"] .nc-flash { display: none; }
+:root[data-skin="nightcity"][data-mode="light"] .nc-beam, :root[data-mode="light"] .theme-art[data-skin="nightcity"] .nc-beam { opacity: .25; }
+:root[data-skin="nightcity"][data-mode="light"] .nc-layer.far, :root[data-mode="light"] .theme-art[data-skin="nightcity"] .nc-layer.far { fill: #8a7f97; }
+:root[data-skin="nightcity"][data-mode="light"] .nc-layer.mid, :root[data-mode="light"] .theme-art[data-skin="nightcity"] .nc-layer.mid { fill: #4c4660; }
+:root[data-skin="nightcity"][data-mode="light"] .nc-layer.near, :root[data-mode="light"] .theme-art[data-skin="nightcity"] .nc-layer.near { fill: #221f2e; }
+:root[data-skin="nightcity"][data-mode="light"] .nc-win, :root[data-mode="light"] .theme-art[data-skin="nightcity"] .nc-win { opacity: .55; }
+:root[data-skin="nightcity"][data-mode="light"] .nc-win.off, :root[data-mode="light"] .theme-art[data-skin="nightcity"] .nc-win.off { fill: #3a3550; opacity: .5; }
+:root[data-skin="nightcity"][data-mode="light"] .nc-fog, :root[data-mode="light"] .theme-art[data-skin="nightcity"] .nc-fog { background: radial-gradient(50% 50% at 50% 50%, rgba(255, 214, 190, .45), transparent 70%); }
+:root[data-skin="nightcity"][data-mode="light"] .nc-street, :root[data-mode="light"] .theme-art[data-skin="nightcity"] .nc-street { background: linear-gradient(180deg, #2a2536, #15131c), repeating-linear-gradient(180deg, transparent 0 6px, rgba(255, 220, 190, .05) 6px 7px); }
+:root[data-skin="nightcity"][data-mode="light"] .nc-street i, :root[data-mode="light"] .theme-art[data-skin="nightcity"] .nc-street i { background: linear-gradient(180deg, rgba(255, 180, 120, .45), rgba(255, 180, 120, 0)); }
+:root[data-skin="nightcity"][data-mode="light"] .nc-rain i, :root[data-mode="light"] .theme-art[data-skin="nightcity"] .nc-rain i { opacity: .12; }
+:root[data-skin="nightcity"][data-mode="light"] .nc-rain i.near, :root[data-mode="light"] .theme-art[data-skin="nightcity"] .nc-rain i.near { opacity: .18; }
+:root[data-skin="nightcity"][data-mode="light"] .nc-vignette, :root[data-mode="light"] .theme-art[data-skin="nightcity"] .nc-vignette { background: radial-gradient(130% 90% at 50% 40%, transparent 60%, rgba(60, 40, 60, .22)); }
+@media (prefers-color-scheme: light) {
+  :root[data-skin="nightcity"]:not([data-mode="dark"]), :root:not([data-mode="dark"]) .theme-art[data-skin="nightcity"] {
+    --bg: #e6e1e3; --stage: #eee8e6; --surface: #fbf8f6; --sunk: #ede6e3;
+    --ink: #1e1d27; --muted: #6d6a77; --hair: rgba(30, 25, 40, .08); --line: rgba(30, 25, 40, .14);
+    --lift: inset 0 1px 0 rgba(255, 255, 255, .8), 0 1px 2px rgba(40, 30, 50, .08), 0 10px 22px -12px rgba(40, 30, 50, .3);
+    --lift-press: inset 0 1px 0 rgba(255, 255, 255, .6), 0 1px 1px rgba(40, 30, 50, .12);
+    --float: 0 1px 2px rgba(40, 30, 50, .1), 0 18px 36px -14px rgba(40, 30, 50, .35);
+    --sun: #de7438; --active: #de7438; --active-soft: #f8e1d1; --stripe: rgba(40, 30, 50, .03);
+    color-scheme: light;
+  }
+  :root[data-skin="nightcity"]:not([data-mode="dark"]) .nc-sky, :root:not([data-mode="dark"]) .theme-art[data-skin="nightcity"] .nc-sky { background:
+  radial-gradient(90% 45% at 50% 78%, rgba(255, 196, 140, .85), transparent 70%),
+  linear-gradient(180deg, #4b5874 0%, #8a8ea8 30%, #c9a7ae 52%, #f2bf9e 66%, #f6d2b2 78%, #e8c2a8 100%); }
+  :root[data-skin="nightcity"]:not([data-mode="dark"]) .nc-sun, :root:not([data-mode="dark"]) .theme-art[data-skin="nightcity"] .nc-sun { opacity: 1; }
+  :root[data-skin="nightcity"]:not([data-mode="dark"]) .nc-moon, :root:not([data-mode="dark"]) .theme-art[data-skin="nightcity"] .nc-moon { opacity: .32; box-shadow: none; }
+  :root[data-skin="nightcity"]:not([data-mode="dark"]) .nc-veil, :root:not([data-mode="dark"]) .theme-art[data-skin="nightcity"] .nc-veil { opacity: .45; background: radial-gradient(40% 30% at 30% 50%, rgba(120, 110, 140, .55), transparent 70%), radial-gradient(35% 22% at 70% 35%, rgba(140, 120, 150, .5), transparent 70%); }
+  :root[data-skin="nightcity"]:not([data-mode="dark"]) .nc-flash, :root:not([data-mode="dark"]) .theme-art[data-skin="nightcity"] .nc-flash { display: none; }
+  :root[data-skin="nightcity"]:not([data-mode="dark"]) .nc-beam, :root:not([data-mode="dark"]) .theme-art[data-skin="nightcity"] .nc-beam { opacity: .25; }
+  :root[data-skin="nightcity"]:not([data-mode="dark"]) .nc-layer.far, :root:not([data-mode="dark"]) .theme-art[data-skin="nightcity"] .nc-layer.far { fill: #8a7f97; }
+  :root[data-skin="nightcity"]:not([data-mode="dark"]) .nc-layer.mid, :root:not([data-mode="dark"]) .theme-art[data-skin="nightcity"] .nc-layer.mid { fill: #4c4660; }
+  :root[data-skin="nightcity"]:not([data-mode="dark"]) .nc-layer.near, :root:not([data-mode="dark"]) .theme-art[data-skin="nightcity"] .nc-layer.near { fill: #221f2e; }
+  :root[data-skin="nightcity"]:not([data-mode="dark"]) .nc-win, :root:not([data-mode="dark"]) .theme-art[data-skin="nightcity"] .nc-win { opacity: .55; }
+  :root[data-skin="nightcity"]:not([data-mode="dark"]) .nc-win.off, :root:not([data-mode="dark"]) .theme-art[data-skin="nightcity"] .nc-win.off { fill: #3a3550; opacity: .5; }
+  :root[data-skin="nightcity"]:not([data-mode="dark"]) .nc-fog, :root:not([data-mode="dark"]) .theme-art[data-skin="nightcity"] .nc-fog { background: radial-gradient(50% 50% at 50% 50%, rgba(255, 214, 190, .45), transparent 70%); }
+  :root[data-skin="nightcity"]:not([data-mode="dark"]) .nc-street, :root:not([data-mode="dark"]) .theme-art[data-skin="nightcity"] .nc-street { background: linear-gradient(180deg, #2a2536, #15131c), repeating-linear-gradient(180deg, transparent 0 6px, rgba(255, 220, 190, .05) 6px 7px); }
+  :root[data-skin="nightcity"]:not([data-mode="dark"]) .nc-street i, :root:not([data-mode="dark"]) .theme-art[data-skin="nightcity"] .nc-street i { background: linear-gradient(180deg, rgba(255, 180, 120, .45), rgba(255, 180, 120, 0)); }
+  :root[data-skin="nightcity"]:not([data-mode="dark"]) .nc-rain i, :root:not([data-mode="dark"]) .theme-art[data-skin="nightcity"] .nc-rain i { opacity: .12; }
+  :root[data-skin="nightcity"]:not([data-mode="dark"]) .nc-rain i.near, :root:not([data-mode="dark"]) .theme-art[data-skin="nightcity"] .nc-rain i.near { opacity: .18; }
+  :root[data-skin="nightcity"]:not([data-mode="dark"]) .nc-vignette, :root:not([data-mode="dark"]) .theme-art[data-skin="nightcity"] .nc-vignette { background: radial-gradient(130% 90% at 50% 40%, transparent 60%, rgba(60, 40, 60, .22)); }
+}
+/* frosted dawn glass on the home page */
+:root[data-skin="nightcity"][data-mode="light"] .page[aria-label="Page A"] .btn:not(.empty),
+:root[data-mode="light"] .theme-art[data-skin="nightcity"] .mini-dot {
+  background: rgba(255, 248, 242, .5); border-color: rgba(255, 255, 255, .55);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8), inset 0 -10px 20px -12px rgba(222, 116, 56, .2), 0 14px 30px -12px rgba(40, 30, 50, .35);
+}
+@media (prefers-color-scheme: light) {
+  :root[data-skin="nightcity"]:not([data-mode="dark"]) .page[aria-label="Page A"] .btn:not(.empty),
+  :root:not([data-mode="dark"]) .theme-art[data-skin="nightcity"] .mini-dot {
+    background: rgba(255, 248, 242, .5); border-color: rgba(255, 255, 255, .55);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8), inset 0 -10px 20px -12px rgba(222, 116, 56, .2), 0 14px 30px -12px rgba(40, 30, 50, .35);
+  }
+}
 
 /* ---------- Neon theme: minimal cyber city. Dark = neon night, light = monochrome day ---------- */
 :root[data-skin="neon"], .theme-art[data-skin="neon"] {
@@ -802,3 +885,14 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 }
 .choice.ungroup { color: var(--muted); }
 @media (prefers-reduced-motion: reduce) { .fan-dot, .dot.merge.ready { animation: none; } }
+
+/* ---------- language picker (gear settings, login) ---------- */
+.set-row.lang-row { gap: 10px; }
+.flags { display: flex; gap: 6px; }
+.flags button { width: 34px; height: 24px; padding: 0; border: 0; border-radius: 6px; background: none; cursor: pointer; display: grid; place-items: center;
+  opacity: .55; transition: opacity .2s, transform .2s var(--ease), box-shadow .2s; box-shadow: 0 0 0 1px var(--line); }
+.flags button.on { opacity: 1; box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--active); }
+.flags button:active { transform: scale(.92); }
+.flag { width: 100%; height: 100%; border-radius: 5px; object-fit: cover; display: block; }
+.login-lang { position: absolute; top: 18px; right: 6%; }
+.login { position: relative; }

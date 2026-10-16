@@ -1,5 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { signIn, signUp, resetPassword, resendVerification, setNewPassword, canResetPassword, verifiesEmail, arrivedFromEmailLink } from '../lib/auth'
+import { t } from '../lib/i18n'
+import { LangPicker } from '../components/Flag'
 
 // Log in / sign up: the first screen for anyone not signed in. Once signed in,
 // the account is remembered until Log out (gear on page A).
@@ -13,9 +15,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [info, setInfo] = useState<string | null>(arrivedFromEmailLink ? 'Your email is verified. Log in to continue.' : null)
+  const [info, setInfo] = useState<string | null>(arrivedFromEmailLink ? t('Your email is verified. Log in to continue.') : null)
   const [cooldown, setCooldown] = useState(0)
-  const unverified = !!error && /verify your email/i.test(error)
+  const unverified = error === t('Verify your email first: open the link we sent you, then log in.')
 
   useEffect(() => {
     if (!cooldown) return
@@ -42,33 +44,33 @@ export default function LoginPage() {
     setBusy(true); setError(null)
     const err = await resendVerification(email.trim())
     setError(err)
-    if (!err) { setInfo(`Sent a new link to ${email.trim()}.`); setCooldown(60) }
+    if (!err) { setInfo(t('Sent a new link to {email}.', { email: email.trim() })); setCooldown(60) }
     setBusy(false)
   }
 
   async function forgot() {
-    if (!email.trim()) { setError('Type your email first, then tap "Forgot password".'); return }
+    if (!email.trim()) { setError(t('Type your email first, then tap "Forgot password".')); return }
     setBusy(true); setError(null)
     const err = await resetPassword(email.trim())
     setError(err)
-    if (!err) setInfo(`We sent a password reset link to ${email.trim()}.`)
+    if (!err) setInfo(t('We sent a password reset link to {email}.', { email: email.trim() }))
     setBusy(false)
   }
 
   if (mode === 'sent') {
     return (
-      <main className="page scroll login" aria-label="Verify your email">
+      <main className="page scroll login" aria-label={t('Verify your email')}>
         <div className="login-form">
-          <h1>Check your email</h1>
-          <p className="muted">We sent a link to <b>{email.trim()}</b>. Open it to verify your email, and you'll be logged in.</p>
-          <p className="muted small">Not there? Check spam, or send it again.</p>
+          <h1>{t('Check your email')}</h1>
+          <p className="muted">{t("We sent a link to {email}. Open it to verify your email, and you'll be logged in.").split('{email}')[0]}<b>{email.trim()}</b>{t("We sent a link to {email}. Open it to verify your email, and you'll be logged in.").split('{email}')[1]}</p>
+          <p className="muted small">{t('Not there? Check spam, or send it again.')}</p>
           {error && <p className="form-error" role="alert">{error}</p>}
           {info && <p className="form-info" role="status">{info}</p>}
           <button className="primary" type="button" onClick={resend} disabled={busy || cooldown > 0}>
-            {cooldown > 0 ? `Send again in ${cooldown}s` : 'Send again'}
+            {cooldown > 0 ? t('Send again in {n}s', { n: cooldown }) : t('Send again')}
           </button>
           <div className="login-links">
-            <button type="button" onClick={() => { setMode('login'); setError(null); setInfo(null) }}>Back to log in</button>
+            <button type="button" onClick={() => { setMode('login'); setError(null); setInfo(null) }}>{t('Back to log in')}</button>
           </div>
         </div>
       </main>
@@ -78,32 +80,33 @@ export default function LoginPage() {
   const isLogin = mode === 'login'
 
   return (
-    <main className="page scroll login" aria-label={isLogin ? 'Log in' : 'Sign up'}>
+    <main className="page scroll login" aria-label={isLogin ? t('Log in') : t('Sign up')}>
+      <div className="login-lang"><LangPicker /></div>
       <form className="login-form" onSubmit={submit}>
         <h1>Sidekick</h1>
-        <p className="muted">{isLogin ? 'Log in to your notes.' : 'Make an account to keep your notes.'}</p>
+        <p className="muted">{isLogin ? t('Log in to your notes.') : t('Make an account to keep your notes.')}</p>
 
-        <input id="email" className="field" type="email" autoComplete="email" placeholder="Email" required
+        <input id="email" className="field" type="email" autoComplete="email" placeholder={t('Email')} required
           value={email} onChange={(e) => setEmail(e.target.value)} />
         <input id="password" className="field" type="password" autoComplete={isLogin ? 'current-password' : 'new-password'}
-          placeholder="Password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
-        {!isLogin && verifiesEmail && <p className="muted small">We'll email you a link to verify your address.</p>}
+          placeholder={t('Password')} required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+        {!isLogin && verifiesEmail && <p className="muted small">{t("We'll email you a link to verify your address.")}</p>}
 
         {error && <p className="form-error" role="alert">{error}</p>}
         {unverified && (
           <button type="button" className="link-btn" onClick={resend} disabled={busy || cooldown > 0}>
-            {cooldown > 0 ? `Verification email sent (again in ${cooldown}s)` : 'Send the verification email again'}
+            {cooldown > 0 ? t('Verification email sent (again in {n}s)', { n: cooldown }) : t('Send the verification email again')}
           </button>
         )}
         {info && <p className="form-info" role="status">{info}</p>}
 
-        <button className="primary" type="submit" disabled={busy}>{busy ? 'One moment…' : isLogin ? 'Log in' : 'Sign up'}</button>
+        <button className="primary" type="submit" disabled={busy}>{busy ? t('One moment…') : isLogin ? t('Log in') : t('Sign up')}</button>
 
         <div className="login-links">
           <button type="button" onClick={() => { setMode(isLogin ? 'signup' : 'login'); setError(null); setInfo(null) }}>
-            {isLogin ? 'New here? Sign up' : 'Have an account? Log in'}
+            {isLogin ? t('New here? Sign up') : t('Have an account? Log in')}
           </button>
-          {isLogin && canResetPassword && <button type="button" onClick={forgot}>Forgot password</button>}
+          {isLogin && canResetPassword && <button type="button" onClick={forgot}>{t('Forgot password')}</button>}
         </div>
       </form>
     </main>
@@ -120,14 +123,14 @@ export function NewPasswordPage() {
     setBusy(true); setError(await setNewPassword(password)); setBusy(false)
   }
   return (
-    <main className="page scroll login" aria-label="New password">
+    <main className="page scroll login" aria-label={t('New password')}>
       <form className="login-form" onSubmit={submit}>
-        <h1>New password</h1>
-        <p className="muted">Choose a new password for your account.</p>
-        <input id="password" className="field" type="password" autoComplete="new-password" placeholder="New password" required minLength={6}
+        <h1>{t('New password')}</h1>
+        <p className="muted">{t('Choose a new password for your account.')}</p>
+        <input id="password" className="field" type="password" autoComplete="new-password" placeholder={t('New password')} required minLength={6}
           value={password} onChange={(e) => setPassword(e.target.value)} />
         {error && <p className="form-error" role="alert">{error}</p>}
-        <button className="primary" type="submit" disabled={busy}>{busy ? 'One moment…' : 'Save password'}</button>
+        <button className="primary" type="submit" disabled={busy}>{busy ? t('One moment…') : t('Save password')}</button>
       </form>
     </main>
   )

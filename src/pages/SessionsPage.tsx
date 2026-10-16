@@ -3,6 +3,16 @@ import { WorkoutMark } from '../components/icons'
 import { useSessions, deleteSession, updateSession, type Workout, type Session, type SetEntry } from '../lib/store'
 import { useSession, discardSession } from '../lib/session'
 import { day, time, duration, setLines } from '../lib/format'
+import { compare } from '../lib/progress'
+import { t } from '../lib/i18n'
+
+// A small change chip, the same look as the summary page: ▲ +3 reps, ▼ −2.5 kg, first time.
+function Change({ d, unit, label }: { d: number | null; unit?: string; label: string }) {
+  if (d === null) return <span className="delta new static">{t('{label}: first time', { label })}</span>
+  const cls = d > 0 ? 'up' : d < 0 ? 'down' : 'same'
+  const text = d === 0 ? t('same') : `${d > 0 ? '+' : '−'}${Math.abs(+d.toFixed(1))}${unit ? ' ' + unit : ''}`
+  return <span className={`delta ${cls} static`}>{label} {d > 0 && '▲ '}{d < 0 && '▼ '}{text}</span>
+}
 
 // Every session as a row, newest at the top. Tap a row to see its exercises and sets.
 export default function SessionsList({ workouts }: { workouts: Workout[] }) {
@@ -14,21 +24,21 @@ export default function SessionsList({ workouts }: { workouts: Workout[] }) {
   const rows: (Session & { live?: boolean })[] = [...(live ? [{ ...live, live: true }] : []), ...[...done].reverse()]
 
   if (rows.length === 0) {
-    return <p className="empty-note">No sessions yet. Open an exercise from the first page to start one.</p>
+    return <p className="empty-note">{t('No sessions yet. Open an exercise from the first page to start one.')}</p>
   }
 
   return (
     <>
     {removing && (
       <div className="scrim" onClick={(e) => { if (e.target === e.currentTarget) setRemoving(null) }}>
-        <div className="confirm" role="alertdialog" aria-label="Remove session?">
-          <p>Remove session?</p>
+        <div className="confirm" role="alertdialog" aria-label={t('Remove session?')}>
+          <p>{t('Remove session?')}</p>
           <div>
-            <button onClick={() => setRemoving(null)}>No</button>
+            <button onClick={() => setRemoving(null)}>{t('No')}</button>
             <button className="yes danger" onClick={() => {
               if (removing.live) discardSession(); else deleteSession(removing.id)
               setOpen(null); setRemoving(null)
-            }}>Yes</button>
+            }}>{t('Yes')}</button>
           </div>
         </div>
       </div>
@@ -36,13 +46,18 @@ export default function SessionsList({ workouts }: { workouts: Workout[] }) {
     <ol className="sessions">
       {rows.map((s) => {
         const isOpen = open === s.id
+        // compare with the sessions before this one (oldest first); a live session comes after all of them
+        const at = s.live ? done.length : done.findIndex((x) => x.id === s.id)
+        const changes = Object.fromEntries(s.order.map((id) => [id, compare(done, at, s, id)]))
+        const gains = s.order.filter((id) => changes[id].up).length
         return (
           <li key={s.id} className={s.live ? 'live' : undefined}>
             <button className="session-row" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : s.id)}>
               <span className="when">
                 <b>{day(s.startedAt)}</b>
-                <small>{s.live ? `In progress since ${time(s.startedAt)}` : `${time(s.startedAt)} · ${duration(s.startedAt, s.endedAt ?? s.startedAt)}`}</small>
+                <small>{s.live ? t('In progress since {time}', { time: time(s.startedAt) }) : `${time(s.startedAt)} · ${duration(s.startedAt, s.endedAt ?? s.startedAt)}`}</small>
               </span>
+              {gains > 0 && <span className="gain-badge" aria-label={t('{n} improved', { n: gains })}>▲ {gains}</span>}
               <span className="marks">
                 {s.order.map((id) => {
                   const info = s.snap?.[id] ?? workouts.find((w) => w.id === id)
@@ -61,17 +76,23 @@ export default function SessionsList({ workouts }: { workouts: Workout[] }) {
                   const lines = setLines(s, id, current)
                   return (
                     <div key={id} className="ex">
-                      <p className="ex-name">{info ? <WorkoutMark icon={info.icon} letter={info.letter} size="1em" /> : null} {info?.exercise || 'Untitled'}</p>
-                      {s.snap?.[id]?.move && <p className="muted">Progression: {s.snap[id].move}</p>}
-                      {lines.length === 0 ? <p className="muted">Nothing recorded</p> : (
-                        <ul>{lines.map((l) => <li key={l.set}><span>Set {l.set}</span>{l.text}</li>)}</ul>
+                      <p className="ex-name">{info ? <WorkoutMark icon={info.icon} letter={info.letter} size="1em" /> : null} {info?.exercise || t('Untitled')}</p>
+                      {s.snap?.[id]?.move && <p className="muted">{t('Progression: {move}', { move: s.snap[id].move! })}</p>}
+                      {changes[id].now && (
+                        <div className="changes">
+                          <Change d={changes[id].repDelta} label={info?.mode === 'progression' && info?.count === 'sec' ? t('Seconds') : t('Reps')} />
+                          {info?.mode !== 'progression' && changes[id].now!.top !== null && changes[id].prev && <Change d={changes[id].topDelta} unit={info?.unit ?? 'kg'} label={t('Top load')} />}
+                        </div>
+                      )}
+                      {lines.length === 0 ? <p className="muted">{t('Nothing recorded')}</p> : (
+                        <ul>{lines.map((l) => <li key={l.set}><span>{t('Set {n}', { n: l.set })}</span>{l.text}</li>)}</ul>
                       )}
                     </div>
                   )
                 })}
                 <div className="detail-actions">
-                  {!s.live && <button className="edit-session" onClick={() => setEditing(s.id)}>Edit</button>}
-                  <button className="remove" onClick={() => setRemoving(s)}>Remove session</button>
+                  {!s.live && <button className="edit-session" onClick={() => setEditing(s.id)}>{t('Edit')}</button>}
+                  <button className="remove" onClick={() => setRemoving(s)}>{t('Remove session')}</button>
                 </div>
               </div>
             )}
@@ -115,21 +136,21 @@ function SessionEditor({ s, workouts, onClose }: { s: Session; workouts: Workout
         const nums = Object.keys(sets[id] ?? {}).sort((a, b) => Number(a) - Number(b))
         return (
           <div key={id} className="ex">
-            <p className="ex-name">{info ? <WorkoutMark icon={info.icon} letter={info.letter} size="1em" /> : null} {info?.exercise || 'Untitled'}</p>
+            <p className="ex-name">{info ? <WorkoutMark icon={info.icon} letter={info.letter} size="1em" /> : null} {info?.exercise || t('Untitled')}</p>
             {progression && (
               <button className="unit small" onClick={() => setCounts((c) => ({ ...c, [id]: count === 'reps' ? 'sec' : 'reps' }))} aria-label={`Counting ${count}, tap to switch`}>
-                <span className={count === 'reps' ? 'on' : ''}>reps</span> / <span className={count === 'sec' ? 'on' : ''}>sec</span>
+                <span className={count === 'reps' ? 'on' : ''}>{t('reps')}</span> / <span className={count === 'sec' ? 'on' : ''}>{t('sec')}</span>
               </button>
             )}
-            {nums.length === 0 ? <p className="muted">Nothing recorded</p> : (
+            {nums.length === 0 ? <p className="muted">{t('Nothing recorded')}</p> : (
               <ul className="set-edit">
                 {nums.map((n) => (
                   <li key={n}>
-                    <span>Set {n}</span>
+                    <span>{t('Set {n}', { n })}</span>
                     {!progression && (
                       <label><input inputMode="decimal" type="number" min="0" step="any" value={sets[id][n].weight ?? ''} onChange={(e) => put(id, n, 'weight', e.target.value)} aria-label={`Set ${n} load`} /><small>{unit}</small></label>
                     )}
-                    <label><input inputMode="numeric" type="number" min="0" value={sets[id][n].reps ?? ''} onChange={(e) => put(id, n, 'reps', e.target.value)} aria-label={`Set ${n} ${progression && count === 'sec' ? 'seconds' : 'reps'}`} /><small>{progression && count === 'sec' ? 'sec' : 'reps'}</small></label>
+                    <label><input inputMode="numeric" type="number" min="0" value={sets[id][n].reps ?? ''} onChange={(e) => put(id, n, 'reps', e.target.value)} aria-label={`Set ${n} ${progression && count === 'sec' ? 'seconds' : 'reps'}`} /><small>{progression && count === 'sec' ? t('sec') : t('reps')}</small></label>
                   </li>
                 ))}
               </ul>
@@ -138,8 +159,8 @@ function SessionEditor({ s, workouts, onClose }: { s: Session; workouts: Workout
         )
       })}
       <div className="detail-actions">
-        <button className="edit-session primary" onClick={save}>Save</button>
-        <button className="edit-session" onClick={onClose}>Cancel</button>
+        <button className="edit-session primary" onClick={save}>{t('Save')}</button>
+        <button className="edit-session" onClick={onClose}>{t('Cancel')}</button>
       </div>
     </div>
   )

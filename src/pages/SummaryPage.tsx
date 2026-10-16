@@ -2,22 +2,11 @@ import { useEffect, useState } from 'react'
 import { Icon, WorkoutMark } from '../components/icons'
 import { useSessions, type Session, type Workout } from '../lib/store'
 import { day, duration } from '../lib/format'
+import { statOf } from '../lib/progress'
+import { t } from '../lib/i18n'
 
 // Shown right after a session ends: this session's numbers count up from the last
 // session's, the change pops in, then everything settles still (good for a screenshot).
-
-type Stat = { reps: number; top: number | null; sets: number }
-
-function statOf(s: Session, wid: string): Stat | null {
-  const entries = Object.values(s.sets[wid] ?? {}).filter((e) => e.reps !== null || e.weight !== null)
-  if (entries.length === 0) return null
-  const weights = entries.map((e) => e.weight).filter((w): w is number => w !== null)
-  return {
-    reps: entries.reduce((n, e) => n + (e.reps ?? 0), 0),
-    top: weights.length ? Math.max(...weights) : null,
-    sets: entries.length,
-  }
-}
 
 const ease = (k: number) => 1 - Math.pow(1 - k, 3)
 
@@ -40,9 +29,9 @@ function Count({ from, to, delay, dur = 1400, decimals = 0 }: { from: number; to
 }
 
 function Delta({ d, unit, delay }: { d: number | null; unit?: string; delay: number }) {
-  if (d === null) return <span className="delta new" style={{ animationDelay: `${delay}ms` }}>first time</span>
+  if (d === null) return <span className="delta new" style={{ animationDelay: `${delay}ms` }}>{t('first time')}</span>
   const cls = d > 0 ? 'up' : d < 0 ? 'down' : 'same'
-  const text = d === 0 ? 'same' : `${d > 0 ? '+' : '−'}${Math.abs(+d.toFixed(1))}${unit ? ' ' + unit : ''}`
+  const text = d === 0 ? t('same') : `${d > 0 ? '+' : '−'}${Math.abs(+d.toFixed(1))}${unit ? ' ' + unit : ''}`
   return <span className={`delta ${cls}`} style={{ animationDelay: `${delay}ms` }}>{d > 0 && '▲ '}{d < 0 && '▼ '}{text}</span>
 }
 
@@ -50,7 +39,7 @@ export default function SummaryPage({ id, workouts, onDone }: { id: string; work
   const sessions = useSessions()
   const index = sessions.findIndex((x) => x.id === id)
   const s = sessions[index]
-  if (!s) return <main className="page summary"><p className="empty-note">Session not found.</p></main>
+  if (!s) return <main className="page summary"><p className="empty-note">{t('Session not found.')}</p></main>
 
   const earlier = sessions.slice(0, index)
   const rows = s.order.map((wid) => {
@@ -70,17 +59,17 @@ export default function SummaryPage({ id, workouts, onDone }: { id: string; work
   return (
     <main className="page scroll summary" aria-label="Session summary">
       <header className="sum-head">
-        <p className="sum-kicker">Session complete</p>
+        <p className="sum-kicker">{t('Session complete')}</p>
         <h1 className="sum-num">#<Count from={Math.max(0, index)} to={index + 1} delay={150} dur={700} /></h1>
         <p className="sum-when">{day(s.startedAt)} · {duration(s.startedAt, s.endedAt ?? s.startedAt)}</p>
         <div className="sum-totals">
-          <div><b><Count from={0} to={totalSets} delay={300} dur={900} /></b><span>sets</span></div>
-          <div><b><Count from={0} to={totalReps} delay={300} dur={1100} /></b><span>reps</span></div>
-          <div><b>{rows.length}</b><span>{rows.length === 1 ? 'exercise' : 'exercises'}</span></div>
+          <div><b><Count from={0} to={totalSets} delay={300} dur={900} /></b><span>{t('sets')}</span></div>
+          <div><b><Count from={0} to={totalReps} delay={300} dur={1100} /></b><span>{t('reps')}</span></div>
+          <div><b>{rows.length}</b><span>{rows.length === 1 ? t('exercise') : t('exercises')}</span></div>
         </div>
       </header>
 
-      {rows.length === 0 && <p className="empty-note">Nothing was recorded in this session.</p>}
+      {rows.length === 0 && <p className="empty-note">{t('Nothing was recorded in this session.')}</p>}
 
       <ol className="sum-list">
         {rows.map((r, i) => {
@@ -93,23 +82,23 @@ export default function SummaryPage({ id, workouts, onDone }: { id: string; work
           const up = (repDelta ?? 0) > 0 || (topDelta ?? 0) > 0
           return (
             <li key={r.wid} className={`sum-card${up ? ' gain' : ''}`} style={{ ['--in-delay' as string]: `${delay - 200}ms`, ['--glow-delay' as string]: `${after + 150}ms` }}>
-              <p className="sum-ex">{r.info && <WorkoutMark icon={r.info.icon} letter={r.info.letter} size="1em" />}<span className="nm">{r.info?.exercise || 'Untitled'}</span><small>{r.now!.sets} {r.now!.sets === 1 ? 'set' : 'sets'}</small></p>
+              <p className="sum-ex">{r.info && <WorkoutMark icon={r.info.icon} letter={r.info.letter} size="1em" />}<span className="nm">{r.info?.exercise || t('Untitled')}</span><small>{r.now!.sets} {r.now!.sets === 1 ? t('set') : t('sets')}</small></p>
               <div className="sum-stats">
                 <div className="sum-stat">
-                  <span className="lbl">{isTimed(r) ? 'Seconds' : 'Reps'}</span>
-                  <b><Count from={r.prev?.reps ?? 0} to={r.now!.reps} delay={delay} />{isTimed(r) && <small>sec</small>}</b>
-                  <Delta d={repDelta} unit={isTimed(r) ? 'sec' : undefined} delay={after} />
+                  <span className="lbl">{isTimed(r) ? t('Seconds') : t('Reps')}</span>
+                  <b><Count from={r.prev?.reps ?? 0} to={r.now!.reps} delay={delay} />{isTimed(r) && <small>{t('sec')}</small>}</b>
+                  <Delta d={repDelta} unit={isTimed(r) ? t('sec') : undefined} delay={after} />
                 </div>
                 {!progression && r.now!.top !== null && (
                   <div className="sum-stat">
-                    <span className="lbl">Top load</span>
+                    <span className="lbl">{t('Top load')}</span>
                     <b><Count from={r.prev?.top ?? 0} to={r.now!.top} delay={delay} decimals={Number.isInteger(r.now!.top) ? 0 : 1} /><small>{unit}</small></b>
                     <Delta d={topDelta} unit={unit} delay={after + 80} />
                   </div>
                 )}
                 {progression && s.snap?.[r.wid]?.move && (
                   <div className="sum-stat">
-                    <span className="lbl">Progression</span>
+                    <span className="lbl">{t('Progression')}</span>
                     <b className="move">{s.snap[r.wid].move}</b>
                   </div>
                 )}
@@ -119,7 +108,7 @@ export default function SummaryPage({ id, workouts, onDone }: { id: string; work
         })}
       </ol>
 
-      <button className="btn circle big save-new" aria-label="Done" onClick={onDone}>
+      <button className="btn circle big save-new" aria-label={t('Done')} onClick={onDone}>
         <Icon name="check" strokeWidth={2.2} />
       </button>
     </main>

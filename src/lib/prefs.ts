@@ -1,18 +1,26 @@
 import { useSyncExternalStore } from 'react'
 
 // Per-device settings from the gear on page A.
-export type Prefs = { theme: 'auto' | 'light' | 'dark'; sound: boolean }
+export type Prefs = { theme: 'auto' | 'light' | 'dark'; sound: boolean; lang: 'en' | 'th' | 'ja' | 'zh' }
+
+// First visit: follow the phone's language when it is one the app speaks.
+function guessLang(): Prefs['lang'] {
+  const l = (typeof navigator !== 'undefined' ? navigator.language : 'en').toLowerCase()
+  return l.startsWith('th') ? 'th' : l.startsWith('ja') ? 'ja' : l.startsWith('zh') ? 'zh' : 'en'
+}
 const KEY = 'workout-lab:prefs'
 let prefs: Prefs = read()
 const listeners = new Set<() => void>()
 
 function read(): Prefs {
-  try { return { theme: 'auto', sound: true, ...JSON.parse(localStorage.getItem(KEY) || '{}') } } catch { return { theme: 'auto', sound: true } }
+  const base: Prefs = { theme: 'auto', sound: true, lang: guessLang() }
+  try { return { ...base, ...JSON.parse(localStorage.getItem(KEY) || '{}') } } catch { return base }
 }
 
 // 'auto' follows the phone's own light/dark setting.
 function apply() {
   const root = document.documentElement
+  root.lang = prefs.lang
   if (prefs.theme === 'auto') root.removeAttribute('data-mode')
   else root.setAttribute('data-mode', prefs.theme)
   const dark = prefs.theme === 'dark' || (prefs.theme === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches)

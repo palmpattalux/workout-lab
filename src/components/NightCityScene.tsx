@@ -1,7 +1,8 @@
 // Night City: a gothic noir skyline in three depths. Far towers fade into fog, a
 // searchlight sweeps the clouds, lightning now and then lights the sky behind the
 // spires, rain falls in two depths and lamp light smears across the wet street.
-// The layers sway at different speeds, so the city feels deep. Purely decorative.
+// The layers sway at different speeds, so the city feels deep. Light mode is the same
+// city at dawn: the sun about to rise behind the towers, the last of the rain. Purely decorative.
 
 // small deterministic random, so the city is the same every time
 function rng(seed: number) {
@@ -80,6 +81,7 @@ export default function NightCityScene() {
   return (
     <div className="nightcity-scene" aria-hidden="true">
       <div className="nc-sky" />
+      <div className="nc-sun" />
       <div className="nc-moon"><i /></div>
       <div className="nc-veil" />
       <div className="nc-flash" />

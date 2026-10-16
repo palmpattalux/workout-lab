@@ -11,6 +11,7 @@ import { useWorkouts, setScope } from './lib/store'
 import { supabase, useUser, useRecovering } from './lib/auth'
 import { switchTo } from './lib/session'
 import { getPreview, checkOwnerEmail } from './lib/theme'
+import { usePrefs } from './lib/prefs'
 
 // Every screen is swapped in memory, so nothing reloads and switching is instant.
 // The hash only mirrors where you are so the back gesture works.
@@ -26,6 +27,7 @@ function go(hash: string) {
 }
 
 export default function App() {
+  usePrefs() // re-render everything when the language changes
   return <><PreviewBar /><Screen /></>
 }
 

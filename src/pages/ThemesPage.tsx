@@ -3,6 +3,7 @@ import { Icon } from '../components/icons'
 import ThemeScene from '../components/ThemeScene'
 import { THEMES, THEME_SLOTS, setPreview, usePreview, useOwner, useApplied, applyTheme } from '../lib/theme'
 import { sound } from '../lib/sound'
+import { t } from '../lib/i18n'
 
 // Swipe through the theme slots like a scenery picker: the centred card is big,
 // its neighbours shrink away. "View" tries the theme on without owning it.
@@ -44,10 +45,10 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
   }
 
   return (
-    <main className="page themes" aria-label="Themes">
+    <main className="page themes" aria-label={t('Themes')}>
       <header className="create-head">
-        <h1>Themes</h1>
-        <button className="icon-btn" aria-label="Back" onClick={() => history.back()}><Icon name="back" size="22px" /></button>
+        <h1>{t('Themes')}</h1>
+        <button className="icon-btn" aria-label={t('Back')} onClick={() => history.back()}><Icon name="back" size="22px" /></button>
       </header>
 
       <div
@@ -58,26 +59,26 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
         onPointerUp={() => { if (drag.current) { drag.current = null; goTo(Math.round(pos)) } }}
         onPointerLeave={() => { if (drag.current) { drag.current = null; goTo(Math.round(pos)) } }}
       >
-        {THEMES.map((t, i) => {
+        {THEMES.map((th, i) => {
           const d = Math.min(1.4, Math.abs(i - pos))
           return (
             <div key={i} className="theme-cell">
               <button
-                className={`theme-card${t ? '' : ' empty'}${t && preview === t.key ? ' viewing' : ''}`}
+                className={`theme-card${th ? '' : ' empty'}${th && preview === th.key ? ' viewing' : ''}`}
                 style={{ transform: `scale(${1 - d * 0.16})`, opacity: 1 - d * 0.45 }}
-                aria-label={t ? `${t.name} theme` : `Empty slot ${i + 1}`}
+                aria-label={th ? `${th.name} theme` : `Empty slot ${i + 1}`}
                 onClick={() => goTo(i)}
               >
-                {t ? (
-                  <div className={`theme-art skin-${t.key}`} data-skin={t.key}>
-                    <ThemeScene skin={t.key} />
+                {th ? (
+                  <div className={`theme-art skin-${th.key}`} data-skin={th.key}>
+                    <ThemeScene skin={th.key} />
                     <span className="mini-dot" style={{ left: '58%', top: '57%' }} />
                     <span className="mini-dot" style={{ left: '82%', top: '55%' }} />
                     <span className="mini-dot" style={{ left: '40%', top: '70%' }} />
                     <span className="mini-dot small" style={{ left: '20%', top: '87%' }} />
                   </div>
                 ) : (
-                  <div className="theme-art blank"><span>{i + 1}</span><small>Coming soon</small></div>
+                  <div className="theme-art blank"><span>{i + 1}</span><small>{t('Coming soon')}</small></div>
                 )}
               </button>
             </div>
@@ -87,17 +88,17 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
 
       <div className="theme-info">
         <p className="theme-count">{index + 1} / {THEME_SLOTS}</p>
-        <h2>{theme ? theme.name : 'Empty slot'}</h2>
-        <p className="theme-blurb">{theme ? theme.blurb : 'A new theme will land here.'}</p>
+        <h2>{theme ? theme.name : t('Empty slot')}</h2>
+        <p className="theme-blurb">{theme ? t(theme.blurb) : t('A new theme will land here.')}</p>
         {theme && (
           <>
-            <span className={`owned-tag${owner ? ' yes' : ''}`}>{owner ? 'Owned' : 'Not owned'}</span>
+            <span className={`owned-tag${owner ? ' yes' : ''}`}>{owner ? t('Owned') : t('Not owned')}</span>
             {owner ? (applied === theme.key
-              ? <button className="theme-view on" onClick={() => { applyTheme(null); sound.tap() }}>In use · Turn off</button>
-              : <button className="theme-view" onClick={() => { applyTheme(theme.key); sound.pop(); onViewed() }}>Use</button>)
+              ? <button className="theme-view on" onClick={() => { applyTheme(null); sound.tap() }}>{t('In use · Turn off')}</button>
+              : <button className="theme-view" onClick={() => { applyTheme(theme.key); sound.pop(); onViewed() }}>{t('Use')}</button>)
             : viewing
-              ? <button className="theme-view on" onClick={() => setPreview(null)}>Stop viewing</button>
-              : <button className="theme-view" onClick={() => { setPreview(theme.key); sound.pop(); onViewed() }}>View</button>}
+              ? <button className="theme-view on" onClick={() => setPreview(null)}>{t('Stop viewing')}</button>
+              : <button className="theme-view" onClick={() => { setPreview(theme.key); sound.pop(); onViewed() }}>{t('View')}</button>}
           </>
         )}
       </div>

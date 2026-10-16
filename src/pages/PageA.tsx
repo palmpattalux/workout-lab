@@ -7,6 +7,8 @@ import { usePrefs, setPrefs } from '../lib/prefs'
 import { useSkin, getPreview } from '../lib/theme'
 import ThemeScene from '../components/ThemeScene'
 import { useEmail, signOut } from '../lib/auth'
+import { t } from '../lib/i18n'
+import { LangPicker } from '../components/Flag'
 
 // Exercise dot positions, as % of the screen: low and toward the right, in easy reach of a
 // right thumb. The first four are always shown; the rest fill in as more workouts exist.
@@ -254,7 +256,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
       onPointerDownCapture={(e) => { if (pickedIcon && !(e.target as Element).closest('.add')) setPickedIcon(null) }}
       onClick={(e) => { if (e.target === e.currentTarget) { setChosen(null); setSettingsOpen(false); setRing(null) } }}>
       <ThemeScene skin={skin} />
-      <button className="btn pill" id="a2" aria-label="Book (A2)" onClick={onOpenBook}>
+      <button className="btn pill" id="a2" aria-label={t('Book')} onClick={onOpenBook}>
         <Icon name="book" size="46%" />
       </button>
 
@@ -318,7 +320,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
       })}
 
       {groupWith && drag && (
-        <span className={`group-pop${groupWith.ready ? ' on' : ''}`} style={{ left: `${SLOTS[groupWith.slot].left}%`, top: `calc(${SLOTS[groupWith.slot].top}% - min(18.7cqw, 10.6cqh) / 2 - 22px)` }}>Group</span>
+        <span className={`group-pop${groupWith.ready ? ' on' : ''}`} style={{ left: `${SLOTS[groupWith.slot].left}%`, top: `calc(${SLOTS[groupWith.slot].top}% - min(18.7cqw, 10.6cqh) / 2 - 22px)` }}>{t('Group')}</span>
       )}
 
       {ring && !drag && (() => {
@@ -330,11 +332,11 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
           return (
             <button key={w.id} className={`btn circle fan-dot${ring.hover === i ? ' hover' : ''}`}
               style={{ left: `calc(${SLOTS[slot].left}% + ${p.dx} * min(18.7cqw, 10.6cqh) * 1.15)`, top: `calc(${SLOTS[slot].top}% + ${p.dy} * min(18.7cqw, 10.6cqh) * 1.15)`, animationDelay: `${i * 30}ms` }}
-              aria-label={w.exercise || 'Workout'}
+              aria-label={w.exercise || t('Workout')}
               onClick={() => { setChosen(w.id); setRing(null); sound.tap() }}
             >
               <WorkoutMark icon={w.icon} letter={w.letter} size="1em" />
-              {ring.hover === i && <span className="fan-name">{w.exercise || 'Untitled'}</span>}
+              {ring.hover === i && <span className="fan-name">{w.exercise || t('Untitled')}</span>}
             </button>
           )
         })
@@ -343,12 +345,12 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
       {chosen !== null && !drag && slotOf.has(chosen) && (
         <>
         <span className="dot-name" style={{ right: `calc(${100 - SLOTS[slotOf.get(chosen)!].left}% + min(13cqw, 7.4cqh) / 2 + 8px)`, top: `calc(${SLOTS[slotOf.get(chosen)!].top}% - min(18.7cqw, 10.6cqh) / 2 - 34px)` }}>
-          {workouts.find((w) => w.id === chosen)?.exercise || 'Untitled'}
+          {workouts.find((w) => w.id === chosen)?.exercise || t('Untitled')}
         </span>
         <button
           className="btn circle choice"
           style={{ left: `${SLOTS[slotOf.get(chosen)!].left}%`, top: `calc(${SLOTS[slotOf.get(chosen)!].top}% - min(18.7cqw, 10.6cqh) / 2 - 34px)` }}
-          aria-label="Edit workout"
+          aria-label={t('Edit workout')}
           onClick={() => onEdit(chosen)}
         >
           <Icon name="write" size="48%" />
@@ -357,7 +359,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
           <button
             className="btn circle choice ungroup"
             style={{ left: `calc(${SLOTS[slotOf.get(chosen)!].left}% + min(13cqw, 7.4cqh) + 6px)`, top: `calc(${SLOTS[slotOf.get(chosen)!].top}% - min(18.7cqw, 10.6cqh) / 2 - 34px)` }}
-            aria-label="Take out of group"
+            aria-label={t('Take out of group')}
             onClick={() => ungroup(chosen)}
           >
             <Icon name="ungroup" size="50%" />
@@ -395,34 +397,38 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
       )}
 
       {settingsOpen && (
-        <div className="settings" role="dialog" aria-label="Settings">
-          <h2>Appearance</h2>
+        <div className="settings" role="dialog" aria-label={t('Settings')}>
+          <h2>{t('Appearance')}</h2>
           <div className="seg" role="radiogroup" aria-label="Theme">
-            {(['light', 'dark', 'auto'] as const).map((t) => (
-              <button key={t} role="radio" aria-checked={prefs.theme === t} className={prefs.theme === t ? 'on' : undefined}
-                onClick={() => setPrefs({ theme: t })}>{t[0].toUpperCase() + t.slice(1)}</button>
+            {(['light', 'dark', 'auto'] as const).map((m) => (
+              <button key={m} role="radio" aria-checked={prefs.theme === m} className={prefs.theme === m ? 'on' : undefined}
+                onClick={() => setPrefs({ theme: m })}>{t(m[0].toUpperCase() + m.slice(1))}</button>
             ))}
           </div>
           <div className="set-row">
-            <span>Sounds</span>
-            <button className={`switch${prefs.sound ? ' on' : ''}`} role="switch" aria-checked={prefs.sound} aria-label="Sounds"
+            <span>{t('Sounds')}</span>
+            <button className={`switch${prefs.sound ? ' on' : ''}`} role="switch" aria-checked={prefs.sound} aria-label={t('Sounds')}
               onClick={() => setPrefs({ sound: !prefs.sound })}>
               <span className="knob" />
             </button>
           </div>
+          <div className="set-row lang-row">
+            <span>{t('Language')}</span>
+            <LangPicker />
+          </div>
           <button className="set-row themes-link" onClick={onThemes}>
-            <span>Themes</span>
+            <span>{t('Themes')}</span>
             <span className="chev"><Icon name="back" size="18px" /></span>
           </button>
           <div className="set-row account">
-            <span className="who">{email ?? 'Signed in'}</span>
-            <button className="logout-btn" onClick={() => { setSettingsOpen(false); signOut() }}>Log out</button>
+            <span className="who">{email ?? t('Signed in')}</span>
+            <button className="logout-btn" onClick={() => { setSettingsOpen(false); signOut() }}>{t('Log out')}</button>
           </div>
         </div>
       )}
 
       <button className={`btn circle mid gear${settingsOpen ? ' open' : ''}`} style={{ left: '86%', top: '90%' }}
-        aria-label="Settings (A1)" aria-expanded={settingsOpen} onClick={() => setSettingsOpen(!settingsOpen)}>
+        aria-label={t('Settings')} aria-expanded={settingsOpen} onClick={() => setSettingsOpen(!settingsOpen)}>
         <Icon name="gear" size="44%" />
       </button>
     </main>
