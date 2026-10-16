@@ -12,11 +12,12 @@ import PlansPage from './pages/PlansPage'
 import NotePage from './pages/NotePage'
 import WeekPage from './pages/WeekPage'
 import { useWorkouts, setScope } from './lib/store'
-import { supabase, useUser, useRecovering } from './lib/auth'
+import { supabase, useUser, useRecovering, arrivedFromEmailLink } from './lib/auth'
 import { switchTo } from './lib/session'
 import { getPreview } from './lib/theme'
 import { checkOwnerEmail, getPlan, atLeast, FREE_WORKOUTS } from './lib/plan'
 import { usePrefs } from './lib/prefs'
+import { t } from './lib/i18n'
 
 // Every screen is swapped in memory, so nothing reloads and switching is instant.
 // The hash only mirrors where you are so the back gesture works.
@@ -26,6 +27,8 @@ import { usePrefs } from './lib/prefs'
 //   edit-<id>   edit page for a workout
 //   summary-<id> the summary shown right after a session ends
 //   themes      themes gallery (gear > Themes)
+//   login, signup  log in / sign up (anyone not signed in can use the app as a guest first)
+//   save        sign up after a guest's first session: "Sign in to save your workout"
 //   plans       subscription plans (gear > Plan)
 //   note-<id>   one note (page B Notes, Book > Notes)
 //   week        weekly summary (Book > This week, Exclusive)
@@ -49,7 +52,9 @@ function Screen() {
 
   // load the signed-in person's data (or this browser's, where there are no accounts)
   useEffect(() => {
-    if (user) setScope(user.id)
+    // signed out = guest: the app works on this browser's own copy until they sign up
+    if (user !== undefined) setScope(user?.id ?? null)
+    if (user && ['login', 'signup', 'save'].includes(location.hash.slice(1))) location.replace('#')
     // device accounts can't prove an email, so only online accounts are checked for ownership
     if (supabase && user !== undefined) checkOwnerEmail(user?.email)
   }, [user])
@@ -61,8 +66,11 @@ function Screen() {
   }, [])
 
   if (user === undefined) return <main className="page" aria-busy="true" />
-  if (!user) return <LoginPage />
+  if (!user && (hash === 'login' || hash === 'signup' || hash === 'save' || arrivedFromEmailLink)) {
+    return <LoginPage key={hash} start={hash === 'login' ? 'login' : hash ? 'signup' : undefined} note={hash === 'save' ? t('Sign in to save your workout') : undefined} />
+  }
   if (recovering) return <NewPasswordPage />
+  const guest = !user
 
   if (hash === 'plans') return <PlansPage />
   if (hash.startsWith('note-')) return <NotePage key={hash} id={hash.slice(5)} workouts={workouts} />
@@ -70,7 +78,7 @@ function Screen() {
   if (hash === 'themes') return <ThemesPage onViewed={() => location.replace('#')} />
   if (hash.startsWith('b-')) {
     const key = hash.slice(2)
-    return <PageB key={key} workout={workouts.find((w) => w.id === key) ?? null} workouts={workouts} onGo={(id) => location.replace('#b-' + id)} onHome={() => go('')} onEnded={(sid) => location.replace('#summary-' + sid)} />
+    return <PageB key={key} guest={guest} workout={workouts.find((w) => w.id === key) ?? null} workouts={workouts} onGo={(id) => location.replace('#b-' + id)} onHome={() => go('')} onEnded={(sid) => location.replace(guest ? '#save' : '#summary-' + sid)} />
   }
   if (hash.startsWith('summary-')) {
     return <SummaryPage key={hash} id={hash.slice(8)} workouts={workouts} onDone={() => location.replace('#')} />
@@ -103,6 +111,7 @@ function Screen() {
   }
   return (
     <PageA
+      guest={guest}
       workouts={workouts}
       onOpenDot={(id) => { if (!getPreview()) switchTo(id); go('b-' + id) }}
       onStartPreset={(id, preset) => { if (!getPreview()) switchTo(id, preset); go('b-' + id) }}

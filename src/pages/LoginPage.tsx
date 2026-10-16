@@ -2,13 +2,15 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { signIn, signUp, resetPassword, resendVerification, setNewPassword, canResetPassword, verifiesEmail, arrivedFromEmailLink } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { LangPicker } from '../components/Flag'
+import { Icon } from '../components/icons'
 
 // Log in / sign up: the first screen for anyone not signed in. Once signed in,
 // the account is remembered until Log out (gear on page A).
 // With online accounts, a new account must verify its email before it can log in.
-export default function LoginPage() {
+export default function LoginPage({ start, note }: { start?: 'login' | 'signup'; note?: string }) {
   const [mode, setMode] = useState<'login' | 'signup' | 'sent'>(() => {
     if (arrivedFromEmailLink) return 'login'
+    if (start) return start
     try { return localStorage.getItem('workout-lab:accounts') || localStorage.getItem('workout-lab:has-account') ? 'login' : 'signup' } catch { return 'signup' }
   })
   const [email, setEmail] = useState('')
@@ -82,7 +84,9 @@ export default function LoginPage() {
   return (
     <main className="page scroll login" aria-label={isLogin ? t('Log in') : t('Sign up')}>
       <div className="login-lang"><LangPicker /></div>
+      {!arrivedFromEmailLink && <button className="icon-btn login-close" aria-label={t('Back')} onClick={() => { if (history.length > 1) history.back(); else location.replace('#') }}><Icon name="close" size="22px" /></button>}
       <form className="login-form" onSubmit={submit}>
+        {note && <p className="login-note"><Icon name="check" size="16px" strokeWidth={2.6} />{note}</p>}
         <h1>Sidekick</h1>
         <p className="muted">{isLogin ? t('Log in to your notes.') : t('Make an account to keep your notes.')}</p>
 

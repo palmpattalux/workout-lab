@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { DAY, weekStart, useNewWeek, markWeekSeen } from '../lib/week'
 import { Icon, WorkoutMark } from '../components/icons'
 import { useSessions, useNotes, type Workout, type Session } from '../lib/store'
 import { statOf, type Stat } from '../lib/progress'
@@ -11,12 +12,6 @@ import { t, locale } from '../lib/i18n'
 // Weekly summary (Exclusive): one page for a Monday-to-Sunday week. First what was
 // trained and how it moved compared with before the week, and what wasn't trained;
 // then the notes written that week.
-const DAY = 86400000
-function weekStart(offset: number) {
-  const d = new Date(); d.setHours(0, 0, 0, 0)
-  d.setDate(d.getDate() - ((d.getDay() + 6) % 7) + offset * 7)
-  return d.getTime()
-}
 
 function Change({ d, unit, label }: { d: number | null; unit?: string; label: string }) {
   if (d === null) return <span className="delta new static">{t('{label}: first time', { label })}</span>
@@ -29,7 +24,10 @@ export default function WeekPage({ workouts }: { workouts: Workout[] }) {
   const can = atLeast(usePlan(), 'exclusive')
   const all = useSessions()
   const notes = useNotes()
-  const [offset, setOffset] = useState(0)
+  // a new summary just out opens on last week
+  const fresh = useNewWeek()
+  const [offset, setOffset] = useState(fresh ? -1 : 0)
+  useEffect(() => { if (fresh) markWeekSeen() }, [fresh])
   const from = weekStart(offset), to = from + 7 * DAY
   const fmt = (ts: number) => new Date(ts).toLocaleDateString(locale(), { day: 'numeric', month: 'short' })
 

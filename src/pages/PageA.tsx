@@ -5,12 +5,15 @@ import { updateWorkout, usePresets, addPreset, updatePreset, type Workout } from
 import { sound } from '../lib/sound'
 import { usePrefs, setPrefs } from '../lib/prefs'
 import { useSkin, getPreview } from '../lib/theme'
+import { useSessions } from '../lib/store'
+import { useSession } from '../lib/session'
 import ThemeScene from '../components/ThemeScene'
 import { useEmail, signOut } from '../lib/auth'
 import { t, LANGS } from '../lib/i18n'
 import { LangPicker } from '../components/Flag'
 import { LockBadge } from '../components/LockNote'
 import { usePlan, atLeast, showLocked, tierName, FREE_WORKOUTS } from '../lib/plan'
+import { useNewWeek } from '../lib/week'
 
 // Exercise dot positions, as % of the screen: low and toward the right, in easy reach of a
 // right thumb. The first four are always shown; the rest fill in as more workouts exist.
@@ -77,7 +80,8 @@ function fan(slot: number, n: number) {
 const iconOptions = WORKOUT_ICONS.map((i) => ({ key: i.key, label: i.name, node: <WorkoutIcon k={i.key} size="24px" strokeWidth={2} /> }))
 const letterOptions = BODY_LETTERS.map((l) => ({ key: l.key, label: l.name, node: <b className="letter">{l.key}</b> }))
 
-export default function PageA({ workouts, onOpenDot, onStartPreset, onEdit, onOpenBook, onThemes, onPlans, onCreate }: {
+export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdit, onOpenBook, onThemes, onPlans, onCreate }: {
+  guest: boolean
   workouts: Workout[]
   onOpenDot: (id: string) => void
   onStartPreset: (id: string, preset: string) => void
@@ -296,6 +300,15 @@ export default function PageA({ workouts, onOpenDot, onStartPreset, onEdit, onOp
     lastTap.current = now
   }
   const prefs = usePrefs()
+  const newWeek = useNewWeek()
+  // First run for a guest (not signed in): holograms show how to make an exercise with
+  // "+" and where to sign up (gear). Once they've made one, a hologram taps it until
+  // their first session starts.
+  const pastSessions = useSessions()
+  const live = useSession()
+  const firstRun = guest && pastSessions.length === 0 && !live
+  const showCreateHolo = firstRun && workouts.length === 0 && pickedIcon === null && !settingsOpen
+  const tapTarget = firstRun && workouts.length > 0 && !drag && !ring && !settingsOpen ? workouts[0].id : null
   const email = useEmail()
   const skin = useSkin()
 
@@ -306,6 +319,7 @@ export default function PageA({ workouts, onOpenDot, onStartPreset, onEdit, onOp
       <ThemeScene skin={skin} />
       <button className="btn pill" id="a2" aria-label={t('Book')} onClick={onOpenBook}>
         <Icon name="book" size="46%" />
+        {newWeek && <span className="new-dot" aria-label={t('New summary')} />}
       </button>
 
       {/* empty slots: the first four always, every one while dragging */}
@@ -531,10 +545,41 @@ export default function PageA({ workouts, onOpenDot, onStartPreset, onEdit, onOp
             <span>{t('Themes')}</span>
             <span className="chev"><Icon name="back" size="18px" /></span>
           </button>
-          <div className="set-row account">
-            <span className="who">{email ?? t('Signed in')}</span>
-            <button className="logout-btn" onClick={() => { setSettingsOpen(false); signOut() }}>{t('Log out')}</button>
-          </div>
+          {guest ? (
+            <div className="set-row account">
+              <span className="who">{t('Not signed in')}</span>
+              <button className="logout-btn signup-btn" onClick={() => { setSettingsOpen(false); location.hash = 'signup' }}>{t('Sign up or log in')}</button>
+            </div>
+          ) : (
+            <div className="set-row account">
+              <span className="who">{email ?? t('Signed in')}</span>
+              <button className="logout-btn" onClick={() => { setSettingsOpen(false); signOut(); location.replace('#login') }}>{t('Log out')}</button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {showCreateHolo && (
+        <div className="holo holo-create" aria-hidden="true">
+          <span className="holo-track" />
+          <span className="holo-pick one"><WorkoutIcon k="dumbbell" size="52%" strokeWidth={2} /></span>
+          <span className="holo-pick two"><b>A</b></span>
+          <span className="holo-hand"><Icon name="hand" size="100%" strokeWidth={1.6} /></span>
+          <span className="holo-label">{t('Slide up to make an exercise')}</span>
+        </div>
+      )}
+      {firstRun && workouts.length === 0 && !settingsOpen && (
+        <button className="holo holo-signup" onClick={() => { location.hash = 'signup' }}>
+          <span className="holo-label">{t('Sign up or log in')}</span>
+          <span className="holo-hand"><Icon name="hand" size="100%" strokeWidth={1.6} /></span>
+        </button>
+      )}
+      {tapTarget && slotOf.has(tapTarget) && (
+        <div className={`holo holo-tap${chosen === tapTarget ? ' again' : ''}`} aria-hidden="true"
+          style={{ left: `${SLOTS[slotOf.get(tapTarget)!].left}%`, top: `${SLOTS[slotOf.get(tapTarget)!].top}%` }}>
+          <span className="holo-ring" />
+          <span className="holo-hand"><Icon name="hand" size="100%" strokeWidth={1.6} /></span>
+          <span className="holo-label">{chosen === tapTarget ? t('Tap again to start') : t('Tap to choose it')}</span>
         </div>
       )}
 

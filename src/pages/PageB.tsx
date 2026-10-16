@@ -6,13 +6,15 @@ import { updateWorkout, usePresets, addNote, type Workout } from '../lib/store'
 import { useSession, switchTo, goToSet, record, endSession, discardSession } from '../lib/session'
 import { t } from '../lib/i18n'
 import { usePlan, atLeast, showLocked, MAX_SETS, FREE_SETS } from '../lib/plan'
+import { useSessions } from '../lib/store'
 import { LockBadge } from '../components/LockNote'
 
 const repOptions = Array.from({ length: 25 }, (_, i) => ({ key: String(i + 1), node: i + 1 }))
 // timed holds: 5 s steps up to 3 minutes
 const secOptions = Array.from({ length: 36 }, (_, i) => ({ key: String((i + 1) * 5), node: (i + 1) * 5, label: t('{n} sec', { n: (i + 1) * 5 }) }))
 
-export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
+export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded }: {
+  guest?: boolean
   workout: Workout | null
   workouts: Workout[]
   onGo: (id: string) => void
@@ -34,6 +36,9 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
   const inSession = !!session && !!id && session.current === id
   // a session started from a preset: the switcher only offers that preset, in its order
   const presets = usePresets()
+  // a guest's first session: from set 2 on, a hologram shows that Active ends it
+  const doneSessions = useSessions()
+  const firstSession = !!guest && doneSessions.length === 0
   const preset = session?.preset ? presets.find((p) => p.id === session.preset) : undefined
   const set = inSession ? session.setOf[id] ?? 1 : 1
   const entry = inSession ? session.sets[id]?.[String(set)] : undefined
@@ -53,6 +58,7 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
 
   const [setsOpen, setSetsOpen] = useState(false)
   const [confirmEnd, setConfirmEnd] = useState(false)
+  const endHint = firstSession && inSession && set >= 2 && !confirmEnd
   const [adding, setAdding] = useState(false)
   const [move, setMove] = useState('')
 
@@ -66,13 +72,20 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
   return (
     <main className="page" aria-label="Page B">
       <div className="tabs">
-        <button className={`btn pill${session ? ' live' : ''}`} id="b1" aria-label={session ? t('Active session: tap to end') : t('Active')} onClick={() => session && setConfirmEnd(true)}>
+        <button className={`btn pill${session ? ' live' : ''}${endHint ? ' holo-target' : ''}`} id="b1" aria-label={session ? t('Active session: tap to end') : t('Active')} onClick={() => session && setConfirmEnd(true)}>
           <span className="led" />{t('Active')}
         </button>
         <button className="btn pill" id="b2" aria-label={t('Notes')}
           onClick={() => { const n = addNote({ sessionId: session?.id, workoutId: id ?? undefined }); location.hash = 'note-' + n.id }}>{t('Notes')}</button>
       </div>
       {preset && <span className="preset-chip"><Icon name="preset" size="14px" strokeWidth={2.2} />{preset.name}</span>}
+
+      {endHint && (
+        <div className="holo holo-end" aria-hidden="true">
+          <span className="holo-hand"><Icon name="hand" size="100%" strokeWidth={1.6} /></span>
+          <span className="holo-label">{t('Done? Tap Active to end the session')}</span>
+        </div>
+      )}
 
       <button className="icon-btn home-back" aria-label={t('Back to home')} onClick={onHome}>
         <Icon name="arrowLeft" size="24px" />

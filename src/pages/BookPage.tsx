@@ -3,6 +3,7 @@ import { useSessions, usePresets, deletePreset, useNotes, addNote, type Workout,
 import { NoteRow } from './NotePage'
 import { useState } from 'react'
 import { usePlan, atLeast, showLocked } from '../lib/plan'
+import { useNewWeek } from '../lib/week'
 import { LockBadge } from '../components/LockNote'
 import { day, time, setLines } from '../lib/format'
 import SessionsList from './SessionsPage'
@@ -26,6 +27,7 @@ export default function BookPage({ workouts, view, openId, presetId, onOpen, onO
   const open = openId ? workouts.find((w) => w.id === openId) : null
   const presets = usePresets()
   const canPreset = atLeast(usePlan(), 'exclusive')
+  const newWeek = useNewWeek()
   const preset = presetId && canPreset ? presets.find((p) => p.id === presetId) ?? null : null
 
   return (
@@ -36,6 +38,7 @@ export default function BookPage({ workouts, view, openId, presetId, onOpen, onO
           <button className={`week-link${canPreset ? '' : ' locked'}`}
             onClick={() => { if (canPreset) location.hash = 'week'; else showLocked(t('The weekly summary is an Exclusive feature'), 'exclusive') }}>
             {!canPreset && <LockBadge />}{t('This week')}
+            {newWeek && <span className="new-dot" aria-label={t('New summary')} />}
           </button>
         )}
         <button className="icon-btn" aria-label={t('Back')} onClick={() => history.back()}><Icon name="back" size="22px" /></button>
@@ -54,7 +57,7 @@ export default function BookPage({ workouts, view, openId, presetId, onOpen, onO
       )}
 
       {!open && !preset && supabase && (
-        <button className="logout" onClick={() => signOut()}>{t('Log out')}</button>
+        <button className="logout" onClick={() => { signOut(); location.replace('#login') }}>{t('Log out')}</button>
       )}
 
       {open ? <Detail w={open} /> : preset ? <PresetDetail p={preset} workouts={workouts} /> : view === 'sessions' ? <SessionsList workouts={workouts} />

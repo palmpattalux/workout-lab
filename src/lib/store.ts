@@ -185,7 +185,7 @@ export function setScope(userId: string | null) {
   emit()
   scopeListeners.forEach((fn) => fn())
   if (supabase && userId) useSupabase()
-  else if (!supabase) useArtifactDb()
+  else if (!supabase && userId) useArtifactDb()
 }
 // Workouts logged on this device before online accounts move into the account the
 // first time someone logs in here: both the original no-login copy and any
@@ -199,18 +199,21 @@ function adoptDeviceData() {
     for (const pre of sources) {
       const w: Workout[] = JSON.parse(localStorage.getItem(pre + 'workouts') || '[]')
       const x: Session[] = JSON.parse(localStorage.getItem(pre + 'sessions') || '[]')
+      const nt: Note[] = JSON.parse(localStorage.getItem(pre + 'notes') || '[]')
       const live = localStorage.getItem(pre + 'active-session')
-      if (w.length === 0 && x.length === 0 && !live) continue
+      if (w.length === 0 && x.length === 0 && nt.length === 0 && !live) continue
       const haveW = new Set(workouts.map((i) => i.id))
       const haveS = new Set(sessions.map((i) => i.id))
       workouts = [...workouts, ...w.filter((i) => !haveW.has(i.id))].sort(byDate)
       sessions = [...sessions, ...x.filter((i) => !haveS.has(i.id))].sort(byStart)
+      const haveN = new Set(notes.map((i) => i.id))
+      notes = [...notes, ...nt.filter((i) => !haveN.has(i.id) && i.text.trim())].sort(byDate)
       if (live && !localStorage.getItem(key('active-session'))) localStorage.setItem(key('active-session'), live)
       moved = true
     }
     if (!moved) return
     writeCache() // safe in this account's copy before the device copies go
-    for (const pre of sources) ['workouts', 'sessions', 'active-session'].forEach((n) => localStorage.removeItem(pre + n))
+    for (const pre of sources) ['workouts', 'sessions', 'notes', 'active-session'].forEach((n) => localStorage.removeItem(pre + n))
   } catch { /* storage blocked */ }
 }
 

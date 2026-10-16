@@ -1100,3 +1100,74 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .week-notes { padding: 0 5.7%; }
 .week-locked { margin: 30cqh 8% 0; display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--muted); text-align: center; }
 .week-locked .lock-badge { width: 28px; height: 28px; color: var(--sun); }
+
+/* ---------- new-summary dot ---------- */
+.new-dot { position: absolute; top: 8px; right: 10px; width: 9px; height: 9px; border-radius: 50%; background: var(--sun); box-shadow: 0 0 0 2px var(--surface), 0 0 10px var(--sun); animation: new-dot 2s ease-in-out infinite; }
+.week-link { position: relative; }
+.week-link .new-dot { top: -2px; right: -2px; }
+@keyframes new-dot { 50% { transform: scale(1.25); } }
+
+/* ---------- first-run holograms (guests) ---------- */
+.holo { position: absolute; z-index: 7; pointer-events: none; color: var(--active); filter: drop-shadow(0 0 6px color-mix(in srgb, var(--active) 65%, transparent)); }
+.holo-hand { position: absolute; width: 34px; height: 34px; opacity: 0; }
+.holo-hand svg { fill: color-mix(in srgb, var(--active) 18%, transparent); }
+.holo-label {
+  position: absolute; white-space: nowrap; padding: 6px 12px; border-radius: 999px; font: 700 .8rem var(--font); color: var(--active);
+  background: color-mix(in srgb, var(--surface) 70%, transparent); border: 1px solid color-mix(in srgb, var(--active) 45%, transparent);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: holo-flicker 4s linear infinite;
+}
+@keyframes holo-flicker { 0%, 100% { opacity: .95; } 47% { opacity: .95; } 48% { opacity: .6; } 49% { opacity: .95; } 80% { opacity: .85; } }
+
+/* "+": slide up, an icon lights, then again for a letter */
+.holo-create { left: 20%; top: 87%; width: 0; height: 0; }
+.holo-track { position: absolute; left: -1px; bottom: 0; width: 2px; height: 130px; border-radius: 2px; background: linear-gradient(to top, transparent, color-mix(in srgb, var(--active) 55%, transparent)); opacity: .5; }
+.holo-create .holo-hand { left: -9px; top: 4px; animation: holo-swipe 3.2s var(--ease) infinite; }
+@keyframes holo-swipe {
+  0% { opacity: 0; transform: translateY(0) scale(1); }
+  10% { opacity: .9; transform: translateY(0) scale(.88); }
+  48% { opacity: .9; transform: translateY(-118px) scale(.88); }
+  60% { opacity: .9; transform: translateY(-118px) scale(1); }
+  72%, 100% { opacity: 0; transform: translateY(-118px) scale(1); }
+}
+.holo-pick {
+  position: absolute; left: -24px; top: -158px; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; opacity: 0;
+  border: 1.5px solid color-mix(in srgb, var(--active) 60%, transparent); background: color-mix(in srgb, var(--active) 12%, transparent);
+  font: 800 1.1rem var(--font);
+}
+.holo-pick.one { animation: holo-pick-one 6.4s ease-out infinite; }
+.holo-pick.two { animation: holo-pick-two 6.4s ease-out infinite; }
+@keyframes holo-pick-one { 0%, 18% { opacity: 0; transform: scale(.6); } 24%, 32% { opacity: 1; transform: scale(1); } 38%, 100% { opacity: 0; transform: scale(1.1); } }
+@keyframes holo-pick-two { 0%, 68% { opacity: 0; transform: scale(.6); } 74%, 82% { opacity: 1; transform: scale(1); } 88%, 100% { opacity: 0; transform: scale(1.1); } }
+.holo-create .holo-label { left: 46px; top: -16px; }
+
+/* gear: where to sign up */
+.holo-signup {
+  pointer-events: auto; cursor: pointer; border: 0; background: none; padding: 0; font: inherit;
+  right: 5.7%; bottom: calc(10% + min(17.5cqw, 9.8cqh) / 2 + 6px); width: min(17.5cqw, 9.8cqh); height: 86px;
+}
+.holo-signup .holo-label { right: 0; top: 0; }
+.holo-signup .holo-hand { left: 50%; bottom: 0; margin-left: -12px; transform: rotate(180deg); animation: holo-point 1.6s ease-in-out infinite; opacity: .9; }
+@keyframes holo-point { 50% { translate: 0 8px; } }
+
+/* first exercise: tap it, then tap again */
+.holo-tap { width: 0; height: 0; }
+.holo-ring { position: absolute; left: calc(min(18.7cqw, 10.6cqh) / -2 - 6px); top: calc(min(18.7cqw, 10.6cqh) / -2 - 6px); width: calc(min(18.7cqw, 10.6cqh) + 12px); aspect-ratio: 1; border-radius: 50%; border: 2px solid var(--active); animation: holo-ring 1.6s ease-out infinite; }
+@keyframes holo-ring { from { transform: scale(.85); opacity: .9; } to { transform: scale(1.3); opacity: 0; } }
+.holo-tap .holo-hand { left: -6px; top: 2px; animation: holo-tap 1.6s ease-in-out infinite; }
+@keyframes holo-tap { 0%, 100% { opacity: .9; transform: translate(6px, 14px) scale(1); } 40% { opacity: .9; transform: translate(0, 0) scale(.86); } 55% { transform: translate(0, 0) scale(.86); } }
+.holo-tap .holo-label { left: 50%; top: calc(min(18.7cqw, 10.6cqh) / 2 + 30px); transform: translateX(-50%); }
+.holo-tap.again .holo-ring { border-color: var(--sun); }
+
+/* page B, guest's first session: Active ends it */
+#b1.holo-target { box-shadow: var(--lift), 0 0 0 2px var(--active), 0 0 18px color-mix(in srgb, var(--active) 55%, transparent); animation: holo-b1 1.8s ease-in-out infinite; }
+@keyframes holo-b1 { 50% { box-shadow: var(--lift), 0 0 0 4px color-mix(in srgb, var(--active) 60%, transparent), 0 0 26px color-mix(in srgb, var(--active) 45%, transparent); } }
+.holo-end { left: calc(5.7% + 15.6cqw); top: calc(3.5% + min(11cqw, 6.2cqh) + 6px); width: 0; height: 0; z-index: 8; }
+.holo-end .holo-hand { left: -12px; top: 0; opacity: .9; animation: holo-point-up 1.6s ease-in-out infinite; }
+@keyframes holo-point-up { 50% { translate: 0 -6px; } }
+.holo-end .holo-label { left: 28px; top: 8px; }
+
+/* sign up after a guest's first session */
+.login-close { position: absolute; top: 12px; left: 4.5%; z-index: 2; }
+.login-note { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; margin: 0 0 4px; padding: 8px 14px; border-radius: 999px; background: var(--active-soft); color: var(--active); font: 700 .9rem var(--font); }
+.signup-btn { color: var(--active); border-color: color-mix(in srgb, var(--active) 40%, transparent); }
+@media (prefers-reduced-motion: reduce) { .holo-hand, .holo-ring, .holo-pick, #b1.holo-target, .new-dot { animation-duration: 3s; } }
