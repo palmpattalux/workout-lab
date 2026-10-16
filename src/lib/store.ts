@@ -155,20 +155,30 @@ export function setScope(userId: string | null) {
   if (supabase && userId) useSupabase()
   else if (!supabase) useArtifactDb()
 }
-// Workouts logged on this device before signing in move into the account the
-// first time someone logs in here, then the device-only copy is cleared.
+// Workouts logged on this device before online accounts move into the account the
+// first time someone logs in here: both the original no-login copy and any
+// device-only accounts from before Supabase. Each device copy is cleared once moved.
 function adoptDeviceData() {
   try {
-    const w: Workout[] = JSON.parse(localStorage.getItem('workout-lab:workouts') || '[]')
-    const x: Session[] = JSON.parse(localStorage.getItem('workout-lab:sessions') || '[]')
-    if (w.length === 0 && x.length === 0) return
-    const haveW = new Set(workouts.map((i) => i.id))
-    const haveS = new Set(sessions.map((i) => i.id))
-    workouts = [...workouts, ...w.filter((i) => !haveW.has(i.id))].sort(byDate)
-    sessions = [...sessions, ...x.filter((i) => !haveS.has(i.id))].sort(byStart)
-    const live = localStorage.getItem('workout-lab:active-session')
-    if (live && !localStorage.getItem(key('active-session'))) localStorage.setItem(key('active-session'), live)
-    ;['workouts', 'sessions', 'active-session'].forEach((n) => localStorage.removeItem('workout-lab:' + n))
+    const sources = ['workout-lab:']
+    const accounts = JSON.parse(localStorage.getItem('workout-lab:accounts') || '{}') as Record<string, { id: string }>
+    Object.values(accounts).forEach((a) => { if (a?.id && a.id !== scope) sources.push(`workout-lab:${a.id}:`) })
+    let moved = false
+    for (const pre of sources) {
+      const w: Workout[] = JSON.parse(localStorage.getItem(pre + 'workouts') || '[]')
+      const x: Session[] = JSON.parse(localStorage.getItem(pre + 'sessions') || '[]')
+      const live = localStorage.getItem(pre + 'active-session')
+      if (w.length === 0 && x.length === 0 && !live) continue
+      const haveW = new Set(workouts.map((i) => i.id))
+      const haveS = new Set(sessions.map((i) => i.id))
+      workouts = [...workouts, ...w.filter((i) => !haveW.has(i.id))].sort(byDate)
+      sessions = [...sessions, ...x.filter((i) => !haveS.has(i.id))].sort(byStart)
+      if (live && !localStorage.getItem(key('active-session'))) localStorage.setItem(key('active-session'), live)
+      moved = true
+    }
+    if (!moved) return
+    writeCache() // safe in this account's copy before the device copies go
+    for (const pre of sources) ['workouts', 'sessions', 'active-session'].forEach((n) => localStorage.removeItem(pre + n))
   } catch { /* storage blocked */ }
 }
 
