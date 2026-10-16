@@ -11,7 +11,8 @@ export const THEMES: (Theme | null)[] = [
   { key: 'sakura', name: 'Sakura', blurb: 'Blossom branches, petals drifting onto still water.', tier: 'premium' },
   { key: 'nightcity', name: 'Night City', blurb: 'A gothic skyline in the rain. Searchlights and lightning by night, the sun about to rise by day.', tier: 'premium' },
   { key: 'neon', name: 'Neon', blurb: 'A cyber city. Neon rooftops and light trails by night, a clean black and white skyline by day.', tier: 'premium' },
-  ...Array.from({ length: THEME_SLOTS - 3 }, () => null),
+  { key: 'manga', name: 'Manga', blurb: 'Black ink on paper. Speech bubbles at home, sword slashes once a session starts.', tier: 'premium' },
+  ...Array.from({ length: THEME_SLOTS - 4 }, () => null),
 ]
 
 let preview: string | null = null

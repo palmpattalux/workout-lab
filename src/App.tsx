@@ -1,3 +1,4 @@
+import { sound } from './lib/sound'
 import { useEffect, useState } from 'react'
 import PageA from './pages/PageA'
 import PageB from './pages/PageB'
@@ -66,7 +67,11 @@ function Screen() {
   }, [user])
 
   useEffect(() => {
-    const onHash = () => setHash(location.hash.slice(1))
+    const onHash = () => {
+      setHash(location.hash.slice(1))
+      // Manga theme: turning a page sounds like one
+      if (document.documentElement.dataset.skin === 'manga') sound.flip()
+    }
     window.addEventListener('hashchange', onHash)
     return () => window.removeEventListener('hashchange', onHash)
   }, [])

@@ -51,8 +51,40 @@ function buzz(ms: number) {
   try { navigator.vibrate?.(ms) } catch { /* not supported */ }
 }
 
+// A short burst of filtered noise: paper, swords, impacts (Manga theme).
+let noiseBuf: AudioBuffer | null = null
+function noise(dur: number, gain: number, type: BiquadFilterType, from: number, to: number, at = 0) {
+  const c = audio()
+  if (!c || c.state !== 'running') return
+  if (!noiseBuf) {
+    noiseBuf = c.createBuffer(1, c.sampleRate, c.sampleRate)
+    const d = noiseBuf.getChannelData(0)
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1
+  }
+  const t = c.currentTime + at
+  const src = c.createBufferSource()
+  const f = c.createBiquadFilter()
+  const g = c.createGain()
+  src.buffer = noiseBuf
+  f.type = type
+  f.Q.value = 0.9
+  f.frequency.setValueAtTime(from, t)
+  f.frequency.exponentialRampToValueAtTime(to, t + dur)
+  g.gain.setValueAtTime(0.0001, t)
+  g.gain.exponentialRampToValueAtTime(gain, t + dur * 0.25)
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur)
+  src.connect(f).connect(g).connect(c.destination)
+  src.start(t, Math.random() * 0.5)
+  src.stop(t + dur + 0.02)
+}
+
 export const sound = {
   tap() { tone(1000, 620, 0.05, 0.16, 'sine') },
   pop() { tone(600, 1300, 0.08, 0.16, 'sine'); buzz(10) },
   tick() { tone(2200, 1700, 0.018, 0.1, 'triangle'); buzz(4) },
+  // Manga theme
+  flip() { noise(0.16, 0.22, 'bandpass', 900, 3600); noise(0.1, 0.12, 'bandpass', 2400, 1200, 0.12) },
+  slash() { noise(0.13, 0.12, 'highpass', 1800, 6500); tone(2900, 2700, 0.32, 0.025, 'sine') },
+  bubble() { tone(420, 880, 0.09, 0.08, 'sine') },
+  impact() { tone(140, 42, 0.32, 0.3, 'sine'); noise(0.18, 0.16, 'lowpass', 1400, 200); buzz(18) },
 }

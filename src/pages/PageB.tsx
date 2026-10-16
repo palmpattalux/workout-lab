@@ -1,3 +1,5 @@
+import { MangaBattle } from '../components/MangaScene'
+import { useSkin } from '../lib/theme'
 import { useEffect, useState } from 'react'
 import { Icon, WorkoutMark } from '../components/icons'
 import HoldPicker from '../components/HoldPicker'
@@ -32,6 +34,7 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
   }, [session, id])
 
   const inSession = !!session && !!id && session.current === id
+  const skin = useSkin()
   // a session started from a preset: the switcher only offers that preset, in its order
   const presets = usePresets()
   // a guest's first session: from set 2 on, a hologram shows that Active ends it
@@ -69,6 +72,7 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
 
   return (
     <main className="page" aria-label="Page B">
+      {skin === 'manga' && inSession && <MangaBattle set={set} />}
       <div className="tabs">
         <button className={`btn pill${session ? ' live' : ''}${endHint ? ' holo-target' : ''}`} id="b1" aria-label={session ? t('Active session: tap to end') : t('Active')} onClick={() => session && setConfirmEnd(true)}>
           <span className="led" />{t('Active')}

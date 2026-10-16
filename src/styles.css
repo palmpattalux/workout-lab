@@ -1185,3 +1185,107 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 /* gear > open-source licences */
 .settings .credits-link span:first-child { color: var(--muted); font-weight: 500; font-size: .85rem; }
 .licence-text { margin: 14px 5.7% 40px; padding: 16px; border-radius: 18px; background: var(--surface); border: 1px solid var(--hair); color: var(--ink); font: 500 .72rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; overflow-wrap: anywhere; user-select: text; -webkit-user-select: text; }
+
+/* ---------- Manga theme: black ink on paper. Light = white page, dark = inverted page ----------
+   Paper grain + screentone, focus lines in the top-right corner, speech bubbles at home,
+   sword slashes on page B during a session, comic-panel buttons, pages turn in. */
+:root[data-skin="manga"], .theme-art[data-skin="manga"] {
+  --bg: #deddd8; --stage: #f6f5f1; --surface: #ffffff; --sunk: #edece7;
+  --ink: #111111; --muted: #5b5b58; --hair: rgba(0, 0, 0, .1); --line: rgba(0, 0, 0, .2);
+  --sun: #111111; --active: #111111; --active-soft: #e6e5df;
+  --mg-paper: #ffffff; --mg-tone: rgba(0, 0, 0, .22); --mg-grain: .07; --mg-focus: .5;
+  --mg-cut: #111111; --mg-cut-glow: rgba(0, 0, 0, 0); --mg-flash: rgba(0, 0, 0, .1);
+  color-scheme: light;
+}
+:root[data-skin="manga"][data-mode="dark"], :root[data-mode="dark"] .theme-art[data-skin="manga"] {
+  --bg: #050505; --stage: #0f0f0f; --surface: #1a1a1a; --sunk: #141414;
+  --ink: #f2f1ec; --muted: #9a9994; --hair: rgba(255, 255, 255, .1); --line: rgba(255, 255, 255, .2);
+  --sun: #f2f1ec; --active: #f2f1ec; --active-soft: #2a2a28;
+  --mg-paper: #0f0f0f; --mg-tone: rgba(255, 255, 255, .16); --mg-grain: .12; --mg-focus: .38;
+  --mg-cut: #ffffff; --mg-cut-glow: rgba(255, 255, 255, .7); --mg-flash: rgba(255, 255, 255, .07);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="manga"]:not([data-mode="light"]), :root:not([data-mode="light"]) .theme-art[data-skin="manga"] {
+    --bg: #050505; --stage: #0f0f0f; --surface: #1a1a1a; --sunk: #141414;
+    --ink: #f2f1ec; --muted: #9a9994; --hair: rgba(255, 255, 255, .1); --line: rgba(255, 255, 255, .2);
+    --sun: #f2f1ec; --active: #f2f1ec; --active-soft: #2a2a28;
+    --mg-paper: #0f0f0f; --mg-tone: rgba(255, 255, 255, .16); --mg-grain: .12; --mg-focus: .38;
+    --mg-cut: #ffffff; --mg-cut-glow: rgba(255, 255, 255, .7); --mg-flash: rgba(255, 255, 255, .07);
+    color-scheme: dark;
+  }
+}
+/* paper grain on every page (one small tile, drawn once) */
+:root[data-skin="manga"] .page::before, .theme-art[data-skin="manga"]::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: -1; opacity: var(--mg-grain); mix-blend-mode: difference;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.theme-art[data-skin="manga"] { color: var(--ink); }
+/* turning to a new page: it sweeps in from the left like the next manga page */
+:root[data-skin="manga"] .page { animation: mg-turn .42s cubic-bezier(.3, .7, .2, 1); }
+@keyframes mg-turn { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+
+.manga-scene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.mg-focus { position: absolute; top: 0; right: 0; width: 74cqw; height: auto; opacity: var(--mg-focus);
+  -webkit-mask-image: radial-gradient(100% 100% at 100% 0, #000 30%, transparent 92%); mask-image: radial-gradient(100% 100% at 100% 0, #000 30%, transparent 92%);
+  transform-origin: 100% 0; animation: mg-focus 5s ease-in-out infinite alternate; }
+.manga-scene .mg-focus path { fill: var(--ink); stroke: none; }
+@keyframes mg-focus { from { transform: scale(1); opacity: calc(var(--mg-focus) * .8); } to { transform: scale(1.04); opacity: var(--mg-focus); } }
+.mg-tone { position: absolute; left: 0; right: 0; bottom: 0; height: 30cqh;
+  background: radial-gradient(circle, var(--mg-tone) 1.15px, transparent 1.6px) 0 0 / 7px 7px;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 75%); mask-image: linear-gradient(180deg, transparent, #000 75%); }
+.mg-bubble { position: absolute; transform: translate(-50%, -50%); padding: 12px 18px; white-space: nowrap;
+  background: var(--mg-paper); color: var(--ink); border: 2px solid var(--ink); border-radius: 50%;
+  font: 800 1.02rem/1.1 var(--font); letter-spacing: .02em; animation: mg-bubble 2.6s cubic-bezier(.3, 1.5, .5, 1) both; }
+.mg-bubble::before, .mg-bubble::after { content: ""; position: absolute; top: 100%; left: 28%; width: 18px; height: 16px; clip-path: polygon(0 0, 100% 0, 10% 100%); }
+.mg-bubble::before { background: var(--ink); margin-top: -1px; }
+.mg-bubble::after { background: var(--mg-paper); width: 13px; height: 11px; margin: -3px 0 0 2.5px; }
+.mg-bubble.flip::before, .mg-bubble.flip::after { left: auto; right: 28%; clip-path: polygon(0 0, 100% 0, 90% 100%); }
+.mg-bubble.flip::after { margin: -3px 2.5px 0 0; }
+@keyframes mg-bubble {
+  0% { transform: translate(-50%, -50%) scale(.2); opacity: 0; }
+  10% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  88% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -54%) scale(.92); opacity: 0; }
+}
+.mg-sfx { position: absolute; transform: translate(-50%, -50%) skewX(-12deg); color: var(--ink); font: 900 2rem/1 var(--font); letter-spacing: -.02em;
+  text-shadow: 0 0 3px var(--mg-paper), 0 0 1px var(--mg-paper); opacity: 0; animation: mg-sfx 2.6s ease-out both; }
+@keyframes mg-sfx {
+  0% { opacity: 0; transform: translate(-50%, -40%) skewX(-12deg) scale(.9); }
+  12%, 80% { opacity: .9; }
+  20%, 40%, 60% { transform: translate(-51%, -50%) skewX(-12deg); }
+  30%, 50%, 70% { transform: translate(-49%, -51%) skewX(-12deg); }
+  100% { opacity: 0; transform: translate(-50%, -52%) skewX(-12deg); }
+}
+
+/* page B battlefield (only while a session runs) */
+.mg-wind i { position: absolute; right: 0; width: 36cqw; height: 1.5px; border-radius: 2px; opacity: 0;
+  background: linear-gradient(90deg, transparent, var(--ink)); animation: mg-wind linear infinite; }
+@keyframes mg-wind { 0% { transform: translateX(40cqw); opacity: 0; } 20% { opacity: .18; } 80% { opacity: .18; } 100% { transform: translateX(-120cqw); opacity: 0; } }
+.mg-cut { position: absolute; height: 0; }
+.mg-cut::before, .mg-cut::after { content: ""; position: absolute; left: 0; width: 100%; transform-origin: 0 50%; opacity: 0;
+  background: linear-gradient(90deg, transparent, var(--mg-cut) 30%, var(--mg-cut) 80%, transparent);
+  filter: drop-shadow(0 0 4px var(--mg-cut-glow)); clip-path: polygon(0 50%, 60% 0, 100% 50%, 60% 100%);
+  animation: mg-cut .5s cubic-bezier(.2, .9, .3, 1) var(--d, 0ms) both; }
+.mg-cut::before { top: -2px; height: 4px; }
+.mg-cut::after { top: 5px; height: 1.5px; animation-delay: calc(var(--d, 0ms) + 50ms); }
+@keyframes mg-cut { 0% { transform: scaleX(0); opacity: 1; } 35% { transform: scaleX(1); opacity: 1; } 100% { transform: scaleX(1) translateY(2px); opacity: 0; } }
+.mg-flash { position: absolute; inset: 0; background: var(--mg-flash); opacity: 0; animation: mg-flash 1.2s ease-out both; }
+@keyframes mg-flash { 0%, 100% { opacity: 0; } 8%, 20%, 34% { opacity: 1; } 14%, 27% { opacity: .2; } }
+.mg-impact { position: absolute; left: 50%; top: 19%; width: 90cqw; aspect-ratio: 1; transform: translate(-50%, -50%); opacity: 0;
+  display: grid; place-items: center; animation: mg-impact .9s ease-out both; }
+.mg-impact::before { content: ""; position: absolute; inset: 0; border-radius: 50%;
+  background: repeating-conic-gradient(var(--ink) 0 1.2deg, transparent 1.2deg 9deg);
+  -webkit-mask-image: radial-gradient(circle, transparent 32%, #000 40%, transparent 70%); mask-image: radial-gradient(circle, transparent 32%, #000 40%, transparent 70%); opacity: .45; }
+.mg-impact span { position: relative; font: 900 2.6rem/1 var(--font); color: var(--ink); transform: skewX(-10deg); text-shadow: 0 0 4px var(--mg-paper), 0 0 1px var(--mg-paper); }
+@keyframes mg-impact { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.6); } 15% { opacity: 1; transform: translate(-50%, -50%) scale(1.04); } 60% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.1); } }
+@media (prefers-reduced-motion: reduce) { .manga-scene *, :root[data-skin="manga"] .page { animation-duration: .01s !important; animation-iteration-count: 1 !important; } }
+
+/* comic-panel buttons: ink outline and a hard offset shadow */
+:root[data-skin="manga"] .page .btn:not(.empty), .theme-art[data-skin="manga"] .mini-dot {
+  background: var(--surface); border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink);
+}
+:root[data-skin="manga"] .page .btn:not(.empty):active { box-shadow: 1px 1px 0 var(--ink); }
+:root[data-skin="manga"] .page .dot.empty { border: 2px dashed var(--line); }
+:root[data-skin="manga"] #b1.live { background: var(--ink); color: var(--stage); }
+:root[data-skin="manga"] #b1.live .led { background: var(--stage); }
