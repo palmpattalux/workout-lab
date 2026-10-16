@@ -16,6 +16,7 @@ const ui = {
   arrowLeft: <path d="M19 12H5M11 6l-6 6 6 6" />,
   back: <path d="M15 5l-7 7 7 7" />,
   check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
+  preset: <path d="M4 6.5h1.5M4 12h1.5M4 17.5h1.5M9.5 6.5H20M9.5 12H20M9.5 17.5H20" />,
   lock: <><rect x="5" y="10.5" width="14" height="10" rx="2.5" /><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3" /></>,
   close: <path d="M6 6l12 12M18 6 6 18" />,
   weight: <><path d="M9.5 7.5a2.5 2.5 0 1 1 5 0" /><path d="M7.2 9h9.6l2 10.5H5.2z" /></>,

@@ -19,6 +19,11 @@ export type Workout = {
   createdAt: number
 }
 
+// A preset: a named list of exercises in the order they're done (Exclusive plan).
+// Saved alongside the workouts (marked kind: 'preset') so it syncs the same way
+// without a separate database table.
+export type Preset = { id: string; kind: 'preset'; name: string; items: string[]; createdAt: number }
+
 // One set inside a session, per exercise.
 export type SetEntry = { reps: number | null; weight: number | null }
 
@@ -28,6 +33,7 @@ export type Session = {
   startedAt: number
   endedAt?: number
   current: string                                   // workout on screen
+  preset?: string                                   // preset this session was started from
   order: string[]                                   // workouts in the order they were used
   setOf: Record<string, number>                     // current set per workout
   sets: Record<string, Record<string, SetEntry>>     // workoutId -> set number -> entry
@@ -47,6 +53,7 @@ let scope = 'local'                       // whose data is loaded: 'local' or a 
 const key = (name: string) => (scope === 'local' ? `workout-lab:${name}` : `workout-lab:${scope}:${name}`)
 let workouts: Workout[] = []
 let sessions: Session[] = []
+let presets: Preset[] = []
 const listeners = new Set<() => void>()
 const scopeListeners = new Set<() => void>()
 
@@ -54,35 +61,45 @@ function readCache() {
   try {
     workouts = JSON.parse(localStorage.getItem(key('workouts')) || '[]')
     sessions = JSON.parse(localStorage.getItem(key('sessions')) || '[]')
-  } catch { workouts = []; sessions = [] }
+    presets = JSON.parse(localStorage.getItem(key('presets')) || '[]')
+  } catch { workouts = []; sessions = []; presets = [] }
 }
 function writeCache() {
   try {
     localStorage.setItem(key('workouts'), JSON.stringify(workouts))
     localStorage.setItem(key('sessions'), JSON.stringify(sessions))
+    localStorage.setItem(key('presets'), JSON.stringify(presets))
   } catch { /* storage blocked */ }
 }
 function emit() {
   writeCache()
   listeners.forEach((fn) => fn())
 }
-const byDate = (a: Workout, b: Workout) => a.createdAt - b.createdAt
+const byDate = (a: { createdAt: number }, b: { createdAt: number }) => a.createdAt - b.createdAt
 const byStart = (a: Session, b: Session) => a.startedAt - b.startedAt
 const clean = (o: object) => JSON.parse(JSON.stringify(o)) as Record<string, unknown>
 
 // ---------- online copy ----------
-type Remote = { saveWorkout(w: Workout): void; saveSession(s: Session): void; deleteSession(id: string): void; deleteWorkout(id: string): void }
+type Remote = { saveWorkout(w: Workout | Preset): void; saveSession(s: Session): void; deleteSession(id: string): void; deleteWorkout(id: string): void }
 let remote: Remote | null = null
 
 // Merge what the database has with anything made here before it answered.
-function merge(dbWorkouts: Workout[], dbSessions: Session[]) {
+function merge(dbRows: (Workout | Preset)[], dbSessions: Session[]) {
+  const [dbWorkouts, dbPresets] = split(dbRows)
   const knownW = new Set(dbWorkouts.map((w) => w.id))
+  const knownP = new Set(dbPresets.map((p) => p.id))
   const knownS = new Set(dbSessions.map((x) => x.id))
   workouts.filter((w) => !knownW.has(w.id)).forEach((w) => { dbWorkouts.push(w); remote?.saveWorkout(w) })
+  presets.filter((p) => !knownP.has(p.id)).forEach((p) => { dbPresets.push(p); remote?.saveWorkout(p) })
   sessions.filter((x) => !knownS.has(x.id)).forEach((x) => { dbSessions.push(x); remote?.saveSession(x) })
   workouts = dbWorkouts.sort(byDate)
+  presets = dbPresets.sort(byDate)
   sessions = dbSessions.sort(byStart)
   emit()
+}
+const isPreset = (r: Workout | Preset): r is Preset => (r as Preset).kind === 'preset'
+function split(rows: (Workout | Preset)[]): [Workout[], Preset[]] {
+  return [rows.filter((r): r is Workout => !isPreset(r)), rows.filter(isPreset)]
 }
 
 // Supabase: one row per record, the record itself kept whole in `data`.
@@ -107,7 +124,7 @@ async function useSupabase() {
   const [w, x] = await Promise.all([sb.from('workouts').select('id, data'), sb.from('sessions').select('id, data')])
   if (w.error || x.error) return // offline: keep the local copy, saves retry on next change
   merge(
-    (w.data ?? []).map((r) => ({ ...(r.data as Workout), id: r.id })),
+    (w.data ?? []).map((r) => ({ ...(r.data as Workout | Preset), id: r.id })),
     (x.data ?? []).map((r) => ({ ...(r.data as Session), id: r.id })),
   )
 }
@@ -133,12 +150,12 @@ async function useArtifactDb() {
   }
   let first = true
   col.onSnapshot((snap) => {
-    const ws = snap.docs.filter((d) => d.data()?.kind !== 'session').map((d) => ({ ...(d.data() as Workout), id: d.id }))
+    const ws = snap.docs.filter((d) => d.data()?.kind !== 'session').map((d) => ({ ...(d.data() as Workout | Preset), id: d.id }))
     const ss = snap.docs.filter((d) => d.data()?.kind === 'session').map((d) => {
       const { kind: _k, ...b } = d.data() as Session & { kind: string }
       return { ...b, id: d.id } as Session
     })
-    if (first) { first = false; merge(ws, ss) } else { workouts = ws.sort(byDate); sessions = ss.sort(byStart); emit() }
+    if (first) { first = false; merge(ws, ss) } else { const [w, p] = split(ws); workouts = w.sort(byDate); presets = p.sort(byDate); sessions = ss.sort(byStart); emit() }
   }, () => { /* offline or refused: keep the local copy */ })
 }
 
@@ -223,6 +240,13 @@ export function updateSession(x: Session) {
 
 export function deleteWorkout(id: string) {
   workouts = workouts.filter((x) => x.id !== id)
+  // take it out of any preset too
+  presets = presets.map((p) => {
+    if (!p.items.includes(id)) return p
+    const next = { ...p, items: p.items.filter((i) => i !== id) }
+    remote?.saveWorkout(next)
+    return next
+  })
   emit()
   remote?.deleteWorkout(id)
 }
@@ -233,12 +257,31 @@ export function deleteSession(id: string) {
   remote?.deleteSession(id)
 }
 
+export function getPresets() {
+  return presets
+}
+export function addPreset(name: string, items: string[]): Preset {
+  const p: Preset = { id: crypto.randomUUID(), kind: 'preset', name, items, createdAt: Date.now() }
+  presets = [...presets, p]
+  emit()
+  remote?.saveWorkout(p)
+  return p
+}
+export function deletePreset(id: string) {
+  presets = presets.filter((p) => p.id !== id)
+  emit()
+  remote?.deleteWorkout(id)
+}
+
 function subscribe(fn: () => void) {
   listeners.add(fn)
   return () => { listeners.delete(fn) }
 }
 export function useSessions(): Session[] {
   return useSyncExternalStore(subscribe, () => sessions)
+}
+export function usePresets(): Preset[] {
+  return useSyncExternalStore(subscribe, () => presets)
 }
 export function useWorkouts(): Workout[] {
   return useSyncExternalStore(subscribe, () => workouts)

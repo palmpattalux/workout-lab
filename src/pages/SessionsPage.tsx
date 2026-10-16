@@ -15,16 +15,17 @@ function Change({ d, unit, label }: { d: number | null; unit?: string; label: st
 }
 
 // Every session as a row, newest at the top. Tap a row to see its exercises and sets.
-export default function SessionsList({ workouts }: { workouts: Workout[] }) {
+export default function SessionsList({ workouts, only }: { workouts: Workout[]; only?: string }) {
   const done = useSessions()
   const live = useSession()
   const [open, setOpen] = useState<string | null>(null)
   const [removing, setRemoving] = useState<(Session & { live?: boolean }) | null>(null)
   const [editing, setEditing] = useState<string | null>(null)
-  const rows: (Session & { live?: boolean })[] = [...(live ? [{ ...live, live: true }] : []), ...[...done].reverse()]
+  // `only`: a preset's id, to list just the sessions done from it
+  const rows: (Session & { live?: boolean })[] = [...(live ? [{ ...live, live: true }] : []), ...[...done].reverse()].filter((s) => !only || s.preset === only)
 
   if (rows.length === 0) {
-    return <p className="empty-note">{t('No sessions yet. Open an exercise from the first page to start one.')}</p>
+    return <p className="empty-note">{only ? t('No sessions from this preset yet. Pick it on the first page, then open one of its exercises.') : t('No sessions yet. Open an exercise from the first page to start one.')}</p>
   }
 
   return (

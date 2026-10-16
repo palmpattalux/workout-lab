@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Icon, WorkoutMark } from '../components/icons'
 import HoldPicker from '../components/HoldPicker'
 import HoldMenu from '../components/HoldMenu'
-import { updateWorkout, type Workout } from '../lib/store'
+import { updateWorkout, usePresets, type Workout } from '../lib/store'
 import { useSession, switchTo, goToSet, record, endSession, discardSession } from '../lib/session'
 import { t } from '../lib/i18n'
 import { usePlan, atLeast, showLocked, MAX_SETS, FREE_SETS } from '../lib/plan'
@@ -32,6 +32,9 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
   }, [session, id])
 
   const inSession = !!session && !!id && session.current === id
+  // a session started from a preset: the switcher only offers that preset, in its order
+  const presets = usePresets()
+  const preset = session?.preset ? presets.find((p) => p.id === session.preset) : undefined
   const set = inSession ? session.setOf[id] ?? 1 : 1
   const entry = inSession ? session.sets[id]?.[String(set)] : undefined
 
@@ -68,6 +71,7 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
         </button>
         <button className="btn pill" id="b2" aria-label={t('Notes')}>{t('Notes')}</button>
       </div>
+      {preset && <span className="preset-chip"><Icon name="preset" size="14px" strokeWidth={2.2} />{preset.name}</span>}
 
       <button className="icon-btn home-back" aria-label={t('Back to home')} onClick={onHome}>
         <Icon name="arrowLeft" size="24px" />
@@ -173,10 +177,11 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
 
       {/* pen: hold to pick an exercise and start/continue a session; tap to end the session */}
       <HoldMenu
-        items={workouts.map((w) => ({
+        items={(preset ? preset.items.map((pid) => workouts.find((w) => w.id === pid)).filter((w): w is Workout => !!w) : workouts).map((w, i) => ({
           key: w.id,
           label: w.exercise || t('Untitled'),
           current: w.id === id,
+          num: preset ? i + 1 : undefined,
           node: <WorkoutMark icon={w.icon} letter={w.letter} size="1.1em" />,
         }))}
         onPick={(wid) => { switchTo(wid); onGo(wid) }}

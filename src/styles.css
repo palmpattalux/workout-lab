@@ -954,3 +954,72 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .plan-state.on { color: var(--stage); background: var(--ink); border-color: var(--ink); }
 .plan-link .lang-now { margin-left: auto; margin-right: 6px; color: var(--muted); font-weight: 500; font-size: .85rem; }
 .tier-tag .lock-badge { width: 15px; height: 15px; margin: -2px -2px -2px -4px; }
+
+/* ---------- presets (Exclusive) ---------- */
+.preset-btn.open, .preset-btn.on { color: var(--active); }
+.preset-name {
+  position: absolute; right: calc(14% + min(17.5cqw, 9.8cqh) / 2 + 8px); top: 41%; transform: translateY(-50%); z-index: 3; max-width: 52%;
+  padding: 6px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--lift);
+  font: 700 .82rem var(--font); color: var(--active); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.preset-list {
+  position: absolute; right: 5.7%; bottom: calc(59% + min(17.5cqw, 9.8cqh) / 2 + 10px); z-index: 8;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 6px; max-height: 32%; overflow-y: auto; padding: 4px;
+  transform-origin: 90% 100%; animation: pop-in .22s var(--ease);
+}
+.preset-list button {
+  display: inline-flex; align-items: center; gap: 8px; max-width: 220px; padding: 9px 14px; border-radius: 999px;
+  border: 1px solid var(--hair); background: var(--surface); color: var(--ink); box-shadow: var(--lift);
+  font: 700 .9rem var(--font); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.preset-list button small { font: 700 .7rem var(--num); color: var(--muted); }
+.preset-list button.on { background: var(--active-soft); color: var(--active); border-color: color-mix(in srgb, var(--active) 30%, transparent); }
+.preset-list button:disabled { opacity: .45; }
+.preset-list button.new { color: var(--muted); border-style: dashed; border-color: var(--line); box-shadow: none; background: var(--surface); }
+.preset-form { top: calc(41% - min(17.5cqw, 9.8cqh) / 2 - 64px); right: 5.7%; left: auto; width: min(72%, 280px); position: absolute; }
+.preset-form button:disabled { opacity: .4; }
+.preset-form button { display: grid; place-items: center; }
+
+/* picking a preset's exercises */
+.page.picking { box-shadow: inset 0 0 0 2px var(--active); }
+.page.picking .dot.filled:not(.in-preset) { opacity: .62; }
+.page.picking .dot.filled { animation: none; }
+.page.picking .add, .page.picking #a2, .page.picking .gear { opacity: .25; pointer-events: none; }
+.page.preset-on .dot.filled:not(.in-preset):not(.armed) { opacity: .4; }
+.pick-bar {
+  position: absolute; left: 5.7%; right: 5.7%; top: 3.5%; z-index: 9; display: flex; align-items: center; gap: 8px;
+  padding: 8px 8px 8px 6px; border-radius: 20px; background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--float);
+  animation: ln-in2 .28s var(--ease) both;
+}
+@keyframes ln-in2 { from { opacity: 0; transform: translateY(-10px); } }
+.pick-text { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+.pick-text b { font: 800 1rem var(--font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pick-text small { font: 500 .78rem var(--font); color: var(--muted); }
+.pick-done { flex: none; border: 0; border-radius: 999px; padding: 10px 16px; background: var(--active); color: var(--surface); font: 800 .86rem var(--font); cursor: pointer; }
+.pick-done:disabled { background: var(--sunk); color: var(--muted); cursor: default; }
+.pnum {
+  position: absolute; left: 0; top: 0; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px;
+  display: grid; place-items: center; background: var(--active); color: var(--surface);
+  font: 800 .72rem var(--num); box-shadow: 0 0 0 2px var(--surface); pointer-events: none;
+  animation: pnum-in .22s var(--ease) both;
+}
+@keyframes pnum-in { from { transform: scale(.4); opacity: 0; } }
+.fan-dot .pnum { min-width: 18px; height: 18px; font-size: .64rem; left: -2px; top: -2px; }
+.pop .pnum { left: -3px; top: -3px; min-width: 19px; height: 19px; font-size: .66rem; }
+.preset-chip {
+  position: absolute; left: 50%; top: 23%; transform: translateX(-50%);
+  display: inline-flex; align-items: center; gap: 5px; max-width: 60cqw; padding: 5px 10px; border-radius: 999px;
+  background: var(--active-soft); color: var(--active); font: 700 .78rem var(--font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.preset-chip svg { flex: none; }
+
+/* book: presets tab */
+.book-tabs button.locked { display: inline-flex; align-items: center; gap: 4px; }
+.book-tabs button.locked .lock-badge { width: 15px; height: 15px; }
+.preset-box { min-height: 0; gap: 6px; }
+.preset-order { display: flex; flex-wrap: wrap; gap: 6px 10px; margin-top: 6px; color: var(--ink); }
+.preset-order > span { display: inline-flex; align-items: center; gap: 4px; }
+.preset-order i { font: 800 .64rem var(--num); font-style: normal; min-width: 16px; height: 16px; border-radius: 999px; display: grid; place-items: center; background: var(--sunk); color: var(--muted); padding: 0 4px; }
+.preset-title { font: 800 1.6rem var(--font); letter-spacing: -.03em; }
+.preset-detail > .preset-order { margin: 14px 5.7% 0; }
+.preset-detail > .remove { margin: 0 5.7% 40px; }

@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react'
-import { saveSession, getWorkouts, onScopeChange, scopedKey, type Session, type SetEntry } from './store'
+import { saveSession, getWorkouts, getPresets, onScopeChange, scopedKey, type Session, type SetEntry } from './store'
 
 // The active session, if any. Kept in this browser so a reload doesn't lose it;
 // written to the database once, when the session ends.
@@ -17,11 +17,15 @@ function set(next: Session | null) {
   listeners.forEach((fn) => fn())
 }
 
-// Start a session, or switch exercise inside the running one.
-export function switchTo(workoutId: string) {
-  const s = active ?? { id: crypto.randomUUID(), startedAt: Date.now(), current: workoutId, order: [], setOf: {}, sets: {} }
+// Start a session, or switch exercise inside the running one. Starting from a
+// preset ties the session to it (the switcher on page B then shows only its exercises).
+export function switchTo(workoutId: string, preset?: string) {
+  const s: Session = active ?? { id: crypto.randomUUID(), startedAt: Date.now(), current: workoutId, order: [], setOf: {}, sets: {} }
+  // opening an exercise outside the session's preset leaves the preset
+  const keep = preset ?? (s.preset && getPresets().find((p) => p.id === s.preset)?.items.includes(workoutId) ? s.preset : undefined)
   set({
     ...s,
+    preset: keep,
     current: workoutId,
     order: s.order.includes(workoutId) ? s.order : [...s.order, workoutId],
     setOf: { ...s.setOf, [workoutId]: s.setOf[workoutId] ?? 1 },

@@ -1,7 +1,8 @@
 import { useRef, useState, type PointerEvent } from 'react'
 import { Icon, WorkoutIcon, WorkoutMark, WORKOUT_ICONS, BODY_LETTERS } from '../components/icons'
 import HoldPicker from '../components/HoldPicker'
-import { updateWorkout, type Workout } from '../lib/store'
+import { updateWorkout, usePresets, addPreset, type Workout } from '../lib/store'
+import { useSession } from '../lib/session'
 import { sound } from '../lib/sound'
 import { usePrefs, setPrefs } from '../lib/prefs'
 import { useSkin, getPreview } from '../lib/theme'
@@ -77,9 +78,10 @@ function fan(slot: number, n: number) {
 const iconOptions = WORKOUT_ICONS.map((i) => ({ key: i.key, label: i.name, node: <WorkoutIcon k={i.key} size="24px" strokeWidth={2} /> }))
 const letterOptions = BODY_LETTERS.map((l) => ({ key: l.key, label: l.name, node: <b className="letter">{l.key}</b> }))
 
-export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onThemes, onPlans, onCreate }: {
+export default function PageA({ workouts, onOpenDot, onStartPreset, onEdit, onOpenBook, onThemes, onPlans, onCreate }: {
   workouts: Workout[]
   onOpenDot: (id: string) => void
+  onStartPreset: (id: string, preset: string) => void
   onEdit: (id: string) => void
   onOpenBook: () => void
   onThemes: () => void
@@ -96,6 +98,36 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
   const plan = usePlan()
   const canGroup = atLeast(plan, 'premium')
   const atLimit = !canGroup && workouts.length >= FREE_WORKOUTS
+  const canPreset = atLeast(plan, 'exclusive')
+
+  // Presets (Exclusive): the list button opens saved presets and "New preset". A new one
+  // is named, then its exercises are tapped right here, in the order they'll be done.
+  // Picking a saved preset numbers its exercises on the page; opening one of them
+  // starts the session from that preset.
+  const presets = usePresets()
+  const session = useSession()
+  const [presetOpen, setPresetOpen] = useState(false)
+  const [naming, setNaming] = useState<string | null>(null)
+  const [picking, setPicking] = useState<{ name: string; items: string[] } | null>(null)
+  const [focusId, setFocusId] = useState<string | null>(null)
+  const focus = presets.find((p) => p.id === (session?.preset ?? focusId)) ?? null
+  const order = picking?.items ?? focus?.items ?? null
+  const numOf = (id: string) => (order ? order.indexOf(id) + 1 : 0)
+  function togglePick(id: string) {
+    if (!picking) return
+    setPicking({ ...picking, items: picking.items.includes(id) ? picking.items.filter((i) => i !== id) : [...picking.items, id] })
+    sound.tick()
+  }
+  function savePicked() {
+    if (!picking || picking.items.length === 0) return
+    const p = addPreset(picking.name, picking.items)
+    setPicking(null); setFocusId(p.id)
+    sound.pop()
+  }
+  function openDot(id: string) {
+    if (focus && focus.items.includes(id)) onStartPreset(id, focus.id)
+    else onOpenDot(id)
+  }
   const bySlot = placeAll(units)
   const slotOf = new Map<string, number>() // unit key and every member id -> slot
   for (const [i, u] of bySlot) { slotOf.set(u.key, i); u.members.forEach((w) => slotOf.set(w.id, i)) }
@@ -129,6 +161,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
   function clearDwell() { if (dwell.current) { clearTimeout(dwell.current); dwell.current = null } }
 
   function onDotDown(e: PointerEvent<HTMLButtonElement>, key: string) {
+    if (picking) return
     press.current = { key, x: e.clientX, y: e.clientY, moved: false }
     e.currentTarget.setPointerCapture(e.pointerId)
   }
@@ -199,6 +232,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
   // drag well past the fan to move the whole bubble instead
   function onGroupDown(e: PointerEvent<HTMLButtonElement>, u: Unit) {
     if (chosen && u.members.some((w) => w.id === chosen)) return // armed: a tap opens it
+    if (picking && ring?.key === u.key) { setRing(null); return }
     const el = e.currentTarget, page = el.offsetParent as HTMLElement
     const r = page.getBoundingClientRect(), b = el.getBoundingClientRect()
     ringPress.current = { key: u.key, cx: b.left + b.width / 2 - r.left, cy: b.top + b.height / 2 - r.top, w: r.width, h: r.height, dot: b.width }
@@ -216,7 +250,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
     const pt = pagePoint(e)
     const R = rp.dot * 1.15
     const far = Math.hypot(pt.x - rp.cx, pt.y - rp.cy)
-    if (far > R + rp.dot * 0.9) { p.moved = true; ringPress.current = null; startDrag(u.key); dragTo(e, u.key); return }
+    if (far > R + rp.dot * 0.9 && !picking) { p.moved = true; ringPress.current = null; startDrag(u.key); dragTo(e, u.key); return }
     const spots = fan(slotOf.get(u.key)!, u.members.length)
     let hover: number | null = null, best = rp.dot * 0.45
     spots.forEach((s, i) => {
@@ -230,6 +264,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
     press.current = null
     ringPress.current = null
     if (p?.moved) { endDrag(e, u.key); return }
+    if (ring?.hover != null && picking) { togglePick(u.members[ring.hover].id); setRing(null); justDragged.current = true; return }
     if (ring?.hover != null) { setChosen(u.members[ring.hover].id); setRing(null); justDragged.current = true; sound.tap() }
     // let go on the bubble itself: the fan stays open, tap an exercise to pick it
   }
@@ -261,9 +296,9 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
   const skin = useSkin()
 
   return (
-    <main className="page" aria-label="Page A"
+    <main className={`page${picking ? ' picking' : ''}${focus && !picking ? ' preset-on' : ''}`} aria-label="Page A"
       onPointerDownCapture={(e) => { if (pickedIcon && !(e.target as Element).closest('.add')) setPickedIcon(null) }}
-      onClick={(e) => { if (e.target === e.currentTarget) { setChosen(null); setSettingsOpen(false); setRing(null) } }}>
+      onClick={(e) => { if (e.target === e.currentTarget) { setChosen(null); setSettingsOpen(false); setRing(null); setPresetOpen(false) } }}>
       <ThemeScene skin={skin} />
       <button className="btn pill" id="a2" aria-label={t('Book')} onClick={onOpenBook}>
         <Icon name="book" size="46%" />
@@ -283,7 +318,9 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
         const merging = groupWith?.slot === i && !dragging
         const fanned = ring?.key === u.key && !dragging
         const pos = { left: dragging ? drag.x : `${s.left}%`, top: dragging ? drag.y : `${s.top}%`, animationDelay: armedMember ? undefined : `${-i * 0.7}s` }
-        const cls = `btn circle dot filled float${armedMember ? ' armed' : ''}${dragging ? ' dragging' : ''}${isGroup ? ' group' : ''}${merging ? (groupWith!.ready ? ' merge ready' : ' merge') : ''}${fanned ? ' fanned' : ''}`
+        const nums = u.members.map((w) => numOf(w.id)).filter((n) => n > 0).sort((a, b) => a - b)
+        const badge = nums.length > 0 && <span className="pnum">{nums.join(',')}</span>
+        const cls = `btn circle dot filled float${nums.length ? ' in-preset' : ''}${armedMember ? ' armed' : ''}${dragging ? ' dragging' : ''}${isGroup ? ' group' : ''}${merging ? (groupWith!.ready ? ' merge ready' : ' merge') : ''}${fanned ? ' fanned' : ''}`
         if (!isGroup) {
           const w = u.members[0]
           return (
@@ -296,11 +333,12 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
               onPointerMove={onDotMove}
               onPointerUp={onDotUp}
               onPointerCancel={() => { press.current = null; setDrag(null); clearDwell(); setGroupWith(null) }}
-              onClick={() => { if (justDragged.current) { justDragged.current = false; return } if (chosen === w.id) onOpenDot(w.id); else setChosen(w.id) }}
+              onClick={() => { if (justDragged.current) { justDragged.current = false; return } if (picking) { togglePick(w.id); return } if (chosen === w.id) openDot(w.id); else setChosen(w.id) }}
             >
               {armedMember
                 ? <Icon name="play" size="38%" strokeWidth={2} />
                 : <WorkoutMark icon={w.icon} letter={w.letter} size="1.15em" />}
+              {badge}
             </button>
           )
         }
@@ -314,7 +352,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
             onPointerMove={(e) => onGroupMove(e, u)}
             onPointerUp={(e) => onGroupUp(e, u)}
             onPointerCancel={() => { press.current = null; ringPress.current = null; setDrag(null); clearDwell(); setGroupWith(null) }}
-            onClick={() => { if (justDragged.current) { justDragged.current = false; return } if (armedMember) onOpenDot(armedMember.id) }}
+            onClick={() => { if (justDragged.current) { justDragged.current = false; return } if (armedMember) openDot(armedMember.id) }}
           >
             {armedMember
               ? <Icon name="play" size="38%" strokeWidth={2} />
@@ -323,7 +361,8 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
                   {u.members.slice(0, 3).map((w) => <i key={w.id}><WorkoutIcon k={w.icon} size="62%" strokeWidth={2.2} /></i>)}
                 </span>
               )}
-            {!armedMember && <span className="count">{u.members.length}</span>}
+            {!armedMember && !badge && <span className="count">{u.members.length}</span>}
+            {!armedMember && badge}
           </button>
         )
       })}
@@ -342,16 +381,17 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
             <button key={w.id} className={`btn circle fan-dot${ring.hover === i ? ' hover' : ''}`}
               style={{ left: `calc(${SLOTS[slot].left}% + ${p.dx} * min(18.7cqw, 10.6cqh) * 1.15)`, top: `calc(${SLOTS[slot].top}% + ${p.dy} * min(18.7cqw, 10.6cqh) * 1.15)`, animationDelay: `${i * 30}ms` }}
               aria-label={w.exercise || t('Workout')}
-              onClick={() => { setChosen(w.id); setRing(null); sound.tap() }}
+              onClick={() => { if (picking) { togglePick(w.id); setRing(null); return } setChosen(w.id); setRing(null); sound.tap() }}
             >
               <WorkoutMark icon={w.icon} letter={w.letter} size="1em" />
+              {numOf(w.id) > 0 && <span className="pnum">{numOf(w.id)}</span>}
               {ring.hover === i && <span className="fan-name">{w.exercise || t('Untitled')}</span>}
             </button>
           )
         })
       })()}
 
-      {chosen !== null && !drag && slotOf.has(chosen) && (
+      {chosen !== null && !drag && !picking && slotOf.has(chosen) && (
         <>
         <span className="dot-name" style={{ right: `calc(${100 - SLOTS[slotOf.get(chosen)!].left}% + min(13cqw, 7.4cqh) / 2 + 8px)`, top: `calc(${SLOTS[slotOf.get(chosen)!].top}% - min(18.7cqw, 10.6cqh) / 2 - 34px)` }}>
           {workouts.find((w) => w.id === chosen)?.exercise || t('Untitled')}
@@ -410,6 +450,42 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
           <WorkoutIcon k={pickedIcon} size="40%" />
           <span className="badge" aria-hidden="true">?</span>
         </HoldPicker>
+      )}
+
+      {/* presets: list button on the right, above the exercises */}
+      {!picking && (
+        <button className={`btn circle mid preset-btn${presetOpen ? ' open' : ''}${focus ? ' on' : ''}${canPreset ? '' : ' at-limit'}`} style={{ left: '86%', top: '41%' }}
+          aria-label={t('Presets')} aria-expanded={presetOpen}
+          onClick={() => { if (!canPreset) { showLocked(t('Presets are an Exclusive feature'), 'exclusive'); return } setPresetOpen(!presetOpen); setNaming(null); sound.tap() }}>
+          <Icon name="preset" size="44%" strokeWidth={2} />
+          {!canPreset && <LockBadge />}
+        </button>
+      )}
+      {focus && !picking && !presetOpen && <span className="preset-name">{focus.name}</span>}
+      {presetOpen && naming === null && (
+        <div className="preset-list" role="menu" aria-label={t('Presets')}>
+          {presets.map((p) => (
+            <button key={p.id} role="menuitemradio" aria-checked={focus?.id === p.id} className={focus?.id === p.id ? 'on' : undefined}
+              disabled={!!session?.preset && session.preset !== p.id}
+              onClick={() => { if (!session?.preset) setFocusId(focus?.id === p.id ? null : p.id); setPresetOpen(false); sound.tap() }}>
+              {p.name}<small>{p.items.length}</small>
+            </button>
+          ))}
+          <button className="new" role="menuitem" onClick={() => setNaming('')}><Icon name="plus" size="15px" strokeWidth={2.4} />{t('New preset')}</button>
+        </div>
+      )}
+      {presetOpen && naming !== null && (
+        <form className="move-form preset-form" onSubmit={(e) => { e.preventDefault(); const n = naming.trim(); if (!n) return; setPicking({ name: n, items: [] }); setNaming(null); setPresetOpen(false); setChosen(null); setRing(null); sound.pop() }}>
+          <input autoFocus placeholder={t('Preset name')} value={naming} maxLength={28} onChange={(e) => setNaming(e.target.value)} />
+          <button type="submit" aria-label={t('Confirm')} disabled={!naming.trim()}><Icon name="check" size="18px" strokeWidth={2.6} /></button>
+        </form>
+      )}
+      {picking && (
+        <div className="pick-bar" role="status">
+          <button className="icon-btn" aria-label={t('Cancel')} onClick={() => setPicking(null)}><Icon name="close" size="20px" /></button>
+          <span className="pick-text"><b>{picking.name}</b><small>{picking.items.length ? t('{n} picked · tap again to remove', { n: picking.items.length }) : t('Tap exercises in the order you do them')}</small></span>
+          <button className="pick-done" disabled={picking.items.length === 0} onClick={savePicked}>{t('Confirm')}</button>
+        </div>
       )}
 
       {settingsOpen && (

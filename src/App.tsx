@@ -25,7 +25,8 @@ import { usePrefs } from './lib/prefs'
 //   summary-<id> the summary shown right after a session ends
 //   themes      themes gallery (gear > Themes)
 //   plans       subscription plans (gear > Plan)
-//   book        book list, book-<id> one workout, sessions = all sessions
+//   book        book list, book-<id> one workout, sessions = all sessions,
+//               presets = preset list, preset-<id> one preset's sessions
 function go(hash: string) {
   location.hash = hash
 }
@@ -81,14 +82,16 @@ function Screen() {
     const w = workouts.find((x) => x.id === hash.slice(5))
     if (w) return <CreatePage key={w.id} editing={w} icon={w.icon} letter={w.letter} onClose={() => history.back()} />
   }
-  if (hash === 'book' || hash === 'sessions' || hash.startsWith('book-')) {
+  if (hash === 'book' || hash === 'sessions' || hash === 'presets' || hash.startsWith('book-') || hash.startsWith('preset-')) {
     return (
       <BookPage
         workouts={workouts}
-        view={hash === 'sessions' ? 'sessions' : 'exercises'}
+        view={hash === 'sessions' ? 'sessions' : hash === 'presets' || hash.startsWith('preset-') ? 'presets' : 'exercises'}
         openId={hash.startsWith('book-') ? hash.slice(5) : null}
+        presetId={hash.startsWith('preset-') ? hash.slice(7) : null}
         onOpen={(id) => go('book-' + id)}
-        onView={(v) => location.replace(v === 'sessions' ? '#sessions' : '#book')}
+        onOpenPreset={(id) => go('preset-' + id)}
+        onView={(v) => location.replace(v === 'sessions' ? '#sessions' : v === 'presets' ? '#presets' : '#book')}
       />
     )
   }
@@ -96,6 +99,7 @@ function Screen() {
     <PageA
       workouts={workouts}
       onOpenDot={(id) => { if (!getPreview()) switchTo(id); go('b-' + id) }}
+      onStartPreset={(id, preset) => { if (!getPreview()) switchTo(id, preset); go('b-' + id) }}
       onEdit={(id) => go('edit-' + id)}
       onOpenBook={() => go('book')}
       onThemes={() => go('themes')}

@@ -5,7 +5,7 @@ import { getPreview, previewBlocked } from '../lib/theme'
 const HOLD_MS = 280
 const SIZE = 54 // px, each popped-up button
 
-export type MenuItem = { key: string; node: ReactNode; label: string; current?: boolean }
+export type MenuItem = { key: string; node: ReactNode; label: string; current?: boolean; num?: number }
 
 // A round button that, when pressed and held, pops buttons up in an arc around
 // it. Slide onto one and let go to pick it. A quick tap calls onTap instead.
@@ -106,6 +106,7 @@ export default function HoldMenu({ items, onPick, onTap, className, style, ariaL
           style={{ left: spots[i].x, top: spots[i].y, width: SIZE, height: SIZE, animationDelay: `${i * 18}ms` }}
         >
           {it.node}
+          {it.num !== undefined && <span className="pnum">{it.num}</span>}
         </div>
       ))}
       {spots && hover !== null && (
