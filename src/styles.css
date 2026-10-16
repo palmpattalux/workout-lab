@@ -1023,3 +1023,80 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .preset-title { font: 800 1.6rem var(--font); letter-spacing: -.03em; }
 .preset-detail > .preset-order { margin: 14px 5.7% 0; }
 .preset-detail > .remove { margin: 0 5.7% 40px; }
+
+/* ---------- notes ---------- */
+.book-tabs { max-width: calc(100% - 11.4%); overflow-x: auto; scrollbar-width: none; }
+.book-tabs::-webkit-scrollbar { display: none; }
+.book-tabs button { padding: 0 12px; flex: none; white-space: nowrap; font-size: .88rem; }
+.create-head .week-link {
+  margin-left: auto; margin-right: 6px; display: inline-flex; align-items: center; gap: 5px;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink);
+  font: 700 .82rem var(--font); padding: 7px 13px; cursor: pointer; box-shadow: var(--lift);
+}
+.create-head .week-link.locked { color: var(--muted); box-shadow: none; }
+.week-link .lock-badge { width: 15px; height: 15px; }
+.icon-btn.star svg { transition: fill .2s, color .2s, transform .25s var(--ease); }
+.icon-btn.star.on { color: var(--sun); }
+.icon-btn.star.on svg { fill: currentColor; transform: scale(1.08); }
+.note-page { display: flex; flex-direction: column; }
+.note-when { flex-direction: column; align-items: flex-start !important; font-size: 1.3rem !important; line-height: 1.15; }
+.note-when small { font: 600 .82rem var(--font); color: var(--muted); }
+.note-actions { display: flex; align-items: center; gap: 2px; }
+.note-context { margin: 10px 7% 0; display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; font: 700 .88rem var(--font); }
+.note-context > span { display: inline-flex; align-items: center; gap: 6px; }
+.note-text {
+  flex: 1; min-height: 50cqh; margin: 14px 5.7% 0; padding: 16px 18px; border: 1px solid var(--hair); border-radius: 22px;
+  background: var(--surface); box-shadow: var(--lift); color: var(--ink); font: 500 1.02rem/1.55 var(--font); resize: none; outline: none;
+  user-select: text; -webkit-user-select: text;
+}
+.note-text::placeholder { color: var(--muted); }
+.note-text:focus { border-color: color-mix(in srgb, var(--active) 40%, transparent); }
+.note-remove { margin: 14px 7% 32px; }
+.notes-list { padding: 18px 5.7% 40px; display: flex; flex-direction: column; gap: 10px; }
+.notes-list ul, ul.notes-list { list-style: none; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.notes-list ul { padding: 0; }
+.new-note {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; border: 1px dashed var(--line); border-radius: 999px;
+  background: none; color: var(--ink); font: 700 .88rem var(--font); padding: 9px 15px; cursor: pointer;
+}
+.note-row { display: flex; align-items: flex-start; gap: 4px; padding: 4px 6px 4px 4px; border: 1px solid var(--hair); border-radius: 20px; background: var(--surface); box-shadow: var(--lift); }
+.note-open { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; border: 0; background: none; color: var(--ink); text-align: left; cursor: pointer; font-family: var(--font); }
+.note-open b { font-size: .98rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.note-more { font-size: .86rem; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.note-open small { display: inline-flex; align-items: center; gap: 6px; font-size: .76rem; color: var(--muted); margin-top: 2px; }
+.note-row .star { margin-top: 4px; }
+.note-badge { flex: none; display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 999px; background: var(--sunk); color: var(--ink); font: 800 .72rem var(--font); }
+.gain-badge + .note-badge { margin-left: -6px; }
+.session-notes { display: flex; flex-direction: column; gap: 6px; }
+.session-note {
+  display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 12px; border: 0; border-radius: 14px; background: var(--sunk);
+  color: var(--ink); font: 600 .88rem var(--font); text-align: left; cursor: pointer;
+}
+.session-note span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.session-note i { font-style: normal; color: var(--muted); font-size: 1.1rem; }
+
+/* ---------- weekly summary ---------- */
+.week { padding-bottom: 6cqh; }
+.week-range { display: flex; align-items: center; justify-content: space-between; margin: 6px 4.5% 0; }
+.week-range span { display: flex; flex-direction: column; align-items: center; font: 800 .95rem var(--font); }
+.week-range small { font: 600 .8rem var(--font); color: var(--muted); }
+.week-range .next svg { transform: rotate(180deg); }
+.week-range .next:disabled { opacity: .25; cursor: default; }
+.week-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 5.7% 0; }
+.week-stats div { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px 4px; border-radius: 18px; background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--lift); }
+.week-stats b { font: 800 1.15rem var(--num); letter-spacing: -.02em; white-space: nowrap; }
+.week-stats small { font: 700 .62rem var(--font); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.week-h { margin: 22px 7% 8px; font: 700 .7rem var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.week-ex { list-style: none; margin: 0 5.7%; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.week-ex li { padding: 13px 15px; border-radius: 20px; background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--lift); display: flex; flex-direction: column; gap: 7px; }
+.week-ex .ex-name { margin: 0; display: flex; align-items: center; gap: 6px; font: 700 .98rem var(--font); }
+.week-ex .ex-name small { margin-left: auto; font: 600 .76rem var(--font); color: var(--muted); }
+.week-ex .changes { display: flex; flex-wrap: wrap; gap: 6px; }
+.week-note-count { display: inline-flex; align-items: center; gap: 5px; font-size: .8rem; }
+.week-missed { margin: 12px 5.7% 0; padding: 12px 15px; border-radius: 20px; border: 1px dashed var(--line); }
+.week-missed h3 { margin: 0 0 6px; font: 700 .78rem var(--font); color: var(--muted); }
+.week-missed p { margin: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; color: var(--muted); font: 600 .86rem var(--font); }
+.week-missed span { display: inline-flex; align-items: center; gap: 5px; }
+.week-notes { padding: 0 5.7%; }
+.week-locked { margin: 30cqh 8% 0; display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--muted); text-align: center; }
+.week-locked .lock-badge { width: 28px; height: 28px; color: var(--sun); }

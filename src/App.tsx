@@ -9,6 +9,8 @@ import ThemesPage from './pages/ThemesPage'
 import PreviewBar from './components/PreviewBar'
 import LockNote from './components/LockNote'
 import PlansPage from './pages/PlansPage'
+import NotePage from './pages/NotePage'
+import WeekPage from './pages/WeekPage'
 import { useWorkouts, setScope } from './lib/store'
 import { supabase, useUser, useRecovering } from './lib/auth'
 import { switchTo } from './lib/session'
@@ -25,8 +27,10 @@ import { usePrefs } from './lib/prefs'
 //   summary-<id> the summary shown right after a session ends
 //   themes      themes gallery (gear > Themes)
 //   plans       subscription plans (gear > Plan)
+//   note-<id>   one note (page B Notes, Book > Notes)
+//   week        weekly summary (Book > This week, Exclusive)
 //   book        book list, book-<id> one workout, sessions = all sessions,
-//               presets = preset list, preset-<id> one preset's sessions
+//               presets = preset list, preset-<id> one preset's sessions, notes = all notes
 function go(hash: string) {
   location.hash = hash
 }
@@ -61,6 +65,8 @@ function Screen() {
   if (recovering) return <NewPasswordPage />
 
   if (hash === 'plans') return <PlansPage />
+  if (hash.startsWith('note-')) return <NotePage key={hash} id={hash.slice(5)} workouts={workouts} />
+  if (hash === 'week') return <WeekPage workouts={workouts} />
   if (hash === 'themes') return <ThemesPage onViewed={() => location.replace('#')} />
   if (hash.startsWith('b-')) {
     const key = hash.slice(2)
@@ -82,16 +88,16 @@ function Screen() {
     const w = workouts.find((x) => x.id === hash.slice(5))
     if (w) return <CreatePage key={w.id} editing={w} icon={w.icon} letter={w.letter} onClose={() => history.back()} />
   }
-  if (hash === 'book' || hash === 'sessions' || hash === 'presets' || hash.startsWith('book-') || hash.startsWith('preset-')) {
+  if (hash === 'book' || hash === 'sessions' || hash === 'presets' || hash === 'notes' || hash.startsWith('book-') || hash.startsWith('preset-')) {
     return (
       <BookPage
         workouts={workouts}
-        view={hash === 'sessions' ? 'sessions' : hash === 'presets' || hash.startsWith('preset-') ? 'presets' : 'exercises'}
+        view={hash === 'sessions' ? 'sessions' : hash === 'notes' ? 'notes' : hash === 'presets' || hash.startsWith('preset-') ? 'presets' : 'exercises'}
         openId={hash.startsWith('book-') ? hash.slice(5) : null}
         presetId={hash.startsWith('preset-') ? hash.slice(7) : null}
         onOpen={(id) => go('book-' + id)}
         onOpenPreset={(id) => go('preset-' + id)}
-        onView={(v) => location.replace(v === 'sessions' ? '#sessions' : v === 'presets' ? '#presets' : '#book')}
+        onView={(v) => location.replace(v === 'exercises' ? '#book' : '#' + v)}
       />
     )
   }

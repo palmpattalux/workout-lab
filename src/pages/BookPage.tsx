@@ -1,5 +1,6 @@
 import { Icon, WorkoutMark } from '../components/icons'
-import { useSessions, usePresets, deletePreset, type Workout, type Preset } from '../lib/store'
+import { useSessions, usePresets, deletePreset, useNotes, addNote, type Workout, type Preset } from '../lib/store'
+import { NoteRow } from './NotePage'
 import { useState } from 'react'
 import { usePlan, atLeast, showLocked } from '../lib/plan'
 import { LockBadge } from '../components/LockNote'
@@ -10,8 +11,9 @@ import { t, locale } from '../lib/i18n'
 
 // A2 book: three tabs. Exercises: one box per workout, tap for its notes, details and
 // past sessions. Sessions: every session, newest first. Presets (Exclusive): one row
-// per preset, tap for only the sessions done from it.
-type View = 'exercises' | 'sessions' | 'presets'
+// per preset, tap for only the sessions done from it. Notes: every note, newest first.
+// "This week" (Exclusive) opens the weekly summary.
+type View = 'exercises' | 'sessions' | 'presets' | 'notes'
 export default function BookPage({ workouts, view, openId, presetId, onOpen, onOpenPreset, onView }: {
   workouts: Workout[]
   view: View
@@ -30,6 +32,12 @@ export default function BookPage({ workouts, view, openId, presetId, onOpen, onO
     <main className="page scroll book" aria-label={t('Book')}>
       <header className="create-head">
         <h1>{open ? <WorkoutMark icon={open.icon} letter={open.letter} /> : preset ? <span className="preset-title">{preset.name}</span> : <Icon name="book" size="1em" strokeWidth={2} />}</h1>
+        {!open && !preset && (
+          <button className={`week-link${canPreset ? '' : ' locked'}`}
+            onClick={() => { if (canPreset) location.hash = 'week'; else showLocked(t('The weekly summary is an Exclusive feature'), 'exclusive') }}>
+            {!canPreset && <LockBadge />}{t('This week')}
+          </button>
+        )}
         <button className="icon-btn" aria-label={t('Back')} onClick={() => history.back()}><Icon name="back" size="22px" /></button>
       </header>
 
@@ -41,6 +49,7 @@ export default function BookPage({ workouts, view, openId, presetId, onOpen, onO
             onClick={() => { if (canPreset) onView('presets'); else showLocked(t('Presets are an Exclusive feature'), 'exclusive') }}>
             {!canPreset && <LockBadge />}{t('Presets')}
           </button>
+          <button role="tab" aria-selected={view === 'notes'} className={view === 'notes' ? 'on' : undefined} onClick={() => onView('notes')}>{t('Notes')}</button>
         </div>
       )}
 
@@ -49,6 +58,7 @@ export default function BookPage({ workouts, view, openId, presetId, onOpen, onO
       )}
 
       {open ? <Detail w={open} /> : preset ? <PresetDetail p={preset} workouts={workouts} /> : view === 'sessions' ? <SessionsList workouts={workouts} />
+        : view === 'notes' ? <NotesList workouts={workouts} />
         : view === 'presets' && canPreset ? (presets.length === 0
           ? <p className="empty-note">{t('No presets yet. Tap the list button on the first page to make one.')}</p>
           : <div className="boxes">{presets.map((p) => <PresetBox key={p.id} p={p} workouts={workouts} onOpen={() => onOpenPreset(p.id)} />)}</div>)
@@ -65,6 +75,19 @@ export default function BookPage({ workouts, view, openId, presetId, onOpen, onO
         </div>
       )}
     </main>
+  )
+}
+
+// Book > Notes: newest first (sorting comes later), with a quick way to start one.
+function NotesList({ workouts }: { workouts: Workout[] }) {
+  const notes = useNotes().filter((n) => n.text.trim())
+  return (
+    <div className="notes-list">
+      <button className="new-note" onClick={() => { location.hash = 'note-' + addNote().id }}><Icon name="plus" size="16px" strokeWidth={2.4} />{t('New note')}</button>
+      {notes.length === 0 ? <p className="empty-note">{t('No notes yet. Tap Notes on an exercise during a session, or start one here.')}</p> : (
+        <ul>{[...notes].reverse().map((n) => <NoteRow key={n.id} note={n} workouts={workouts} onOpen={() => { location.hash = 'note-' + n.id }} />)}</ul>
+      )}
+    </div>
   )
 }
 

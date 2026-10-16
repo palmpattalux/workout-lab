@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { WorkoutMark } from '../components/icons'
-import { useSessions, deleteSession, updateSession, type Workout, type Session, type SetEntry } from '../lib/store'
+import { useSessions, deleteSession, updateSession, useNotes, type Workout, type Session, type SetEntry } from '../lib/store'
+import { Icon } from '../components/icons'
 import { useSession, discardSession } from '../lib/session'
 import { day, time, duration, setLines } from '../lib/format'
 import { compare } from '../lib/progress'
@@ -18,6 +19,7 @@ function Change({ d, unit, label }: { d: number | null; unit?: string; label: st
 export default function SessionsList({ workouts, only }: { workouts: Workout[]; only?: string }) {
   const done = useSessions()
   const live = useSession()
+  const allNotes = useNotes().filter((n) => n.text.trim() && n.sessionId)
   const [open, setOpen] = useState<string | null>(null)
   const [removing, setRemoving] = useState<(Session & { live?: boolean }) | null>(null)
   const [editing, setEditing] = useState<string | null>(null)
@@ -51,6 +53,7 @@ export default function SessionsList({ workouts, only }: { workouts: Workout[]; 
         const at = s.live ? done.length : done.findIndex((x) => x.id === s.id)
         const changes = Object.fromEntries(s.order.map((id) => [id, compare(done, at, s, id)]))
         const gains = s.order.filter((id) => changes[id].up).length
+        const notes = allNotes.filter((n) => n.sessionId === s.id)
         return (
           <li key={s.id} className={s.live ? 'live' : undefined}>
             <button className="session-row" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : s.id)}>
@@ -59,6 +62,7 @@ export default function SessionsList({ workouts, only }: { workouts: Workout[]; 
                 <small>{s.live ? t('In progress since {time}', { time: time(s.startedAt) }) : `${time(s.startedAt)} · ${duration(s.startedAt, s.endedAt ?? s.startedAt)}`}</small>
               </span>
               {gains > 0 && <span className="gain-badge" aria-label={t('{n} improved', { n: gains })}>▲ {gains}</span>}
+              {notes.length > 0 && <span className="note-badge" aria-label={t('{n} notes', { n: notes.length })}><Icon name="note" size="13px" strokeWidth={2.2} />{notes.length}</span>}
               <span className="marks">
                 {s.order.map((id) => {
                   const info = s.snap?.[id] ?? workouts.find((w) => w.id === id)
@@ -91,6 +95,15 @@ export default function SessionsList({ workouts, only }: { workouts: Workout[]; 
                     </div>
                   )
                 })}
+                {notes.length > 0 && (
+                  <div className="session-notes">
+                    {notes.map((n) => (
+                      <button key={n.id} className="session-note" onClick={() => { location.hash = 'note-' + n.id }}>
+                        <Icon name="note" size="16px" strokeWidth={2} /><span>{n.text.trim().split('\n')[0]}</span><i aria-hidden="true">›</i>
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <div className="detail-actions">
                   {!s.live && <button className="edit-session" onClick={() => setEditing(s.id)}>{t('Edit')}</button>}
                   <button className="remove" onClick={() => setRemoving(s)}>{t('Remove session')}</button>

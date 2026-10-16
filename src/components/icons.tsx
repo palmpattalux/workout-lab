@@ -17,6 +17,8 @@ const ui = {
   back: <path d="M15 5l-7 7 7 7" />,
   check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
   preset: <path d="M4 6.5h1.5M4 12h1.5M4 17.5h1.5M9.5 6.5H20M9.5 12H20M9.5 17.5H20" />,
+  star: <path d="M12 3.8l2.5 5.1 5.6.8-4.05 3.95.96 5.6L12 16.6l-5.01 2.64.96-5.6L3.9 9.7l5.6-.8z" />,
+  note: <><path d="M6 3.5h8.5L19 8v12.5H6z" /><path d="M14 3.5V8.5h5M9 12.5h6M9 16h4" /></>,
   lock: <><rect x="5" y="10.5" width="14" height="10" rx="2.5" /><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3" /></>,
   close: <path d="M6 6l12 12M18 6 6 18" />,
   weight: <><path d="M9.5 7.5a2.5 2.5 0 1 1 5 0" /><path d="M7.2 9h9.6l2 10.5H5.2z" /></>,

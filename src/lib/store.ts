@@ -24,6 +24,10 @@ export type Workout = {
 // without a separate database table.
 export type Preset = { id: string; kind: 'preset'; name: string; items: string[]; createdAt: number }
 
+// A note (any plan): free text, optionally taken during a session (sessionId) on an
+// exercise (workoutId). Starred notes are favourites. Saved alongside the workouts too.
+export type Note = { id: string; kind: 'note'; text: string; createdAt: number; updatedAt: number; star?: boolean; sessionId?: string; workoutId?: string }
+
 // One set inside a session, per exercise.
 export type SetEntry = { reps: number | null; weight: number | null }
 
@@ -54,6 +58,7 @@ const key = (name: string) => (scope === 'local' ? `workout-lab:${name}` : `work
 let workouts: Workout[] = []
 let sessions: Session[] = []
 let presets: Preset[] = []
+let notes: Note[] = []
 const listeners = new Set<() => void>()
 const scopeListeners = new Set<() => void>()
 
@@ -62,13 +67,15 @@ function readCache() {
     workouts = JSON.parse(localStorage.getItem(key('workouts')) || '[]')
     sessions = JSON.parse(localStorage.getItem(key('sessions')) || '[]')
     presets = JSON.parse(localStorage.getItem(key('presets')) || '[]')
-  } catch { workouts = []; sessions = []; presets = [] }
+    notes = JSON.parse(localStorage.getItem(key('notes')) || '[]')
+  } catch { workouts = []; sessions = []; presets = []; notes = [] }
 }
 function writeCache() {
   try {
     localStorage.setItem(key('workouts'), JSON.stringify(workouts))
     localStorage.setItem(key('sessions'), JSON.stringify(sessions))
     localStorage.setItem(key('presets'), JSON.stringify(presets))
+    localStorage.setItem(key('notes'), JSON.stringify(notes))
   } catch { /* storage blocked */ }
 }
 function emit() {
@@ -80,26 +87,34 @@ const byStart = (a: Session, b: Session) => a.startedAt - b.startedAt
 const clean = (o: object) => JSON.parse(JSON.stringify(o)) as Record<string, unknown>
 
 // ---------- online copy ----------
-type Remote = { saveWorkout(w: Workout | Preset): void; saveSession(s: Session): void; deleteSession(id: string): void; deleteWorkout(id: string): void }
+type Row = Workout | Preset | Note
+type Remote = { saveWorkout(w: Row): void; saveSession(s: Session): void; deleteSession(id: string): void; deleteWorkout(id: string): void }
 let remote: Remote | null = null
 
 // Merge what the database has with anything made here before it answered.
-function merge(dbRows: (Workout | Preset)[], dbSessions: Session[]) {
-  const [dbWorkouts, dbPresets] = split(dbRows)
+function merge(dbRows: Row[], dbSessions: Session[]) {
+  const [dbWorkouts, dbPresets, dbNotes] = split(dbRows)
   const knownW = new Set(dbWorkouts.map((w) => w.id))
   const knownP = new Set(dbPresets.map((p) => p.id))
+  const knownN = new Set(dbNotes.map((n) => n.id))
   const knownS = new Set(dbSessions.map((x) => x.id))
   workouts.filter((w) => !knownW.has(w.id)).forEach((w) => { dbWorkouts.push(w); remote?.saveWorkout(w) })
   presets.filter((p) => !knownP.has(p.id)).forEach((p) => { dbPresets.push(p); remote?.saveWorkout(p) })
+  notes.filter((n) => !knownN.has(n.id)).forEach((n) => { dbNotes.push(n); remote?.saveWorkout(n) })
   sessions.filter((x) => !knownS.has(x.id)).forEach((x) => { dbSessions.push(x); remote?.saveSession(x) })
   workouts = dbWorkouts.sort(byDate)
   presets = dbPresets.sort(byDate)
+  notes = dbNotes.sort(byDate)
   sessions = dbSessions.sort(byStart)
   emit()
 }
-const isPreset = (r: Workout | Preset): r is Preset => (r as Preset).kind === 'preset'
-function split(rows: (Workout | Preset)[]): [Workout[], Preset[]] {
-  return [rows.filter((r): r is Workout => !isPreset(r)), rows.filter(isPreset)]
+const kindOf = (r: Row) => (r as Preset | Note).kind
+function split(rows: Row[]): [Workout[], Preset[], Note[]] {
+  return [
+    rows.filter((r): r is Workout => !kindOf(r)),
+    rows.filter((r): r is Preset => kindOf(r) === 'preset'),
+    rows.filter((r): r is Note => kindOf(r) === 'note'),
+  ]
 }
 
 // Supabase: one row per record, the record itself kept whole in `data`.
@@ -124,7 +139,7 @@ async function useSupabase() {
   const [w, x] = await Promise.all([sb.from('workouts').select('id, data'), sb.from('sessions').select('id, data')])
   if (w.error || x.error) return // offline: keep the local copy, saves retry on next change
   merge(
-    (w.data ?? []).map((r) => ({ ...(r.data as Workout | Preset), id: r.id })),
+    (w.data ?? []).map((r) => ({ ...(r.data as Row), id: r.id })),
     (x.data ?? []).map((r) => ({ ...(r.data as Session), id: r.id })),
   )
 }
@@ -150,12 +165,12 @@ async function useArtifactDb() {
   }
   let first = true
   col.onSnapshot((snap) => {
-    const ws = snap.docs.filter((d) => d.data()?.kind !== 'session').map((d) => ({ ...(d.data() as Workout | Preset), id: d.id }))
+    const ws = snap.docs.filter((d) => d.data()?.kind !== 'session').map((d) => ({ ...(d.data() as Row), id: d.id }))
     const ss = snap.docs.filter((d) => d.data()?.kind === 'session').map((d) => {
       const { kind: _k, ...b } = d.data() as Session & { kind: string }
       return { ...b, id: d.id } as Session
     })
-    if (first) { first = false; merge(ws, ss) } else { const [w, p] = split(ws); workouts = w.sort(byDate); presets = p.sort(byDate); sessions = ss.sort(byStart); emit() }
+    if (first) { first = false; merge(ws, ss) } else { const [w, p, n] = split(ws); workouts = w.sort(byDate); presets = p.sort(byDate); notes = n.sort(byDate); sessions = ss.sort(byStart); emit() }
   }, () => { /* offline or refused: keep the local copy */ })
 }
 
@@ -275,6 +290,40 @@ export function updatePreset(id: string, patch: Partial<Pick<Preset, 'name' | 'i
   emit()
   remote?.saveWorkout(next)
 }
+export function getNotes() {
+  return notes
+}
+export function addNote(fields: Partial<Pick<Note, 'text' | 'sessionId' | 'workoutId'>> = {}): Note {
+  const now = Date.now()
+  const n: Note = { id: crypto.randomUUID(), kind: 'note', text: '', createdAt: now, updatedAt: now, ...fields }
+  notes = [...notes, n]
+  emit() // saved online once it has text (see updateNote)
+  return n
+}
+export function updateNote(id: string, patch: Partial<Pick<Note, 'text' | 'star'>>) {
+  const n = notes.find((x) => x.id === id)
+  if (!n) return
+  const next = { ...n, ...patch, updatedAt: patch.text !== undefined ? Date.now() : n.updatedAt }
+  notes = notes.map((x) => (x.id === id ? next : x))
+  emit()
+  if (next.text.trim()) saveSoon(next)
+}
+export function deleteNote(id: string) {
+  notes = notes.filter((x) => x.id !== id)
+  emit()
+  clearTimeout(pending.get(id)); pending.delete(id)
+  remote?.deleteWorkout(id)
+}
+// typing saves locally at once and online after a short pause
+const pending = new Map<string, number>()
+function saveSoon(n: Note) {
+  clearTimeout(pending.get(n.id))
+  pending.set(n.id, window.setTimeout(() => { pending.delete(n.id); remote?.saveWorkout(notes.find((x) => x.id === n.id) ?? n) }, 700))
+}
+export function useNotes(): Note[] {
+  return useSyncExternalStore(subscribe, () => notes)
+}
+
 export function deletePreset(id: string) {
   presets = presets.filter((p) => p.id !== id)
   emit()

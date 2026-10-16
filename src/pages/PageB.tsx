@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Icon, WorkoutMark } from '../components/icons'
 import HoldPicker from '../components/HoldPicker'
 import HoldMenu from '../components/HoldMenu'
-import { updateWorkout, usePresets, type Workout } from '../lib/store'
+import { updateWorkout, usePresets, addNote, type Workout } from '../lib/store'
 import { useSession, switchTo, goToSet, record, endSession, discardSession } from '../lib/session'
 import { t } from '../lib/i18n'
 import { usePlan, atLeast, showLocked, MAX_SETS, FREE_SETS } from '../lib/plan'
@@ -69,7 +69,8 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
         <button className={`btn pill${session ? ' live' : ''}`} id="b1" aria-label={session ? t('Active session: tap to end') : t('Active')} onClick={() => session && setConfirmEnd(true)}>
           <span className="led" />{t('Active')}
         </button>
-        <button className="btn pill" id="b2" aria-label={t('Notes')}>{t('Notes')}</button>
+        <button className="btn pill" id="b2" aria-label={t('Notes')}
+          onClick={() => { const n = addNote({ sessionId: session?.id, workoutId: id ?? undefined }); location.hash = 'note-' + n.id }}>{t('Notes')}</button>
       </div>
       {preset && <span className="preset-chip"><Icon name="preset" size="14px" strokeWidth={2.2} />{preset.name}</span>}
 
