@@ -3,7 +3,6 @@ import { Icon } from '../components/icons'
 import ThemeScene from '../components/ThemeScene'
 import { THEMES, THEME_SLOTS, setPreview, usePreview, useApplied, applyTheme, canUseTheme } from '../lib/theme'
 import { usePlan, tierName } from '../lib/plan'
-import { LockBadge } from '../components/LockNote'
 import { sound } from '../lib/sound'
 import { t } from '../lib/i18n'
 
@@ -95,7 +94,7 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
         <p className="theme-blurb">{theme ? t(theme.blurb) : t('A new theme will land here.')}</p>
         {theme && (
           <>
-            <span className={`owned-tag tier-tag${owner ? ' yes' : ''}`}>{!owner && <LockBadge />}{t(tierName(theme.tier))}</span>
+            <span className={`owned-tag tier-tag${owner ? ' yes' : ''}`}>{t(tierName(theme.tier))}</span>
             {owner ? (applied === theme.key
               ? <button className="theme-view on" onClick={() => { applyTheme(null); sound.tap() }}>{t('In use · Turn off')}</button>
               : <button className="theme-view" onClick={() => { applyTheme(theme.key); sound.pop(); onViewed() }}>{t('Use')}</button>)

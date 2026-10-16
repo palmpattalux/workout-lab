@@ -187,13 +187,18 @@ export function setScope(userId: string | null) {
   if (supabase && userId) useSupabase()
   else if (!supabase && userId) useArtifactDb()
 }
-// Workouts logged on this device before online accounts move into the account the
-// first time someone logs in here: both the original no-login copy and any
-// device-only accounts from before Supabase. Each device copy is cleared once moved.
+// What a guest made before signing up moves only into a brand-new account (signed up
+// on this device). Logging into an existing account leaves the guest copy alone.
+// Device-only accounts from before Supabase still move in on first login.
 function adoptDeviceData() {
   try {
-    const sources = ['workout-lab:']
-    const accounts = JSON.parse(localStorage.getItem('workout-lab:accounts') || '{}') as Record<string, { id: string }>
+    const sources: string[] = []
+    if (localStorage.getItem('workout-lab:adopt-guest') === scope) {
+      sources.push('workout-lab:')
+      localStorage.removeItem('workout-lab:adopt-guest')
+    }
+    // (Without Supabase those device accounts are the real accounts, so they stay apart.)
+    const accounts = supabase ? JSON.parse(localStorage.getItem('workout-lab:accounts') || '{}') as Record<string, { id: string }> : {}
     Object.values(accounts).forEach((a) => { if (a?.id && a.id !== scope) sources.push(`workout-lab:${a.id}:`) })
     let moved = false
     for (const pre of sources) {

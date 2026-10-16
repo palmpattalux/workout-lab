@@ -93,8 +93,14 @@ async function localSignUp(email: string, password: string) {
   const salt = crypto.randomUUID()
   all[k] = { id: crypto.randomUUID(), salt, hash: await digest(salt + password) }
   write(ACCOUNTS, all)
+  markNewAccount(all[k].id)
   setMe({ id: all[k].id, email: k })
   return null
+}
+
+// Only a brand-new account takes over what was made before signing up (see adoptDeviceData).
+function markNewAccount(id: string) {
+  try { localStorage.setItem('workout-lab:adopt-guest', id) } catch { /* storage blocked */ }
 }
 
 // undefined while checking, null when signed out.
@@ -141,6 +147,8 @@ export async function signIn(email: string, password: string) {
 export async function signUp(email: string, password: string): Promise<{ error: string | null; confirm: boolean }> {
   if (!supabase) return { error: await localSignUp(email, password), confirm: false }
   const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: home() } })
+  // An email that already has an account comes back with no identities: not new.
+  if (!error && data.user && data.user.identities?.length) markNewAccount(data.user.id)
   return { error: friendly(error?.message), confirm: !error && !data.session }
 }
 

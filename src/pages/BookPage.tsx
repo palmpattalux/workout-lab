@@ -2,9 +2,8 @@ import { Icon, WorkoutMark } from '../components/icons'
 import { useSessions, usePresets, deletePreset, useNotes, addNote, type Workout, type Preset } from '../lib/store'
 import { NoteRow } from './NotePage'
 import { useState } from 'react'
-import { usePlan, atLeast, showLocked } from '../lib/plan'
+import { usePlan, atLeast } from '../lib/plan'
 import { useNewWeek } from '../lib/week'
-import { LockBadge } from '../components/LockNote'
 import { day, time, setLines } from '../lib/format'
 import SessionsList from './SessionsPage'
 import { supabase, signOut } from '../lib/auth'
@@ -34,10 +33,9 @@ export default function BookPage({ workouts, view, openId, presetId, onOpen, onO
     <main className="page scroll book" aria-label={t('Book')}>
       <header className="create-head">
         <h1>{open ? <WorkoutMark icon={open.icon} letter={open.letter} /> : preset ? <span className="preset-title">{preset.name}</span> : <Icon name="book" size="1em" strokeWidth={2} />}</h1>
-        {!open && !preset && (
-          <button className={`week-link${canPreset ? '' : ' locked'}`}
-            onClick={() => { if (canPreset) location.hash = 'week'; else showLocked(t('The weekly summary is an Exclusive feature'), 'exclusive') }}>
-            {!canPreset && <LockBadge />}{t('This week')}
+        {!open && !preset && canPreset && (
+          <button className="week-link" onClick={() => { location.hash = 'week' }}>
+            {t('This week')}
             {newWeek && <span className="new-dot" aria-label={t('New summary')} />}
           </button>
         )}
@@ -48,10 +46,9 @@ export default function BookPage({ workouts, view, openId, presetId, onOpen, onO
         <div className="book-tabs" role="tablist">
           <button role="tab" aria-selected={view === 'exercises'} className={view === 'exercises' ? 'on' : undefined} onClick={() => onView('exercises')}>{t('Exercises')}</button>
           <button role="tab" aria-selected={view === 'sessions'} className={view === 'sessions' ? 'on' : undefined} onClick={() => onView('sessions')}>{t('Sessions')}</button>
-          <button role="tab" aria-selected={view === 'presets'} className={`${view === 'presets' ? 'on' : ''}${canPreset ? '' : ' locked'}`}
-            onClick={() => { if (canPreset) onView('presets'); else showLocked(t('Presets are an Exclusive feature'), 'exclusive') }}>
-            {!canPreset && <LockBadge />}{t('Presets')}
-          </button>
+          {canPreset && (
+            <button role="tab" aria-selected={view === 'presets'} className={view === 'presets' ? 'on' : undefined} onClick={() => onView('presets')}>{t('Presets')}</button>
+          )}
           <button role="tab" aria-selected={view === 'notes'} className={view === 'notes' ? 'on' : undefined} onClick={() => onView('notes')}>{t('Notes')}</button>
         </div>
       )}
