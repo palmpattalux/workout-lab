@@ -7,7 +7,7 @@ import { usePrefs, setPrefs } from '../lib/prefs'
 import { useSkin, getPreview } from '../lib/theme'
 import ThemeScene from '../components/ThemeScene'
 import { useEmail, signOut } from '../lib/auth'
-import { t } from '../lib/i18n'
+import { t, LANGS } from '../lib/i18n'
 import { LangPicker } from '../components/Flag'
 
 // Exercise dot positions, as % of the screen: low and toward the right, in easy reach of a
@@ -240,6 +240,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
     sound.tap()
   }
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [langOpen, setLangOpen] = useState(false) // flags stay folded until the arrow is tapped
   const lastTap = useRef(0)
   // While an icon is picked, a double tap on "+" or a press anywhere else means "never mind".
   function tapAdd() {
@@ -412,10 +413,12 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
               <span className="knob" />
             </button>
           </div>
-          <div className="set-row lang-row">
+          <button className={`set-row themes-link lang-toggle${langOpen ? ' open' : ''}`} aria-expanded={langOpen} onClick={() => setLangOpen(!langOpen)}>
             <span>{t('Language')}</span>
-            <LangPicker />
-          </div>
+            <span className="lang-now">{LANGS.find((l) => l.key === prefs.lang)?.name}</span>
+            <span className="chev"><Icon name="back" size="18px" /></span>
+          </button>
+          {langOpen && <div className="lang-flags"><LangPicker /></div>}
           <button className="set-row themes-link" onClick={onThemes}>
             <span>{t('Themes')}</span>
             <span className="chev"><Icon name="back" size="18px" /></span>
