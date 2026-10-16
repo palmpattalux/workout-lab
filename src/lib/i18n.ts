@@ -239,6 +239,9 @@ const ROWS: [string, string, string, string][] = [
   ['Tap to choose it', 'แตะเพื่อเลือก', 'タップして選択', '点一下选中'],
   ['Tap again to start', 'แตะอีกครั้งเพื่อเริ่ม', 'もう一度タップで開始', '再点一下开始'],
   ['Done? Tap Active to end the session', 'เสร็จแล้ว? แตะ "กำลังเล่น" เพื่อจบเซสชัน', '終わったら「実行中」をタップして終了', '练完了？点"进行中"结束训练'],
+  ['Open-source licences', 'ใบอนุญาตโอเพนซอร์ส', 'オープンソースライセンス', '开源许可'],
+  ['Licences', 'ใบอนุญาต', 'ライセンス', '许可'],
+  ["Couldn't load the licences. Check your connection and try again.", 'โหลดใบอนุญาตไม่ได้ ตรวจสอบการเชื่อมต่อแล้วลองใหม่', 'ライセンスを読み込めませんでした。接続を確認してもう一度お試しください。', '无法加载许可信息。请检查网络后重试。'],
   // icons (screen readers)
   ['Arm', 'แขน', '腕', '手臂'],
   ['Leg', 'ขา', '脚', '腿'],

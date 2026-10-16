@@ -11,6 +11,7 @@ import LockNote from './components/LockNote'
 import PlansPage from './pages/PlansPage'
 import NotePage from './pages/NotePage'
 import WeekPage from './pages/WeekPage'
+import LicensesPage from './pages/LicensesPage'
 import { useWorkouts, setScope } from './lib/store'
 import { supabase, useUser, useRecovering, arrivedFromEmailLink } from './lib/auth'
 import { switchTo } from './lib/session'
@@ -31,6 +32,7 @@ import { t } from './lib/i18n'
 //   save        sign up after a guest's first session: "Sign in to save your workout"
 //   plans       subscription plans (gear > Plan)
 //   note-<id>   one note (page B Notes, Book > Notes)
+//   licenses    open-source credits (gear)
 //   week        weekly summary (Book > This week, Exclusive)
 //   book        book list, book-<id> one workout, sessions = all sessions,
 //               presets = preset list, preset-<id> one preset's sessions, notes = all notes
@@ -78,6 +80,7 @@ function Screen() {
 
   if (hash === 'plans') return <PlansPage />
   if (hash.startsWith('note-')) return <NotePage key={hash} id={hash.slice(5)} workouts={workouts} />
+  if (hash === 'licenses') return <LicensesPage />
   if (hash === 'week') return <WeekPage workouts={workouts} />
   if (hash === 'themes') return <ThemesPage onViewed={() => location.replace('#')} />
   if (hash.startsWith('b-')) {

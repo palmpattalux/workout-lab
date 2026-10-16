@@ -545,6 +545,10 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
             <span>{t('Themes')}</span>
             <span className="chev"><Icon name="back" size="18px" /></span>
           </button>
+          <button className="set-row themes-link credits-link" onClick={() => { setSettingsOpen(false); location.hash = 'licenses' }}>
+            <span>{t('Open-source licences')}</span>
+            <span className="chev"><Icon name="back" size="18px" /></span>
+          </button>
           {guest ? (
             <div className="set-row account">
               <span className="who">{t('Not signed in')}</span>
