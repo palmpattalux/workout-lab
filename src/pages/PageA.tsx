@@ -553,7 +553,7 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
           ) : (
             <div className="set-row account">
               <span className="who">{email ?? t('Signed in')}</span>
-              <button className="logout-btn" onClick={() => { setSettingsOpen(false); signOut(); location.replace('#login') }}>{t('Log out')}</button>
+              <button className="logout-btn" onClick={() => { setSettingsOpen(false); signOut() }}>{t('Log out')}</button>
             </div>
           )}
         </div>
@@ -564,7 +564,15 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
           <span className="holo-track" />
           <span className="holo-pick one"><WorkoutIcon k="dumbbell" size="52%" strokeWidth={2} /></span>
           <span className="holo-pick two"><b>A</b></span>
-          <span className="holo-hand"><Icon name="hand" size="100%" strokeWidth={1.6} /></span>
+          {/* a right thumb, as if holding the phone in the right hand: a blueprint to trace */}
+          <span className="holo-thumb">
+            <svg viewBox="0 0 80 250" aria-hidden="true">
+              <path className="th-body" d="M40 2C58 2 70 16 70 38L72 150C72 178 78 208 82 250H-2C2 208 8 178 10 150L10 38C10 16 22 2 40 2Z" />
+              <path className="th-nail" d="M40 10C52 10 60 20 60 34V60C60 68 53 73 40 73S20 68 20 60V34C20 20 28 10 40 10Z" />
+              <path className="th-line" d="M17 118Q40 126 63 118M15 131Q40 139 65 131" />
+              <circle className="th-tip" cx="40" cy="6" r="5" />
+            </svg>
+          </span>
           <span className="holo-label">{t('Slide up to make an exercise')}</span>
         </div>
       )}

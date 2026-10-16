@@ -57,7 +57,7 @@ export default function BookPage({ workouts, view, openId, presetId, onOpen, onO
       )}
 
       {!open && !preset && supabase && (
-        <button className="logout" onClick={() => { signOut(); location.replace('#login') }}>{t('Log out')}</button>
+        <button className="logout" onClick={() => { signOut(); location.replace('#') }}>{t('Log out')}</button>
       )}
 
       {open ? <Detail w={open} /> : preset ? <PresetDetail p={preset} workouts={workouts} /> : view === 'sessions' ? <SessionsList workouts={workouts} />

@@ -34,6 +34,10 @@ import { t } from './lib/i18n'
 //   week        weekly summary (Book > This week, Exclusive)
 //   book        book list, book-<id> one workout, sessions = all sessions,
 //               presets = preset list, preset-<id> one preset's sessions, notes = all notes
+// The log-in page only opens when asked for (gear, the sign-up guide, or ending a guest's
+// session), never on its own when the app is opened.
+if (['login', 'signup', 'save'].includes(location.hash.slice(1))) history.replaceState(null, '', location.pathname + location.search)
+
 function go(hash: string) {
   location.hash = hash
 }

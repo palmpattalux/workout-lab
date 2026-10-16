@@ -1121,7 +1121,17 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 /* "+": slide up, an icon lights, then again for a letter */
 .holo-create { left: 20%; top: 87%; width: 0; height: 0; }
 .holo-track { position: absolute; left: -1px; bottom: 0; width: 2px; height: 130px; border-radius: 2px; background: linear-gradient(to top, transparent, color-mix(in srgb, var(--active) 55%, transparent)); opacity: .5; }
-.holo-create .holo-hand { left: -9px; top: 4px; animation: holo-swipe 3.2s var(--ease) infinite; }
+.holo-thumb { position: absolute; left: 0; top: 0; width: 0; height: 0; opacity: 0; animation: holo-swipe 3.2s var(--ease) infinite; }
+.holo-thumb svg {
+  position: absolute; left: -32px; top: -4px; width: 64px; height: 200px; overflow: visible;
+  transform-origin: 32px 4px; transform: rotate(-32deg);
+  -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 95%); mask-image: linear-gradient(to bottom, #000 45%, transparent 95%);
+}
+.holo-thumb .th-body { fill: color-mix(in srgb, var(--active) 14%, transparent); stroke: var(--active); stroke-width: 1.6; }
+.holo-thumb .th-nail { fill: none; stroke: var(--active); stroke-width: 1.2; stroke-dasharray: 3 3; opacity: .8; }
+.holo-thumb .th-line { fill: none; stroke: var(--active); stroke-width: 1; opacity: .55; }
+.holo-thumb .th-tip { fill: var(--active); opacity: .9; }
+.holo-create .holo-label { animation: holo-flicker 4s linear infinite; }
 @keyframes holo-swipe {
   0% { opacity: 0; transform: translateY(0) scale(1); }
   10% { opacity: .9; transform: translateY(0) scale(.88); }
