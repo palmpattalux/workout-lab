@@ -267,6 +267,14 @@ export function addPreset(name: string, items: string[]): Preset {
   remote?.saveWorkout(p)
   return p
 }
+export function updatePreset(id: string, patch: Partial<Pick<Preset, 'name' | 'items'>>) {
+  const p = presets.find((x) => x.id === id)
+  if (!p) return
+  const next = { ...p, ...patch }
+  presets = presets.map((x) => (x.id === id ? next : x))
+  emit()
+  remote?.saveWorkout(next)
+}
 export function deletePreset(id: string) {
   presets = presets.filter((p) => p.id !== id)
   emit()

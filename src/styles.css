@@ -957,11 +957,6 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 
 /* ---------- presets (Exclusive) ---------- */
 .preset-btn.open, .preset-btn.on { color: var(--active); }
-.preset-name {
-  position: absolute; right: calc(14% + min(17.5cqw, 9.8cqh) / 2 + 8px); top: 41%; transform: translateY(-50%); z-index: 3; max-width: 52%;
-  padding: 6px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--lift);
-  font: 700 .82rem var(--font); color: var(--active); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
 .preset-list {
   position: absolute; right: 5.7%; bottom: calc(59% + min(17.5cqw, 9.8cqh) / 2 + 10px); z-index: 8;
   display: flex; flex-direction: column; align-items: flex-end; gap: 6px; max-height: 32%; overflow-y: auto; padding: 4px;
@@ -973,8 +968,14 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
   font: 700 .9rem var(--font); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .preset-list button small { font: 700 .7rem var(--num); color: var(--muted); }
-.preset-list button.on { background: var(--active-soft); color: var(--active); border-color: color-mix(in srgb, var(--active) 30%, transparent); }
-.preset-list button:disabled { opacity: .45; }
+.preset-row { display: flex; align-items: center; gap: 8px; }
+.preset-list .preset-row > button[role=menuitem].armed {
+  color: var(--sun); border-color: color-mix(in srgb, var(--sun) 45%, transparent); animation: sun 1.8s ease-in-out infinite;
+}
+.preset-list .preset-edit {
+  position: relative; left: auto; top: auto; transform: none; flex: none; width: 40px; height: 40px; padding: 0;
+  display: grid; place-items: center; border-radius: 50%; animation: pop-in .2s var(--ease) both;
+}
 .preset-list button.new { color: var(--muted); border-style: dashed; border-color: var(--line); box-shadow: none; background: var(--surface); }
 .preset-form { top: calc(41% - min(17.5cqw, 9.8cqh) / 2 - 64px); right: 5.7%; left: auto; width: min(72%, 280px); position: absolute; }
 .preset-form button:disabled { opacity: .4; }
@@ -985,7 +986,6 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .page.picking .dot.filled:not(.in-preset) { opacity: .62; }
 .page.picking .dot.filled { animation: none; }
 .page.picking .add, .page.picking #a2, .page.picking .gear { opacity: .25; pointer-events: none; }
-.page.preset-on .dot.filled:not(.in-preset):not(.armed) { opacity: .4; }
 .pick-bar {
   position: absolute; left: 5.7%; right: 5.7%; top: 3.5%; z-index: 9; display: flex; align-items: center; gap: 8px;
   padding: 8px 8px 8px 6px; border-radius: 20px; background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--float);

@@ -203,6 +203,8 @@ const ROWS: [string, string, string, string][] = [
   ['No sessions from this preset yet. Pick it on the first page, then open one of its exercises.', 'ยังไม่มีเซสชันจากชุดท่านี้ เลือกชุดท่าที่หน้าแรกแล้วเปิดท่าในชุด', 'このプリセットのセッションはまだありません。最初のページで選んで、種目を開いてください。', '这个预设还没有训练记录。在首页选中它，再打开其中的动作。'],
   ['1 session', '1 เซสชัน', '1セッション', '1 次训练'],
   ['{n} sessions', '{n} เซสชัน', '{n}セッション', '{n} 次训练'],
+  ['Edit preset', 'แก้ไขชุดท่า', 'プリセットを編集', '编辑预设'],
+  ['Start {name}', 'เริ่ม {name}', '{name}を開始', '开始 {name}'],
   ['Remove preset', 'ลบชุดท่า', 'プリセットを削除', '删除预设'],
   ['Remove preset?', 'ลบชุดท่านี้?', 'このプリセットを削除しますか？', '删除这个预设？'],
   // icons (screen readers)

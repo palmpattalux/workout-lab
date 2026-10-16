@@ -1,8 +1,7 @@
 import { useRef, useState, type PointerEvent } from 'react'
 import { Icon, WorkoutIcon, WorkoutMark, WORKOUT_ICONS, BODY_LETTERS } from '../components/icons'
 import HoldPicker from '../components/HoldPicker'
-import { updateWorkout, usePresets, addPreset, type Workout } from '../lib/store'
-import { useSession } from '../lib/session'
+import { updateWorkout, usePresets, addPreset, updatePreset, type Workout } from '../lib/store'
 import { sound } from '../lib/sound'
 import { usePrefs, setPrefs } from '../lib/prefs'
 import { useSkin, getPreview } from '../lib/theme'
@@ -101,18 +100,16 @@ export default function PageA({ workouts, onOpenDot, onStartPreset, onEdit, onOp
   const canPreset = atLeast(plan, 'exclusive')
 
   // Presets (Exclusive): the list button opens saved presets and "New preset". A new one
-  // is named, then its exercises are tapped right here, in the order they'll be done.
-  // Picking a saved preset numbers its exercises on the page; opening one of them
-  // starts the session from that preset.
+  // is named, then its exercises are tapped right here, in the order they'll be done
+  // (the only time exercises show numbers). A saved preset works like an exercise
+  // bubble: first tap arms it (play + edit pen), second tap starts the session at its
+  // first exercise.
   const presets = usePresets()
-  const session = useSession()
   const [presetOpen, setPresetOpen] = useState(false)
-  const [naming, setNaming] = useState<string | null>(null)
-  const [picking, setPicking] = useState<{ name: string; items: string[] } | null>(null)
-  const [focusId, setFocusId] = useState<string | null>(null)
-  const focus = presets.find((p) => p.id === (session?.preset ?? focusId)) ?? null
-  const order = picking?.items ?? focus?.items ?? null
-  const numOf = (id: string) => (order ? order.indexOf(id) + 1 : 0)
+  const [naming, setNaming] = useState<{ name: string; id?: string } | null>(null)
+  const [picking, setPicking] = useState<{ name: string; items: string[]; id?: string } | null>(null)
+  const [armedPreset, setArmedPreset] = useState<string | null>(null)
+  const numOf = (id: string) => (picking ? picking.items.indexOf(id) + 1 : 0)
   function togglePick(id: string) {
     if (!picking) return
     setPicking({ ...picking, items: picking.items.includes(id) ? picking.items.filter((i) => i !== id) : [...picking.items, id] })
@@ -120,14 +117,21 @@ export default function PageA({ workouts, onOpenDot, onStartPreset, onEdit, onOp
   }
   function savePicked() {
     if (!picking || picking.items.length === 0) return
-    const p = addPreset(picking.name, picking.items)
-    setPicking(null); setFocusId(p.id)
+    if (picking.id) updatePreset(picking.id, { name: picking.name, items: picking.items })
+    else addPreset(picking.name, picking.items)
+    setPicking(null)
     sound.pop()
   }
-  function openDot(id: string) {
-    if (focus && focus.items.includes(id)) onStartPreset(id, focus.id)
-    else onOpenDot(id)
+  function tapPreset(id: string) {
+    const p = presets.find((x) => x.id === id)
+    if (!p) return
+    if (armedPreset !== id) { setArmedPreset(id); sound.tap(); return }
+    const first = p.items.find((i) => workouts.some((w) => w.id === i))
+    if (!first) return
+    setPresetOpen(false); setArmedPreset(null)
+    onStartPreset(first, p.id)
   }
+  const openDot = onOpenDot
   const bySlot = placeAll(units)
   const slotOf = new Map<string, number>() // unit key and every member id -> slot
   for (const [i, u] of bySlot) { slotOf.set(u.key, i); u.members.forEach((w) => slotOf.set(w.id, i)) }
@@ -296,9 +300,9 @@ export default function PageA({ workouts, onOpenDot, onStartPreset, onEdit, onOp
   const skin = useSkin()
 
   return (
-    <main className={`page${picking ? ' picking' : ''}${focus && !picking ? ' preset-on' : ''}`} aria-label="Page A"
+    <main className={`page${picking ? ' picking' : ''}`} aria-label="Page A"
       onPointerDownCapture={(e) => { if (pickedIcon && !(e.target as Element).closest('.add')) setPickedIcon(null) }}
-      onClick={(e) => { if (e.target === e.currentTarget) { setChosen(null); setSettingsOpen(false); setRing(null); setPresetOpen(false) } }}>
+      onClick={(e) => { if (e.target === e.currentTarget) { setChosen(null); setSettingsOpen(false); setRing(null); setPresetOpen(false); setArmedPreset(null) } }}>
       <ThemeScene skin={skin} />
       <button className="btn pill" id="a2" aria-label={t('Book')} onClick={onOpenBook}>
         <Icon name="book" size="46%" />
@@ -454,30 +458,38 @@ export default function PageA({ workouts, onOpenDot, onStartPreset, onEdit, onOp
 
       {/* presets: list button on the right, above the exercises */}
       {!picking && (
-        <button className={`btn circle mid preset-btn${presetOpen ? ' open' : ''}${focus ? ' on' : ''}${canPreset ? '' : ' at-limit'}`} style={{ left: '86%', top: '41%' }}
+        <button className={`btn circle mid preset-btn${presetOpen ? ' open' : ''}${canPreset ? '' : ' at-limit'}`} style={{ left: '86%', top: '41%' }}
           aria-label={t('Presets')} aria-expanded={presetOpen}
-          onClick={() => { if (!canPreset) { showLocked(t('Presets are an Exclusive feature'), 'exclusive'); return } setPresetOpen(!presetOpen); setNaming(null); sound.tap() }}>
+          onClick={() => { if (!canPreset) { showLocked(t('Presets are an Exclusive feature'), 'exclusive'); return } setPresetOpen(!presetOpen); setNaming(null); setArmedPreset(null); sound.tap() }}>
           <Icon name="preset" size="44%" strokeWidth={2} />
           {!canPreset && <LockBadge />}
         </button>
       )}
-      {focus && !picking && !presetOpen && <span className="preset-name">{focus.name}</span>}
       {presetOpen && naming === null && (
         <div className="preset-list" role="menu" aria-label={t('Presets')}>
           {presets.map((p) => (
-            <button key={p.id} role="menuitemradio" aria-checked={focus?.id === p.id} className={focus?.id === p.id ? 'on' : undefined}
-              disabled={!!session?.preset && session.preset !== p.id}
-              onClick={() => { if (!session?.preset) setFocusId(focus?.id === p.id ? null : p.id); setPresetOpen(false); sound.tap() }}>
-              {p.name}<small>{p.items.length}</small>
-            </button>
+            <div key={p.id} className="preset-row">
+              {armedPreset === p.id && (
+                <button className="btn circle choice preset-edit" aria-label={t('Edit preset')}
+                  onClick={() => { setNaming({ name: p.name, id: p.id }); setArmedPreset(null) }}>
+                  <Icon name="write" size="48%" />
+                </button>
+              )}
+              <button role="menuitem" className={armedPreset === p.id ? 'armed' : undefined}
+                aria-label={armedPreset === p.id ? t('Start {name}', { name: p.name }) : p.name}
+                onClick={() => tapPreset(p.id)}>
+                {armedPreset === p.id && <Icon name="play" size="13px" strokeWidth={2.4} />}
+                {p.name}<small>{p.items.length}</small>
+              </button>
+            </div>
           ))}
-          <button className="new" role="menuitem" onClick={() => setNaming('')}><Icon name="plus" size="15px" strokeWidth={2.4} />{t('New preset')}</button>
+          <button className="new" role="menuitem" onClick={() => setNaming({ name: '' })}><Icon name="plus" size="15px" strokeWidth={2.4} />{t('New preset')}</button>
         </div>
       )}
       {presetOpen && naming !== null && (
-        <form className="move-form preset-form" onSubmit={(e) => { e.preventDefault(); const n = naming.trim(); if (!n) return; setPicking({ name: n, items: [] }); setNaming(null); setPresetOpen(false); setChosen(null); setRing(null); sound.pop() }}>
-          <input autoFocus placeholder={t('Preset name')} value={naming} maxLength={28} onChange={(e) => setNaming(e.target.value)} />
-          <button type="submit" aria-label={t('Confirm')} disabled={!naming.trim()}><Icon name="check" size="18px" strokeWidth={2.6} /></button>
+        <form className="move-form preset-form" onSubmit={(e) => { e.preventDefault(); const n = naming.name.trim(); if (!n) return; const old = naming.id ? presets.find((p) => p.id === naming.id) : undefined; setPicking({ name: n, items: old ? old.items.filter((i) => workouts.some((w) => w.id === i)) : [], id: old?.id }); setNaming(null); setPresetOpen(false); setChosen(null); setRing(null); sound.pop() }}>
+          <input autoFocus placeholder={t('Preset name')} value={naming.name} maxLength={28} onChange={(e) => setNaming({ ...naming, name: e.target.value })} />
+          <button type="submit" aria-label={t('Confirm')} disabled={!naming.name.trim()}><Icon name="check" size="18px" strokeWidth={2.6} /></button>
         </form>
       )}
       {picking && (
