@@ -9,6 +9,8 @@ import ThemeScene from '../components/ThemeScene'
 import { useEmail, signOut } from '../lib/auth'
 import { t, LANGS } from '../lib/i18n'
 import { LangPicker } from '../components/Flag'
+import { LockBadge } from '../components/LockNote'
+import { usePlan, atLeast, showLocked, tierName, FREE_WORKOUTS } from '../lib/plan'
 
 // Exercise dot positions, as % of the screen: low and toward the right, in easy reach of a
 // right thumb. The first four are always shown; the rest fill in as more workouts exist.
@@ -75,12 +77,13 @@ function fan(slot: number, n: number) {
 const iconOptions = WORKOUT_ICONS.map((i) => ({ key: i.key, label: i.name, node: <WorkoutIcon k={i.key} size="24px" strokeWidth={2} /> }))
 const letterOptions = BODY_LETTERS.map((l) => ({ key: l.key, label: l.name, node: <b className="letter">{l.key}</b> }))
 
-export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onThemes, onCreate }: {
+export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onThemes, onPlans, onCreate }: {
   workouts: Workout[]
   onOpenDot: (id: string) => void
   onEdit: (id: string) => void
   onOpenBook: () => void
   onThemes: () => void
+  onPlans: () => void
   onCreate: (icon: string, letter: string) => void
 }) {
   // "+" flow: first drag up picks the workout icon, second drag up picks the body-part letter.
@@ -89,6 +92,10 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
   // and a pen (edit) appears above it.
   const [chosen, setChosen] = useState<string | null>(null)
   const units = unitsOf(workouts)
+  // Free plan: grouping is locked and only FREE_WORKOUTS exercises can be made
+  const plan = usePlan()
+  const canGroup = atLeast(plan, 'premium')
+  const atLimit = !canGroup && workouts.length >= FREE_WORKOUTS
   const bySlot = placeAll(units)
   const slotOf = new Map<string, number>() // unit key and every member id -> slot
   for (const [i, u] of bySlot) { slotOf.set(u.key, i); u.members.forEach((w) => slotOf.set(w.id, i)) }
@@ -161,6 +168,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
     if (getPreview()) { setDrag(null); sound.tap(); return }
     const me = unitAt(key)
     if (!me) { setDrag(null); return }
+    if (ready !== null && !canGroup) { setDrag(null); sound.tap(); showLocked(t('Free plan: grouping is locked')); return }
     if (ready !== null) {
       for (const [i, x] of bySlot) setSlot(x, i)
       const target = bySlot.get(ready)!
@@ -321,7 +329,7 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
       })}
 
       {groupWith && drag && (
-        <span className={`group-pop${groupWith.ready ? ' on' : ''}`} style={{ left: `${SLOTS[groupWith.slot].left}%`, top: `calc(${SLOTS[groupWith.slot].top}% - min(18.7cqw, 10.6cqh) / 2 - 22px)` }}>{t('Group')}</span>
+        <span className={`group-pop${groupWith.ready ? ' on' : ''}${canGroup ? '' : ' locked'}`} style={{ left: `${SLOTS[groupWith.slot].left}%`, top: `calc(${SLOTS[groupWith.slot].top}% - min(18.7cqw, 10.6cqh) / 2 - 22px)` }}>{!canGroup && <LockBadge />}{t('Group')}</span>
       )}
 
       {ring && !drag && (() => {
@@ -369,7 +377,14 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
         </>
       )}
 
-      {pickedIcon === null ? (
+      {atLimit && pickedIcon === null ? (
+        <button className="btn circle dot add float at-limit" style={{ left: '20%', top: '87%' }}
+          aria-label={t('Free plan: up to {n} workouts', { n: FREE_WORKOUTS })}
+          onClick={() => showLocked(t('Free plan: up to {n} workouts', { n: FREE_WORKOUTS }))}>
+          <Icon name="plus" strokeWidth={2.6} />
+          <LockBadge />
+        </button>
+      ) : pickedIcon === null ? (
         <HoldPicker
           options={iconOptions}
           maxStep={40}
@@ -419,6 +434,11 @@ export default function PageA({ workouts, onOpenDot, onEdit, onOpenBook, onTheme
             <span className="chev"><Icon name="back" size="18px" /></span>
           </button>
           {langOpen && <div className="lang-flags"><LangPicker /></div>}
+          <button className="set-row themes-link plan-link" onClick={onPlans}>
+            <span>{t('Plan')}</span>
+            <span className="lang-now">{t(tierName(plan))}</span>
+            <span className="chev"><Icon name="back" size="18px" /></span>
+          </button>
           <button className="set-row themes-link" onClick={onThemes}>
             <span>{t('Themes')}</span>
             <span className="chev"><Icon name="back" size="18px" /></span>

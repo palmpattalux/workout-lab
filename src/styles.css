@@ -900,3 +900,57 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .flag { width: 100%; height: 100%; border-radius: 5px; object-fit: cover; display: block; }
 .login-lang { position: absolute; top: 18px; right: 6%; }
 .login { position: relative; }
+
+/* ---------- plans: lock marks, the lock note, the plans page ---------- */
+.lock-badge { display: inline-grid; place-items: center; width: 1.05em; height: 1.05em; color: inherit; }
+.btn .lock-badge {
+  position: absolute; top: -1px; right: -1px; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--ink); color: var(--stage); box-shadow: 0 0 0 2px var(--surface);
+}
+.btn.at-limit > svg:first-child { opacity: .4; }
+.set-menu button.locked { color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 2px; font-size: .95rem; }
+.set-menu button.locked .lock-badge { width: 15px; height: 15px; opacity: .8; }
+.group-pop.locked { display: inline-flex; align-items: center; gap: 5px; }
+.group-pop.locked .lock-badge { width: 15px; height: 15px; margin: -2px -1px; }
+.tier-tag { display: inline-flex; align-items: center; gap: 5px; }
+.tier-tag .lock-badge { width: 11px; height: 11px; }
+
+.lock-note {
+  position: fixed; left: 50%; top: calc(env(safe-area-inset-top) + 14px); z-index: 70;
+  width: min(calc(100% - 32px), 398px); display: flex; align-items: center; gap: 11px; padding: 10px 10px 10px 12px;
+  border-radius: 18px; background: var(--surface); color: var(--ink); border: 1px solid var(--hair); box-shadow: var(--float);
+  transform: translateX(-50%); animation: ln-in .32s var(--ease) both;
+}
+@keyframes ln-in { from { opacity: 0; transform: translate(-50%, -12px) scale(.97); } }
+.lock-note .lock-ic { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--sunk); color: var(--sun); }
+.ln-text { flex: 1; min-width: 0; font: 700 .86rem var(--font); line-height: 1.25; }
+.ln-text small { display: block; font-weight: 500; font-size: .76rem; color: var(--muted); margin-top: 1px; }
+.ln-plans { flex: none; border: 1px solid var(--line); border-radius: 999px; background: none; color: var(--ink); font: 700 .78rem var(--font); padding: 7px 13px; cursor: pointer; }
+.ln-plans:active { transform: scale(.95); }
+
+.plans { padding-bottom: 6cqh; }
+.plans .create-head h1 { font-size: 1.9rem; letter-spacing: -.03em; }
+.plan-now { margin: 6px 7% 14px; display: flex; gap: 8px; align-items: baseline; color: var(--muted); font: 600 .85rem var(--font); }
+.plan-now b { color: var(--ink); font-weight: 800; }
+.plan-card {
+  margin: 0 5.7% 12px; padding: 16px 18px; border-radius: 22px; position: relative;
+  background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--lift);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.plan-card.current { box-shadow: var(--lift), inset 0 0 0 1.5px var(--ink); }
+.plan-card.free { background: transparent; box-shadow: none; border: 1px dashed var(--line); }
+.plan-card.free.current { border-style: solid; border-color: var(--ink); }
+.plan-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.plan-card h2 { margin: 0; font: 800 1.2rem var(--font); letter-spacing: -.02em; }
+.plan-card.exclusive h2::after { content: ""; display: inline-block; width: 6px; height: 6px; margin-left: 7px; vertical-align: .25em; border-radius: 50%; background: var(--sun); }
+.plan-price { font: 800 1.25rem var(--num); letter-spacing: -.02em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.plan-price small { font: 600 .72rem var(--font); color: var(--muted); margin-left: 4px; letter-spacing: 0; }
+.plan-card ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 7px; font-size: .9rem; }
+.plan-card.free ul { color: var(--muted); gap: 4px; font-size: .85rem; }
+.plan-card .perks li { display: flex; align-items: flex-start; gap: 9px; }
+.plan-card .perks svg { flex: none; margin-top: 2px; color: var(--sun); }
+.plan-later { margin: 0; color: var(--muted); font-size: .88rem; }
+.plan-state { align-self: flex-start; font: 700 .68rem var(--font); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 4px 11px; }
+.plan-state.on { color: var(--stage); background: var(--ink); border-color: var(--ink); }
+.plan-link .lang-now { margin-left: auto; margin-right: 6px; color: var(--muted); font-weight: 500; font-size: .85rem; }
+.tier-tag .lock-badge { width: 15px; height: 15px; margin: -2px -2px -2px -4px; }

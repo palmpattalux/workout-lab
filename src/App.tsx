@@ -7,10 +7,13 @@ import SummaryPage from './pages/SummaryPage'
 import LoginPage, { NewPasswordPage } from './pages/LoginPage'
 import ThemesPage from './pages/ThemesPage'
 import PreviewBar from './components/PreviewBar'
+import LockNote from './components/LockNote'
+import PlansPage from './pages/PlansPage'
 import { useWorkouts, setScope } from './lib/store'
 import { supabase, useUser, useRecovering } from './lib/auth'
 import { switchTo } from './lib/session'
-import { getPreview, checkOwnerEmail } from './lib/theme'
+import { getPreview } from './lib/theme'
+import { checkOwnerEmail, getPlan, atLeast, FREE_WORKOUTS } from './lib/plan'
 import { usePrefs } from './lib/prefs'
 
 // Every screen is swapped in memory, so nothing reloads and switching is instant.
@@ -21,6 +24,7 @@ import { usePrefs } from './lib/prefs'
 //   edit-<id>   edit page for a workout
 //   summary-<id> the summary shown right after a session ends
 //   themes      themes gallery (gear > Themes)
+//   plans       subscription plans (gear > Plan)
 //   book        book list, book-<id> one workout, sessions = all sessions
 function go(hash: string) {
   location.hash = hash
@@ -28,7 +32,7 @@ function go(hash: string) {
 
 export default function App() {
   usePrefs() // re-render everything when the language changes
-  return <><PreviewBar /><Screen /></>
+  return <><PreviewBar /><Screen /><LockNote /></>
 }
 
 function Screen() {
@@ -55,6 +59,7 @@ function Screen() {
   if (!user) return <LoginPage />
   if (recovering) return <NewPasswordPage />
 
+  if (hash === 'plans') return <PlansPage />
   if (hash === 'themes') return <ThemesPage onViewed={() => location.replace('#')} />
   if (hash.startsWith('b-')) {
     const key = hash.slice(2)
@@ -63,7 +68,7 @@ function Screen() {
   if (hash.startsWith('summary-')) {
     return <SummaryPage key={hash} id={hash.slice(8)} workouts={workouts} onDone={() => location.replace('#')} />
   }
-  if (hash === 'new' && draft) {
+  if (hash === 'new' && draft && (atLeast(getPlan(), 'premium') || workouts.length < FREE_WORKOUTS)) {
     return (
       <CreatePage
         icon={draft.icon}
@@ -94,6 +99,7 @@ function Screen() {
       onEdit={(id) => go('edit-' + id)}
       onOpenBook={() => go('book')}
       onThemes={() => go('themes')}
+      onPlans={() => go('plans')}
       onCreate={(icon, letter) => { setDraft({ icon, letter }); go('new') }}
     />
   )

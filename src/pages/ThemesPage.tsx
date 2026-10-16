@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from '../components/icons'
 import ThemeScene from '../components/ThemeScene'
-import { THEMES, THEME_SLOTS, setPreview, usePreview, useOwner, useApplied, applyTheme } from '../lib/theme'
+import { THEMES, THEME_SLOTS, setPreview, usePreview, useApplied, applyTheme, canUseTheme } from '../lib/theme'
+import { usePlan, tierName } from '../lib/plan'
+import { LockBadge } from '../components/LockNote'
 import { sound } from '../lib/sound'
 import { t } from '../lib/i18n'
 
 // Swipe through the theme slots like a scenery picker: the centred card is big,
-// its neighbours shrink away. "View" tries the theme on without owning it.
+// its neighbours shrink away. Each theme belongs to a plan; "View" tries it on without that plan.
 export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
   const preview = usePreview()
-  const owner = useOwner()
+  const plan = usePlan()
   const applied = useApplied()
   const track = useRef<HTMLDivElement>(null)
   const [pos, setPos] = useState(0)
@@ -37,6 +39,7 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
   const index = Math.min(THEME_SLOTS - 1, Math.max(0, Math.round(pos)))
   const theme = THEMES[index]
   const viewing = theme && preview === theme.key
+  const owner = !!theme && canUseTheme(theme.key, plan)
 
   function goTo(i: number) {
     const el = track.current
@@ -92,7 +95,7 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
         <p className="theme-blurb">{theme ? t(theme.blurb) : t('A new theme will land here.')}</p>
         {theme && (
           <>
-            <span className={`owned-tag${owner ? ' yes' : ''}`}>{owner ? t('Owned') : t('Not owned')}</span>
+            <span className={`owned-tag tier-tag${owner ? ' yes' : ''}`}>{!owner && <LockBadge />}{t(tierName(theme.tier))}</span>
             {owner ? (applied === theme.key
               ? <button className="theme-view on" onClick={() => { applyTheme(null); sound.tap() }}>{t('In use · Turn off')}</button>
               : <button className="theme-view" onClick={() => { applyTheme(theme.key); sound.pop(); onViewed() }}>{t('Use')}</button>)

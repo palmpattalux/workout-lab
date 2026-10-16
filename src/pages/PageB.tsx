@@ -5,8 +5,9 @@ import HoldMenu from '../components/HoldMenu'
 import { updateWorkout, type Workout } from '../lib/store'
 import { useSession, switchTo, goToSet, record, endSession, discardSession } from '../lib/session'
 import { t } from '../lib/i18n'
+import { usePlan, atLeast, showLocked, MAX_SETS, FREE_SETS } from '../lib/plan'
+import { LockBadge } from '../components/LockNote'
 
-const MAX_SET = 5
 const repOptions = Array.from({ length: 25 }, (_, i) => ({ key: String(i + 1), node: i + 1 }))
 // timed holds: 5 s steps up to 3 minutes
 const secOptions = Array.from({ length: 36 }, (_, i) => ({ key: String((i + 1) * 5), node: (i + 1) * 5, label: t('{n} sec', { n: (i + 1) * 5 }) }))
@@ -19,6 +20,10 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
   onEnded: (sessionId: string) => void
 }) {
   const session = useSession()
+  // Free plan: sets past FREE_SETS show a lock
+  const plan = usePlan()
+  const setCap = atLeast(plan, 'premium') ? MAX_SETS : FREE_SETS
+  const lockedSet = () => showLocked(t('Free plan: up to {n} sets per exercise', { n: FREE_SETS }))
   const id = workout?.id ?? null
 
   // While a session is running, whatever exercise is on screen is part of it.
@@ -93,7 +98,10 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
           </button>
           {setsOpen && (
             <div className="set-menu" role="listbox" aria-label={t('Choose set')}>
-              {Array.from({ length: MAX_SET }, (_, i) => i + 1).map((n) => (
+              {Array.from({ length: MAX_SETS }, (_, i) => i + 1).map((n) => n > setCap ? (
+                <button key={n} role="option" aria-selected={false} aria-disabled="true" className="locked"
+                  onClick={() => { setSetsOpen(false); lockedSet() }}>{n}<LockBadge /></button>
+              ) : (
                 <button key={n} role="option" aria-selected={n === set} className={n === set ? 'on' : undefined}
                   onClick={() => { goToSet(n); setSetsOpen(false) }}>{n}</button>
               ))}
@@ -107,9 +115,11 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
           <Icon name="arrowLeft" />
         </button>
       )}
-      {set < MAX_SET && (
-        <button className="btn circle big" style={{ left: '85.1%', top: '43.2%' }} aria-label={t('Next set')} onClick={() => inSession && goToSet(set + 1)}>
+      {set < MAX_SETS && (
+        <button className={`btn circle big${set >= setCap ? ' at-limit' : ''}`} style={{ left: '85.1%', top: '43.2%' }} aria-label={t('Next set')}
+          onClick={() => { if (set >= setCap) lockedSet(); else if (inSession) goToSet(set + 1) }}>
           <Icon name="arrowRight" />
+          {set >= setCap && <LockBadge />}
         </button>
       )}
 
