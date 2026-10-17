@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Icon, WorkoutMark } from '../components/icons'
 import { useSessions, type Session, type Workout } from '../lib/store'
 import { day, duration } from '../lib/format'
 import { statOf } from '../lib/progress'
 import { t } from '../lib/i18n'
-import { statsOf } from '../lib/sticker'
+import { statsOf, whenOf, type StickerProgress, type StickerCard } from '../lib/sticker'
 import ShareSticker from '../components/ShareSticker'
 
 // Shown right after a session ends: this session's numbers count up from the last
@@ -53,10 +53,40 @@ export default function SummaryPage({ id, workouts, onDone }: { id: string; work
     return { wid, now, prev, info }
   }).filter((r) => r.now)
 
-  const stats = useMemo(() => statsOf(s, workouts), [s, workouts])
   const totalSets = rows.reduce((n, r) => n + r.now!.sets, 0)
   const isTimed = (r: { wid: string; info?: { mode?: string; count?: string } }) => r.info?.mode === 'progression' && r.info?.count === 'sec'
   const totalReps = rows.filter((r) => !isTimed(r)).reduce((n, r) => n + r.now!.reps, 0)
+
+  // what the share images show: this session, what went up since last time, and the page itself
+  // (built only when the share sheet opens; it draws its images once)
+  const shareData = () => {
+    const stats = statsOf(s, workouts)
+    const prev = index > 0 ? statsOf(sessions[index - 1], workouts) : null
+    const gainOf = (r: typeof rows[number]) => {
+      const unit = r.info?.unit ?? 'kg'
+      const top = r.prev && r.prev.top !== null && r.now!.top !== null && r.info?.mode !== 'progression' ? r.now!.top - r.prev.top : 0
+      const reps = r.prev ? r.now!.reps - r.prev.reps : 0
+      if (top > 0) return `+${+top.toFixed(1)} ${unit}`
+      if (reps > 0) return `+${reps} ${isTimed(r) ? t('sec') : t('reps')}`
+      return null
+    }
+    const progress: StickerProgress = {
+      first: index === 0,
+      lifted: prev ? Math.max(0, stats.lifted - prev.lifted) : 0,
+      reps: prev ? Math.max(0, stats.reps - prev.reps) : 0,
+      gains: rows.map((r) => ({ name: r.info?.exercise || t('Untitled'), text: gainOf(r) })).filter((g): g is { name: string; text: string } => !!g.text),
+    }
+    const card: StickerCard = {
+      num: index + 1, when: whenOf(s), sets: totalSets, reps: totalReps, exercises: rows.length,
+      rows: rows.map((r) => {
+        const unit = r.info?.unit ?? 'kg'
+        const reps = `${r.now!.reps} ${isTimed(r) ? t('sec') : t('reps')}`
+        const detail = r.info?.mode !== 'progression' && r.now!.top !== null ? `${reps} · ${r.now!.top} ${unit}` : r.info?.mode === 'progression' && s.snap?.[r.wid]?.move ? `${reps} · ${s.snap[r.wid].move}` : reps
+        return { name: r.info?.exercise || t('Untitled'), detail, gain: gainOf(r) && '▲ ' + gainOf(r) }
+      }),
+    }
+    return { stats, progress, card }
+  }
   const START = 500 // header first, then the cards one after another
   const STAGGER = 260
 
@@ -113,7 +143,7 @@ export default function SummaryPage({ id, workouts, onDone }: { id: string; work
       </ol>
 
       {rows.length > 0 && <button className="share-btn" onClick={() => setSharing(true)}><Icon name="share" size="18px" />{t('Share')}</button>}
-      {sharing && <ShareSticker stats={stats} onClose={() => setSharing(false)} />}
+      {sharing && <ShareSticker {...shareData()} onClose={() => setSharing(false)} />}
 
       <button className="btn circle big save-new" aria-label={t('Done')} onClick={onDone}>
         <Icon name="check" strokeWidth={2.2} />

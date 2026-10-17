@@ -1395,8 +1395,19 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .share-top { display: flex; align-items: center; justify-content: space-between; }
 .share-top h2 { margin: 0; font: 800 1.35rem var(--font); letter-spacing: -.02em; color: var(--ink); }
 .share-tag { align-self: flex-start; margin: 0; padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; font: 700 .68rem var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.share-track { flex: 1; min-height: 0; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin: 0 -6%; }
+.share-track::-webkit-scrollbar { display: none; }
+.share-slide { flex: 0 0 100%; scroll-snap-align: center; padding: 0 6%; display: flex; }
 .share-preview { flex: 1; min-height: 0; display: grid; place-items: center; border-radius: 22px; overflow: hidden;
   background: repeating-conic-gradient(#3a3a3a 0 25%, #2c2c2c 0 50%) 0 0 / 28px 28px; }
+.share-preview.solid { background: var(--sunk); }
+.share-preview.solid img { border-radius: 16px; box-shadow: var(--float); }
+.share-nav { display: flex; align-items: center; justify-content: center; gap: 14px; min-height: 28px; }
+.share-dots { display: flex; gap: 6px; }
+.share-dots button { width: 7px; height: 7px; padding: 0; border: 0; border-radius: 99px; background: var(--line); cursor: pointer; transition: width .25s var(--ease), background .25s; }
+.share-dots button.on { width: 20px; background: var(--ink); }
+.share-swipe { display: inline-flex; align-items: center; gap: 4px; border: 0; background: none; color: var(--muted); font: 600 .82rem var(--font); cursor: pointer; animation: swipe-nudge 1.6s var(--ease) infinite; }
+@keyframes swipe-nudge { 0%, 60%, 100% { transform: translateX(0); } 30% { transform: translateX(5px); } }
 .share-preview img { max-width: 92%; max-height: 92%; object-fit: contain; }
 .share-hint { margin: 0; text-align: center; color: var(--muted); font: 500 .85rem var(--font); }
 .share-actions { display: flex; gap: 10px; }

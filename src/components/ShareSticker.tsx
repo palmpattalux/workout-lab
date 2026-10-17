@@ -1,37 +1,56 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Icon } from './icons'
-import { drawSticker, type StickerStats } from '../lib/sticker'
+import { drawSticker, drawProgress, drawCard, type StickerStats, type StickerProgress, type StickerCard } from '../lib/sticker'
 import { t } from '../lib/i18n'
 
-// Sheet with the see-through stats sticker: Share (the phone's own share menu, so
-// Instagram, LINE…) or Save as a PNG.
-export default function ShareSticker({ stats, onClose }: { stats: StickerStats; onClose: () => void }) {
-  const [file, setFile] = useState<File | null>(null)
-  const [url, setUrl] = useState<string | null>(null)
+// Share sheet after a session: swipe between images (two see-through stickers and the
+// full summary card). Share opens the phone's own share menu (Instagram, LINE…); Save keeps a PNG.
+type Slide = { key: string; tag: string; hint: string; clear: boolean; make: () => Promise<Blob> }
+type Made = { file: File; url: string }
+
+export default function ShareSticker({ stats, progress, card, onClose }: { stats: StickerStats; progress: StickerProgress; card: StickerCard; onClose: () => void }) {
+  const slides: Slide[] = [
+    { key: 'stats', tag: t('Transparent'), hint: t('See-through, so it sits on top of your own photo.'), clear: true, make: () => drawSticker(stats) },
+    { key: 'progress', tag: t('Progress'), hint: progress.first ? t('Your first session. Next time this shows how far you came.') : t('How much you improved since last session.'), clear: true, make: () => drawProgress(progress) },
+    { key: 'card', tag: t('Summary card'), hint: t('The whole session, in your theme.'), clear: false, make: () => drawCard(card) },
+  ]
+  const [made, setMade] = useState<(Made | null)[]>(() => slides.map(() => null))
+  const [index, setIndex] = useState(0)
+  const [swiped, setSwiped] = useState(false)
   const [note, setNote] = useState<string | null>(null)
+  const track = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    let u: string | null = null
-    drawSticker(stats).then((b) => {
-      const f = new File([b], 'dotset-session.png', { type: 'image/png' })
-      u = URL.createObjectURL(b)
-      setFile(f); setUrl(u)
-    })
-    return () => { if (u) URL.revokeObjectURL(u) }
-  }, [stats])
+    const urls: string[] = []
+    slides.forEach((s, i) => s.make().then((b) => {
+      const url = URL.createObjectURL(b); urls.push(url)
+      setMade((m) => m.map((x, j) => (j === i ? { file: new File([b], `dotset-${s.key}.png`, { type: 'image/png' }), url } : x)))
+    }))
+    return () => urls.forEach((u) => URL.revokeObjectURL(u))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  const canShare = !!file && !!navigator.canShare?.({ files: [file] })
+  function onScroll() {
+    const el = track.current
+    if (!el) return
+    const i = Math.round(el.scrollLeft / el.clientWidth)
+    if (i !== index) { setIndex(i); setNote(null) }
+    if (i > 0) setSwiped(true)
+  }
+  const go = (i: number) => track.current?.scrollTo({ left: i * track.current.clientWidth, behavior: 'smooth' })
 
+  const cur = made[index]
+  const canShare = !!cur && !!navigator.canShare?.({ files: [cur.file] })
   async function share() {
-    if (!file) return
-    try { await navigator.share({ files: [file] }) } catch (e) { if ((e as Error).name !== 'AbortError') setNote(t("Couldn't open sharing here. Save it instead.")) }
+    if (!cur) return
+    try { await navigator.share({ files: [cur.file] }) } catch (e) { if ((e as Error).name !== 'AbortError') setNote(t("Couldn't open sharing here. Save it instead.")) }
   }
   function save() {
-    if (!url) return
+    if (!cur) return
     const a = document.createElement('a')
-    a.href = url; a.download = 'dotset-session.png'
+    a.href = cur.url; a.download = cur.file.name
     document.body.appendChild(a); a.click(); a.remove()
-    setNote(t('Saved. Add it to your story as a sticker.'))
+    setNote(slides[index].clear ? t('Saved. Add it to your story as a sticker.') : t('Saved to your downloads.'))
   }
 
   return (
@@ -40,12 +59,24 @@ export default function ShareSticker({ stats, onClose }: { stats: StickerStats; 
         <h2>{t('Share your session')}</h2>
         <button className="icon-btn" aria-label={t('Close')} onClick={onClose}><Icon name="close" size="22px" /></button>
       </div>
-      <p className="share-tag">{t('Transparent')}</p>
-      <div className="share-preview">{url ? <img src={url} alt={t('Session stats sticker')} /> : <i className="co-dot" />}</div>
-      <p className="share-hint">{note ?? t('See-through, so it sits on top of your own photo.')}</p>
+      <p className="share-tag">{slides[index].tag}</p>
+      <div className="share-track" ref={track} onScroll={onScroll}>
+        {slides.map((s, i) => (
+          <div key={s.key} className="share-slide">
+            <div className={`share-preview${s.clear ? '' : ' solid'}`}>{made[i] ? <img src={made[i]!.url} alt={s.tag} /> : <i className="co-dot" />}</div>
+          </div>
+        ))}
+      </div>
+      <div className="share-nav">
+        <div className="share-dots" role="tablist">
+          {slides.map((s, i) => <button key={s.key} role="tab" aria-selected={i === index} aria-label={s.tag} className={i === index ? 'on' : undefined} onClick={() => go(i)} />)}
+        </div>
+        {!swiped && <button className="share-swipe" onClick={() => go(1)}>{t('Swipe for more')}<Icon name="swipe" size="18px" /></button>}
+      </div>
+      <p className="share-hint">{note ?? slides[index].hint}</p>
       <div className="share-actions">
         {canShare && <button className="primary" onClick={share}><Icon name="share" size="20px" />{t('Share')}</button>}
-        <button className={canShare ? 'share-save' : 'primary'} onClick={save} disabled={!url}><Icon name="save" size="20px" />{t('Save')}</button>
+        <button className={canShare ? 'share-save' : 'primary'} onClick={save} disabled={!cur}><Icon name="save" size="20px" />{t('Save')}</button>
       </div>
     </div>
   )
