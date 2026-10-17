@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient, type EmailOtpType } from '@supabase/supabase-js'
 import { t } from './i18n'
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined
@@ -19,10 +19,19 @@ const home = () => location.origin + location.pathname
 // Set when the page was opened from a verification link (?code=…). The link confirms
 // the email on Supabase's side; if it was opened in another browser no session comes
 // with it, so the login screen says the email is confirmed and asks to log in.
-export const arrivedFromEmailLink = new URLSearchParams(location.search).has('code')
-// A password reset link comes back as ?reset=1&code=…: once signed in from it, the app
+// Email links come as ?token_hash=…&type=… (our email templates, works in any browser)
+// or ?code=… (Supabase's default, only works in the browser that asked for it).
+const linkParams = new URLSearchParams(location.search)
+const tokenHash = linkParams.get('token_hash')
+export const arrivedFromEmailLink = linkParams.has('code') || !!tokenHash
+// A password reset link (?reset=1 or type=recovery): once signed in from it, the app
 // asks for a new password before anything else.
-let recovering = new URLSearchParams(location.search).has('reset')
+export const resetLink = linkParams.has('reset') || linkParams.get('type') === 'recovery'
+let recovering = resetLink
+// Signs in from a token_hash link once, before the session is first read.
+const linkReady: Promise<unknown> = supabase && tokenHash
+  ? supabase.auth.verifyOtp({ token_hash: tokenHash, type: (linkParams.get('type') ?? 'email') as EmailOtpType }).catch(() => {})
+  : Promise.resolve()
 const recoverListeners = new Set<() => void>()
 export function useRecovering() {
   const [r, setR] = useState(recovering)
@@ -112,7 +121,7 @@ export function useUser(): AppUser | null | undefined {
       meListeners.add(fn)
       return () => { meListeners.delete(fn) }
     }
-    supabase.auth.getSession().then(({ data }) => { setUser(data.session?.user ?? null); dropCodeFromUrl() })
+    linkReady.then(() => supabase!.auth.getSession()).then(({ data }) => { setUser(data.session?.user ?? null); dropCodeFromUrl() })
     const { data } = supabase.auth.onAuthStateChange((e, session) => {
       if (e === 'PASSWORD_RECOVERY') { recovering = true; recoverListeners.forEach((fn) => fn()) }
       setUser(session?.user ?? null)

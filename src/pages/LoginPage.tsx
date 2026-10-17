@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { signIn, signUp, resetPassword, resendVerification, setNewPassword, canResetPassword, verifiesEmail, arrivedFromEmailLink } from '../lib/auth'
+import { signIn, signUp, resetPassword, resendVerification, setNewPassword, canResetPassword, verifiesEmail, arrivedFromEmailLink, resetLink } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { LangPicker } from '../components/Flag'
 import { Icon } from '../components/icons'
@@ -16,8 +16,9 @@ export default function LoginPage({ start, note }: { start?: 'login' | 'signup';
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [info, setInfo] = useState<string | null>(arrivedFromEmailLink ? t('Your email is verified. Log in to continue.') : null)
+  // a reset link that couldn't sign anyone in has expired, was used, or was opened elsewhere
+  const [error, setError] = useState<string | null>(arrivedFromEmailLink && resetLink ? t('That reset link has expired or was already used. Type your email and tap "Forgot password" to get a new one.') : null)
+  const [info, setInfo] = useState<string | null>(arrivedFromEmailLink && !resetLink ? t('Your email is verified. Log in to continue.') : null)
   const [cooldown, setCooldown] = useState(0)
   const unverified = error === t('Verify your email first: open the link we sent you, then log in.')
 

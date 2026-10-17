@@ -52,3 +52,7 @@ Test with Omise's test cards (e.g. 4242 4242 4242 4242, any future date, any CVC
 the test PromptPay QR (mark it paid from the Omise dashboard). Switch to live keys when ready.
 TrueMoney uses the app-jump flow (`truemoney_jumpapp`); set `OMISE_TRUEMONEY_TYPE=truemoney`
 in Vercel for the older phone-number flow if your account only has that.
+
+## Email templates (links that work on any phone or browser)
+
+Supabase > Authentication > Emails > Templates. Paste `supabase/email/confirm-signup.html` into **Confirm signup** and `supabase/email/reset-password.html` into **Reset password** (Subject: "Confirm your Dotset email" / "Reset your Dotset password"). Site URL must be https://dotset.app.
