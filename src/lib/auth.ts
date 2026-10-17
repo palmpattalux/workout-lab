@@ -29,8 +29,11 @@ export const arrivedFromEmailLink = linkParams.has('code') || !!tokenHash
 export const resetLink = linkParams.has('reset') || linkParams.get('type') === 'recovery'
 let recovering = resetLink
 // Signs in from a token_hash link once, before the session is first read.
+// emailLinkFailed: the link had expired or was already used, so nobody got signed in.
+export let emailLinkFailed = false
 const linkReady: Promise<unknown> = supabase && tokenHash
-  ? supabase.auth.verifyOtp({ token_hash: tokenHash, type: (linkParams.get('type') ?? 'email') as EmailOtpType }).catch(() => {})
+  ? supabase.auth.verifyOtp({ token_hash: tokenHash, type: (linkParams.get('type') ?? 'email') as EmailOtpType })
+    .then(({ error }) => { if (error) emailLinkFailed = true }, () => { emailLinkFailed = true })
   : Promise.resolve()
 const recoverListeners = new Set<() => void>()
 export function useRecovering() {
@@ -40,9 +43,9 @@ export function useRecovering() {
 }
 export async function setNewPassword(password: string) {
   const { error } = await supabase!.auth.updateUser({ password })
-  if (!error) { recovering = false; recoverListeners.forEach((fn) => fn()) }
   return friendly(error?.message)
 }
+export function endRecovery() { recovering = false; recoverListeners.forEach((fn) => fn()) }
 function dropCodeFromUrl() {
   if (!location.search) return
   history.replaceState(null, '', location.pathname + location.hash)
@@ -143,6 +146,9 @@ function friendly(msg?: string | null) {
   if (/not confirmed/i.test(msg)) return t('Verify your email first: open the link we sent you, then log in.')
   if (/rate limit|too many/i.test(msg)) return t('Too many emails sent. Wait a minute, then try again.')
   if (/already registered/i.test(msg)) return t('There is already an account with that email. Log in instead.')
+  if (/different from the old/i.test(msg)) return t("That's your current password. Choose a new one.")
+  if (/at least \d|weak/i.test(msg)) return t('Use at least 6 characters.')
+  if (/invalid format|valid email/i.test(msg)) return t("That email doesn't look right. Check it for typos.")
   return msg
 }
 

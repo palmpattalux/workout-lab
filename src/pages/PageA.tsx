@@ -8,7 +8,7 @@ import { useSkin, getPreview } from '../lib/theme'
 import { useSessions } from '../lib/store'
 import { useSession } from '../lib/session'
 import ThemeScene from '../components/ThemeScene'
-import { useEmail, signOut } from '../lib/auth'
+import { useEmail, signOut, canResetPassword } from '../lib/auth'
 import { t, LANGS } from '../lib/i18n'
 import { LangPicker } from '../components/Flag'
 import { usePlan, atLeast, tierName, FREE_WORKOUTS } from '../lib/plan'
@@ -545,12 +545,16 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
               <span className="who">{t('Not signed in')}</span>
               <button className="logout-btn signup-btn" onClick={() => { setSettingsOpen(false); location.hash = 'signup' }}>{t('Sign up or log in')}</button>
             </div>
-          ) : (
+          ) : (<>
+            {canResetPassword && <button className="set-row themes-link" onClick={() => { setSettingsOpen(false); location.hash = 'password' }}>
+              <span>{t('Change password')}</span>
+              <span className="chev"><Icon name="back" size="18px" /></span>
+            </button>}
             <div className="set-row account">
               <span className="who">{email ?? t('Signed in')}</span>
               <button className="logout-btn" onClick={() => { setSettingsOpen(false); signOut() }}>{t('Log out')}</button>
             </div>
-          )}
+          </>)}
         </div>
       )}
 

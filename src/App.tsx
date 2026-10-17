@@ -89,6 +89,7 @@ function Screen() {
     return <LoginPage key={hash} start={hash === 'login' ? 'login' : hash ? 'signup' : undefined} note={hash === 'save' ? t('Sign in to save your workout') : undefined} />
   }
   if (recovering) return <NewPasswordPage />
+  if (user && supabase && hash === 'password') return <NewPasswordPage change />
   const guest = !user
 
   if (hash === 'plans') return <PlansPage userId={user?.id ?? null} />
