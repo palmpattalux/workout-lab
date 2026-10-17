@@ -1421,14 +1421,14 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
   --stage: #f4f0e7; --bg: #e7e1d4; --surface: #fbf9f4; --sunk: #ece7dc;
   --ink: #1f1e1b; --muted: #6f6b62;
   --sun: #c4462e; --active: #b8442e; --active-soft: #f3dfd5;
-  --tt-ink: #23221f; --tt-far: .18; --tt-near: .3; --tt-main: .34;
+  --tt-ink: #23221f; --tt-far: .18; --tt-near: .3; --tt-main: .34; --tt-hill: #3f6f63; --tt-hill-o: .3; --tt-pine: #2f5a4b;
   --tt-sun: #d4583c; --tt-sun-o: .72; --tt-mist: #f4f0e7; --tt-figure: #1f1e1b; --tt-trail: rgba(35, 34, 31, .28);
 }
 :root[data-skin="summit"][data-mode="dark"], :root[data-mode="dark"] .theme-art[data-skin="summit"] {
   --stage: #121418; --bg: #0a0b0d; --surface: #1c1f24; --sunk: #16181c;
   --ink: #ece8df; --muted: #979389;
   --sun: #e2765c; --active: #e2765c; --active-soft: #3a2621;
-  --tt-ink: #b9c2cc; --tt-far: .12; --tt-near: .2; --tt-main: .26;
+  --tt-ink: #b9c2cc; --tt-far: .12; --tt-near: .2; --tt-main: .26; --tt-hill: #6f9c94; --tt-hill-o: .16; --tt-pine: #8fb3a6;
   --tt-sun: #ece6d6; --tt-sun-o: .85; --tt-mist: #121418; --tt-figure: #ece8df; --tt-trail: rgba(236, 232, 223, .22);
   color-scheme: dark;
 }
@@ -1437,7 +1437,7 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
     --stage: #121418; --bg: #0a0b0d; --surface: #1c1f24; --sunk: #16181c;
     --ink: #ece8df; --muted: #979389;
     --sun: #e2765c; --active: #e2765c; --active-soft: #3a2621;
-    --tt-ink: #b9c2cc; --tt-far: .12; --tt-near: .2; --tt-main: .26;
+    --tt-ink: #b9c2cc; --tt-far: .12; --tt-near: .2; --tt-main: .26; --tt-hill: #6f9c94; --tt-hill-o: .16; --tt-pine: #8fb3a6;
     --tt-sun: #ece6d6; --tt-sun-o: .85; --tt-mist: #121418; --tt-figure: #ece8df; --tt-trail: rgba(236, 232, 223, .22);
     color-scheme: dark;
   }
@@ -1450,8 +1450,11 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .summit-scene.top .tt-sun { animation: tt-glow 3.2s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
 @keyframes tt-glow { to { opacity: 1; transform: scale(1.08); } }
 .summit-scene .tt-cun path { fill: none; stroke: var(--tt-ink); stroke-width: 1.2; stroke-linecap: round; opacity: calc(var(--tt-main) * .55); }
-.summit-scene .tt-pine ellipse { fill: var(--tt-ink); opacity: calc(var(--tt-main) * 1.6); }
-.summit-scene .tt-pine .tt-trunk { fill: none; stroke: var(--tt-ink); stroke-width: 1.6; stroke-linecap: round; opacity: calc(var(--tt-main) * 1.6); }
+.summit-scene .tt-pine ellipse { fill: var(--tt-pine); opacity: .78; }
+.summit-scene .tt-pine .tt-trunk { fill: none; stroke: var(--tt-ink); stroke-width: 1.6; stroke-linecap: round; opacity: calc(var(--tt-main) * 1.8); }
+.summit-scene .tt-pagoda { fill: var(--tt-ink); opacity: calc(var(--tt-main) * 1.5); }
+.summit-scene .tt-falls { fill: none; stroke: var(--tt-mist); stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 14 6; opacity: .9; animation: tt-falls 1.6s linear infinite; }
+@keyframes tt-falls { to { stroke-dashoffset: -20; } }
 .summit-scene .tt-trail { fill: none; stroke: var(--tt-trail); stroke-width: 1.6; stroke-dasharray: 1 6; stroke-linecap: round; stroke-linejoin: round; }
 .summit-scene .tt-trail.done { stroke: var(--active); stroke-width: 1.6; opacity: .5; }
 .summit-scene .tt-rock { fill: var(--tt-figure); opacity: .82; }
@@ -1466,3 +1469,78 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .tt-birds { position: absolute; top: 20%; left: 0; width: 44px; height: auto; opacity: .5; animation: tt-fly 34s linear infinite; animation-delay: -6s; }
 .tt-birds path { fill: none !important; stroke: var(--tt-ink) !important; stroke-width: 1.3 !important; stroke-linecap: round; }
 @keyframes tt-fly { from { transform: translate(-60px, 0); } 50% { transform: translate(55cqw, -4cqh); } to { transform: translate(115cqw, 2cqh); } }
+
+/* ---------- Desert theme: sand by day, a campfire under a colourful night sky ----------
+   Sun (moon by night) is the anchor top-right; everything decorative is behind controls. */
+:root[data-skin="desert"], .theme-art[data-skin="desert"] {
+  --stage: #f7efe3; --bg: #eadcc8; --surface: #fffaf3; --sunk: #f1e6d7;
+  --ink: #2b2119; --muted: #7d6b5a;
+  --sun: #d0702f; --active: #c4672b; --active-soft: #f6e0cd;
+  --ds-sky1: #9fc6dc; --ds-sky2: #cfe1e6; --ds-sky3: #f4e6d2; --ds-sky4: #f7e7d0;
+  --ds-aur: 0; --ds-aur1: #000; --ds-aur2: #000; --ds-aur3: #000;
+  --ds-sun: #fff6dc; --ds-bite-o: 0; --ds-bite: #000; --ds-stars-o: 0; --ds-fire: 0;
+  --ds-mesa: #d9a07c; --ds-mesa-o: .55;
+  --ds-dune0: #efcf9f; --ds-dune0b: #f3dcb6; --ds-dune1: #e8bd84; --ds-dune1b: #efd2a6; --ds-dune2: #e2ab6c; --ds-dune2b: #f0cfa2;
+  --ds-shade: rgba(150, 82, 40, .16); --ds-cactus: #6e8b5c; --ds-rock: #b98a66; --ds-log: #7a5a40; --ds-stone: #a88f78;
+  --ds-wisp: rgba(255, 248, 236, .8); --ds-hawk: rgba(60, 40, 30, .55);
+}
+:root[data-skin="desert"][data-mode="dark"], :root[data-mode="dark"] .theme-art[data-skin="desert"] {
+  --stage: #14122a; --bg: #0b0a18; --surface: #221f3a; --sunk: #19172f;
+  --ink: #f2ece3; --muted: #a49db4;
+  --sun: #f39550; --active: #f39550; --active-soft: #3f2a2a;
+  --ds-sky1: #0d0f2c; --ds-sky2: #1e1a46; --ds-sky3: #3a2552; --ds-sky4: #4c2c48;
+  --ds-aur: .32; --ds-aur1: #3fd0c0; --ds-aur2: #8a5cf0; --ds-aur3: #f06aa0;
+  --ds-sun: #f4ecd8; --ds-bite-o: 1; --ds-bite: #11122f; --ds-stars-o: 1; --ds-fire: 1;
+  --ds-mesa: #2a2244; --ds-mesa-o: 1;
+  --ds-dune0: #2b2445; --ds-dune0b: #231d3a; --ds-dune1: #2f2440; --ds-dune1b: #251d35; --ds-dune2: #3a2838; --ds-dune2b: #20182c;
+  --ds-shade: rgba(5, 4, 20, .32); --ds-cactus: #120f22; --ds-rock: #1a1528; --ds-log: #2a1a14; --ds-stone: #3b2c30;
+  --ds-wisp: rgba(255, 255, 255, 0); --ds-hawk: rgba(0, 0, 0, 0);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="desert"]:not([data-mode="light"]), :root:not([data-mode="light"]) .theme-art[data-skin="desert"] {
+    --stage: #14122a; --bg: #0b0a18; --surface: #221f3a; --sunk: #19172f;
+    --ink: #f2ece3; --muted: #a49db4;
+    --sun: #f39550; --active: #f39550; --active-soft: #3f2a2a;
+    --ds-sky1: #0d0f2c; --ds-sky2: #1e1a46; --ds-sky3: #3a2552; --ds-sky4: #4c2c48;
+    --ds-aur: .32; --ds-aur1: #3fd0c0; --ds-aur2: #8a5cf0; --ds-aur3: #f06aa0;
+    --ds-sun: #f4ecd8; --ds-bite-o: 1; --ds-bite: #11122f; --ds-stars-o: 1; --ds-fire: 1;
+    --ds-mesa: #2a2244; --ds-mesa-o: 1;
+    --ds-dune0: #2b2445; --ds-dune0b: #231d3a; --ds-dune1: #2f2440; --ds-dune1b: #251d35; --ds-dune2: #3a2838; --ds-dune2b: #20182c;
+    --ds-shade: rgba(5, 4, 20, .32); --ds-cactus: #120f22; --ds-rock: #1a1528; --ds-log: #2a1a14; --ds-stone: #3b2c30;
+    --ds-wisp: rgba(255, 255, 255, 0); --ds-hawk: rgba(0, 0, 0, 0);
+    color-scheme: dark;
+  }
+}
+.theme-art[data-skin="desert"] { color: var(--ink); }
+.desert-scene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.desert-scene .ds-art { position: absolute; inset: 0; width: 100%; height: 100%; }
+.desert-scene svg * { stroke: none; }
+.ds-sun { fill: var(--ds-sun); }
+.desert-scene .ds-bite { fill: #000; fill-opacity: var(--ds-bite-o); }
+.ds-aurora { animation: ds-aur 14s ease-in-out infinite alternate; transform-origin: 50% 0; }
+@keyframes ds-aur { to { transform: translateX(-14px) scaleY(1.08); opacity: .75; } }
+.ds-stars circle { fill: #fff; opacity: calc(var(--ds-stars-o) * .75); }
+.ds-stars circle.tw { animation: ds-tw 3.4s ease-in-out infinite; }
+@keyframes ds-tw { 50% { opacity: calc(var(--ds-stars-o) * .15); } }
+.ds-mesa { fill: var(--ds-mesa); opacity: var(--ds-mesa-o); }
+.ds-shade { fill: var(--ds-shade); }
+.ds-cactus { fill: var(--ds-cactus); opacity: .7; }
+.ds-cactus.near { opacity: 1; }
+.ds-rocks ellipse { fill: var(--ds-rock); }
+.ds-glow { mix-blend-mode: screen; animation: ds-glow 2.2s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+@keyframes ds-glow { 30% { opacity: .85; transform: scale(.97); } to { opacity: 1; transform: scale(1.03); } }
+.desert-scene .ds-log { fill: none; stroke: var(--ds-log); stroke-width: 3.4; stroke-linecap: round; }
+.ds-stones ellipse { fill: var(--ds-stone); }
+.ds-fire { opacity: var(--ds-fire); }
+.ds-fire path { transform-box: fill-box; transform-origin: 50% 100%; }
+.ds-fire .f1 { fill: #ff8a3a; animation: ds-flick 1.1s ease-in-out infinite alternate; }
+.ds-fire .f2 { fill: #ffd27a; animation: ds-flick .8s ease-in-out infinite alternate-reverse; }
+@keyframes ds-flick { 0% { transform: scale(1, 1) skewX(0); } 40% { transform: scale(.92, 1.1) skewX(4deg); } 100% { transform: scale(1.05, .9) skewX(-3deg); } }
+.ds-fire .spark { fill: #ffc070; animation: ds-spark 2.4s ease-out infinite; }
+@keyframes ds-spark { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translate(var(--sx), -70px); opacity: 0; } }
+.desert-scene .ds-wisps path { fill: none; stroke: var(--ds-wisp); stroke-width: 1.4; stroke-linecap: round; stroke-dasharray: 18 120; animation: ds-wisp 7s linear infinite; }
+@keyframes ds-wisp { from { stroke-dashoffset: 140; } to { stroke-dashoffset: -20; } }
+.ds-hawk { position: absolute; top: 24%; left: 0; width: 30px; height: auto; animation: ds-hawk 46s linear infinite; animation-delay: -12s; }
+.ds-hawk path { fill: var(--ds-hawk) !important; }
+@keyframes ds-hawk { from { transform: translate(-40px, 0); } 50% { transform: translate(50cqw, -3cqh) rotate(-4deg); } to { transform: translate(110cqw, 1cqh); } }

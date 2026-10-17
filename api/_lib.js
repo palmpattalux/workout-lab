@@ -8,7 +8,7 @@ export const PRICES = { premium: 14900, exclusive: 32900 }
 export const NAMES = { premium: 'Premium', exclusive: 'Exclusive' }
 // Single themes, bought once and kept for good (keys match src/lib/theme.ts).
 export const THEME_PRICE = 14900
-export const THEME_NAMES = { sakura: 'Sakura', nightcity: 'Night City', neon: 'Neon', manga: 'Manga', summit: 'To the Top' }
+export const THEME_NAMES = { sakura: 'Sakura', nightcity: 'Night City', neon: 'Neon', manga: 'Manga', summit: 'To the Top', desert: 'Desert' }
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://cafxkuokunjgtvexqaar.supabase.co'
 let admin = null

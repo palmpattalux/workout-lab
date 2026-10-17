@@ -13,7 +13,8 @@ export const THEMES: (Theme | null)[] = [
   { key: 'neon', name: 'Neon', blurb: 'A cyber city. Neon rooftops and light trails by night, a clean black and white skyline by day.', tier: 'premium' },
   { key: 'manga', name: 'Manga', blurb: 'Black ink on paper. Speech bubbles at home, sword slashes once a session starts.', tier: 'premium' },
   { key: 'summit', name: 'To the Top', blurb: 'Stone pillars in an ink painting. Each set you finish pushes the boulder further up the mountain.', tier: 'premium' },
-  ...Array.from({ length: THEME_SLOTS - 5 }, () => null),
+  { key: 'desert', name: 'Desert', blurb: 'Sand dunes, cacti and red rocks under the sun. At night, a campfire under a sky full of colour and stars.', tier: 'premium' },
+  ...Array.from({ length: THEME_SLOTS - 6 }, () => null),
 ]
 
 let preview: string | null = null

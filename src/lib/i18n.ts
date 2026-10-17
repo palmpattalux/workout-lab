@@ -127,6 +127,7 @@ const ROWS: [string, string, string, string][] = [
   ['Exit', 'ออก', '終了', '退出'],
   ['Blossom branches, petals drifting onto still water.', 'กิ่งซากุระ กลีบดอกปลิวลงบนผิวน้ำนิ่ง', '桜の枝と、静かな水面に舞い落ちる花びら。', '樱花枝头，花瓣飘落在静静的水面上。'],
   ['A gothic skyline in the rain. Searchlights and lightning by night, the sun about to rise by day.', 'เส้นขอบฟ้าแบบโกธิกท่ามกลางสายฝน ไฟฉายและฟ้าแลบยามค่ำคืน ดวงอาทิตย์กำลังจะขึ้นยามเช้า', '雨のゴシックな街並み。夜はサーチライトと稲妻、昼は今にも昇る朝日。', '雨中的哥特天际线。夜晚有探照灯与闪电，白天是即将升起的朝阳。'],
+  ['Sand dunes, cacti and red rocks under the sun. At night, a campfire under a sky full of colour and stars.', 'เนินทราย ต้นกระบองเพชร และหินสีแดงใต้แสงแดด ยามค่ำคืนมีกองไฟใต้ท้องฟ้าหลากสีและดวงดาว', '太陽の下の砂丘とサボテンと赤い岩。夜は色とりどりの星空の下で焚き火が灯る。', '烈日下的沙丘、仙人掌和红色岩石。入夜后，篝火在缤纷星空下燃起。'],
   ['Stone pillars in an ink painting. Each set you finish pushes the boulder further up the mountain.', 'เสาหินในภาพวาดหมึกจีน ทุกเซ็ตที่ทำเสร็จจะดันก้อนหินขึ้นภูเขาสูงขึ้นอีก', '水墨画にそびえる岩の柱。セットを終えるたびに、岩を山の上へ押し上げていく。', '水墨画中的石柱群峰。每完成一组，就把巨石推向更高的山顶。'],
   ['Black ink on paper. Speech bubbles at home, sword slashes once a session starts.', 'หมึกดำบนกระดาษ บอลลูนคำพูดที่หน้าแรก และรอยดาบฟันเมื่อเริ่มเซสชัน', '紙に黒インク。ホームには吹き出し、セッションが始まれば斬撃が走る。', '纸上黑墨。主页飘出对话气泡，训练开始后刀光剑影。'],
   ['A cyber city. Neon rooftops and light trails by night, a clean black and white skyline by day.', 'เมืองไซเบอร์ หลังคานีออนและแสงไฟวิ่งยามค่ำคืน เส้นขอบฟ้าขาวดำเรียบ ๆ ยามกลางวัน', 'サイバーシティ。夜はネオンの屋上と光の軌跡、昼はすっきりしたモノクロの街並み。', '赛博城市。夜晚是霓虹屋顶与光轨，白天是简洁的黑白天际线。'],

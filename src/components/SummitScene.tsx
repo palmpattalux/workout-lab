@@ -39,6 +39,16 @@ const NEAR: [number, number, number, number][] = [
 const PEAK: [number, number] = [205, 132]
 const MOUNTAIN = `M-20 ${H} L-20 700 C10 640 28 540 44 460 C58 380 80 320 118 260 C150 214 178 170 ${PEAK[0] - 6} ${PEAK[1] + 4}
   C${PEAK[0] + 4} ${PEAK[1] - 2} ${PEAK[0] + 14} ${PEAK[1] + 2} 226 150 C262 196 286 260 306 330 C326 400 352 470 410 560 L410 ${H} Z`
+// The shadowed face, right of a crease running down from the peak (light comes from the left).
+const SHADE = `M${PEAK[0] + 2} ${PEAK[1] + 2} C${PEAK[0] + 10} ${PEAK[1] + 2} ${PEAK[0] + 16} ${PEAK[1] + 4} 226 150 C262 196 286 260 306 330
+  C326 400 352 470 410 560 L410 ${H} L262 ${H} C250 700 236 560 232 420 C228 300 216 200 ${PEAK[0] + 2} ${PEAK[1] + 2} Z`
+// Foothills in front of the mountain, each with a dark rim fading downward.
+const SPURS = [
+  `M-20 ${H} L-20 520 C20 470 60 430 96 420 C124 412 150 440 176 500 C196 548 214 620 230 ${H} Z`,
+  `M200 ${H} C230 640 262 540 300 492 C322 464 350 456 410 470 L410 ${H} Z`,
+]
+// a small pagoda on the tallest pillar, and a thin waterfall down the left flank
+const PAGODA = 'M-7 0 L7 0 L6 -4 L-6 -4 Z M-9 -4 L9 -4 L5 -7 L-5 -7 Z M-4 -7 L4 -7 L3.4 -10 L-3.4 -10 Z M-7 -10 L7 -10 L3.5 -13 L-3.5 -13 Z M-0.6 -13 L0.6 -13 L0.3 -17 L-0.3 -17 Z'
 const TRAIL: [number, number][] = [[46, 690], [338, 620], [64, 456], [256, 418], [92, 300], [186, 200], [PEAK[0] - 14, PEAK[1] + 8]]
 export const SUMMIT_STEPS = 12
 
@@ -103,6 +113,24 @@ function Painting({ gid, climb }: { gid: string; climb?: boolean }) {
           <stop offset=".45" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 'calc(var(--tt-main) * .45)' }} />
           <stop offset=".95" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 0 }} />
         </linearGradient>
+        <linearGradient id={gid + 'shade'} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 'calc(var(--tt-main) * .9)' }} />
+          <stop offset=".7" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 'calc(var(--tt-main) * .25)' }} />
+          <stop offset="1" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 0 }} />
+        </linearGradient>
+        <linearGradient id={gid + 'hill'} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" style={{ stopColor: 'var(--tt-hill)', stopOpacity: 'var(--tt-hill-o)' }} />
+          <stop offset=".5" style={{ stopColor: 'var(--tt-hill)', stopOpacity: 0 }} />
+        </linearGradient>
+        <linearGradient id={gid + 'spur'} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 'var(--tt-near)' }} />
+          <stop offset=".22" style={{ stopColor: 'var(--tt-hill)', stopOpacity: 'calc(var(--tt-hill-o) * .7)' }} />
+          <stop offset=".6" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 0 }} />
+        </linearGradient>
+        <linearGradient id={gid + 'pside'} x1="0" y1="0" x2="1" y2="0">
+          <stop offset=".45" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 0 }} />
+          <stop offset="1" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 'var(--tt-far)' }} />
+        </linearGradient>
         <linearGradient id={gid + 'side'} x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 0 }} />
           <stop offset=".55" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 0 }} />
@@ -110,18 +138,24 @@ function Painting({ gid, climb }: { gid: string; climb?: boolean }) {
         </linearGradient>
       </defs>
       <circle className="tt-sun" cx="328" cy="94" r="25" />
-      <g fill={`url(#${gid}far)`}>{FAR.map(([x, w, t, b], i) => <path key={i} d={pillar(x, w, t, b, i + 1)} />)}</g>
+      {FAR.map(([x, w, t, b], i) => { const d = pillar(x, w, t, b, i + 1); return <g key={i}><path d={d} fill={`url(#${gid}far)`} /><path d={d} fill={`url(#${gid}pside)`} /></g> })}
+      <path className="tt-pagoda" d={PAGODA} transform="translate(346 238)" />
       <path d={MOUNTAIN} fill={`url(#${gid}main)`} />
-      <path d={MOUNTAIN} fill={`url(#${gid}side)`} />
+      <path d={MOUNTAIN} fill={`url(#${gid}hill)`} />
+      <path d={SHADE} fill={`url(#${gid}shade)`} />
+      <path className="tt-falls" d="M58 470 C56 520 57 570 60 640" />
       {/* texture strokes down the face, like dry-brush ink */}
       <g className="tt-cun">
         <path d="M150 222 C138 300 132 380 126 470" /><path d="M188 176 C180 250 176 300 178 360" />
         <path d="M232 168 C250 230 262 300 268 380" /><path d="M110 300 C96 360 90 420 88 500" />
       </g>
-      <g fill={`url(#${gid}near)`}>{NEAR.map(([x, w, t, b], i) => <path key={i} d={pillar(x, w, t, b, i + 11)} />)}</g>
+      {SPURS.map((d, i) => <path key={i} d={d} fill={`url(#${gid}spur)`} />)}
+      {NEAR.map(([x, w, t, b], i) => { const d = pillar(x, w, t, b, i + 11); return <g key={i}><path d={d} fill={`url(#${gid}near)`} /><path d={d} fill={`url(#${gid}pside)`} /></g> })}
       <Pine x={226} y={150} s={0.9} />
       <Pine x={118} y={262} s={0.7} flip />
-      <Pine x={346} y={238} s={0.6} flip />
+      <Pine x={96} y={421} s={0.8} />
+      <Pine x={318} y={474} s={0.7} flip />
+      <Pine x={24} y={332} s={0.55} flip />
       {climb && <path className="tt-trail" d={trailD} />}
     </>
   )
