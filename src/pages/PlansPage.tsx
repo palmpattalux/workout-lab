@@ -1,15 +1,35 @@
 import { Icon } from '../components/icons'
+import { useState } from 'react'
 import { PLANS, FREE_WORKOUTS, FREE_SETS, usePlan, atLeast, tierName } from '../lib/plan'
+import { canPay, useSubscription, cancelRenewal, refreshSubscription } from '../lib/billing'
+import { formatDate } from '../lib/format'
 import { t } from '../lib/i18n'
 
-// Gear > Plan. Free, then the three paid plans. Payment isn't in yet, so plans you
-// don't have say "Coming soon" instead of offering a purchase.
-export default function PlansPage() {
+// Gear > Plan. Free, then the three paid plans, each with a way to get it (website
+// checkout). Unlimited has no perks yet, so it still says "Coming soon".
+export default function PlansPage({ userId }: { userId: string | null }) {
   const plan = usePlan()
+  const sub = useSubscription()
+  const [stopping, setStopping] = useState(false)
   const price = (n: number) => '฿' + n.toLocaleString()
-  const action = (tier: typeof plan) =>
-    tier === plan ? <span className="plan-state on">{t('Current plan')}</span>
+  const mine = sub && sub.tier === plan ? sub : null
+  const until = mine ? formatDate(new Date(mine.paid_until).getTime()) : ''
+  async function stopRenewing() {
+    setStopping(true)
+    try { await cancelRenewal(); await refreshSubscription(userId) } catch { /* stays as it was */ }
+    setStopping(false)
+  }
+  const action = (tier: typeof plan, unlimited = false) =>
+    tier === plan ? (
+      <div className="plan-manage">
+        <span className="plan-state on">{t('Current plan')}</span>
+        {mine && <small>{mine.renews ? t('Renews on {date}', { date: until }) : t('Active until {date}', { date: until })}</small>}
+        {mine?.renews && <button className="plan-quiet" disabled={stopping} onClick={stopRenewing}>{t('Turn off renewing')}</button>}
+        {mine && !mine.renews && <button className="plan-quiet" onClick={() => { location.hash = 'checkout-' + tier }}>{t('Add another month')}</button>}
+      </div>
+    )
     : atLeast(plan, tier) ? <span className="plan-state">{t('Included')}</span>
+    : canPay && !unlimited ? <button className="plan-buy" onClick={() => { location.hash = 'checkout-' + tier }}>{t('Get {plan}', { plan: t(tierName(tier)) })}</button>
     : <span className="plan-state soon">{t('Coming soon')}</span>
 
   return (
@@ -43,7 +63,7 @@ export default function PlansPage() {
           {p.perks.length > 0
             ? <ul className="perks">{p.perks.map((k) => <li key={k}><Icon name="check" size="16px" strokeWidth={2.4} />{t(k)}</li>)}</ul>
             : <p className="plan-later">{t('Details coming soon')}</p>}
-          {action(p.tier)}
+          {action(p.tier, p.tier === 'unlimited')}
         </section>
       ))}
     </main>

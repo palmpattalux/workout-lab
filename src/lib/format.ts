@@ -4,6 +4,9 @@ import { t, locale } from './i18n'
 export function day(ts: number) {
   return new Date(ts).toLocaleDateString(locale(), { weekday: 'short', day: 'numeric', month: 'short' })
 }
+export function formatDate(ts: number) {
+  return new Date(ts).toLocaleDateString(locale(), { day: 'numeric', month: 'long', year: 'numeric' })
+}
 export function time(ts: number) {
   return new Date(ts).toLocaleTimeString(locale(), { hour: 'numeric', minute: '2-digit' })
 }

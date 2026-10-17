@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react'
 
-// Subscription plans. Payments aren't in yet, so every account is on Free except the
-// app owner's, which gets the top plan. Each paid plan includes everything below it.
+// Subscription plans. An account is on what it has paid for (billing.ts), else Free;
+// the app owner's account always gets the top plan. Each paid plan includes everything below it.
 export type Tier = 'free' | 'premium' | 'exclusive' | 'unlimited'
 const RANK: Record<Tier, number> = { free: 0, premium: 1, exclusive: 2, unlimited: 3 }
 export const atLeast = (have: Tier, need: Tier) => RANK[have] >= RANK[need]
@@ -24,8 +24,13 @@ export const tierName = (tier: Tier) => (tier === 'free' ? 'Free' : PLANS.find((
 // a hash so the address isn't published in the code).
 const OWNER_EMAIL_SHA256 = '7785568f1c31b9896a577b29354b34e40401c36472b1b731ff8388705ff8957e'
 let tier: Tier = 'free'
+let owner = false
+let paid: Tier = 'free'
 const listeners = new Set<() => void>()
-function setTier(next: Tier) { if (next !== tier) { tier = next; listeners.forEach((fn) => fn()) } }
+function update() { const next: Tier = owner ? 'unlimited' : paid; if (next !== tier) { tier = next; listeners.forEach((fn) => fn()) } }
+function setTier(next: Tier) { owner = next === 'unlimited'; update() }
+// what the account has paid for (billing.ts)
+export function setPaidTier(next: Tier) { paid = next; update() }
 export function onPlanChange(fn: () => void) { listeners.add(fn); return () => { listeners.delete(fn) } }
 export const getPlan = () => tier
 export function usePlan(): Tier { return useSyncExternalStore(onPlanChange, () => tier) }

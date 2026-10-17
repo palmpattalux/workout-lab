@@ -1289,3 +1289,81 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 :root[data-skin="manga"] .page .dot.empty { border: 2px dashed var(--line); }
 :root[data-skin="manga"] #b1.live { background: var(--ink); color: var(--stage); }
 :root[data-skin="manga"] #b1.live .led { background: var(--stage); }
+
+/* ---------- website checkout: Plans > Get, #checkout-<plan>, #pay ---------- */
+.plan-buy { align-self: flex-start; border: 0; border-radius: 999px; padding: 10px 18px; cursor: pointer;
+  background: var(--ink); color: var(--stage); font: 700 .88rem var(--font); transition: transform .2s var(--ease); }
+.plan-buy:active { transform: scale(.96); }
+.plan-manage { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.plan-manage small { color: var(--muted); font: 600 .8rem var(--font); }
+.plan-quiet { flex-basis: 100%; text-align: left; background: none; border: 0; padding: 2px 0; color: var(--muted); font: 600 .8rem var(--font); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+
+.checkout, .pay { padding-bottom: 7cqh; }
+.checkout .create-head h1, .pay .create-head h1 { font-size: 1.9rem; letter-spacing: -.03em; }
+.co-plan { margin: 14px 5.7% 22px; padding: 16px 18px; border-radius: 22px; background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--lift);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.co-plan h2 { margin: 0 0 3px; font: 800 1.15rem var(--font); letter-spacing: -.02em; }
+.co-plan.exclusive h2::after { content: ""; display: inline-block; width: 6px; height: 6px; margin-left: 7px; vertical-align: .25em; border-radius: 50%; background: var(--sun); }
+.co-plan p { margin: 0; color: var(--muted); font: 500 .82rem var(--font); }
+.co-label { margin: 0 7% 10px; color: var(--muted); font: 700 .72rem var(--font); letter-spacing: .1em; text-transform: uppercase; }
+.co-methods { margin: 0 5.7%; display: flex; flex-direction: column; gap: 8px; }
+.co-method { display: flex; align-items: center; gap: 14px; padding: 13px 16px; border-radius: 18px; text-align: left; cursor: pointer;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--hair); box-shadow: var(--lift); transition: box-shadow .25s var(--ease), transform .2s var(--ease); }
+.co-method:active { transform: scale(.985); }
+.co-method.on { box-shadow: var(--lift), inset 0 0 0 1.5px var(--ink); }
+.co-ico { flex: none; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--sunk); color: var(--ink); }
+.co-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.co-text b { font: 700 .95rem var(--font); }
+.co-text small { color: var(--muted); font: 500 .78rem var(--font); }
+/* the choice mark is the brand's dot settling into its ring */
+.co-radio { flex: none; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--line); position: relative; transition: border-color .25s; }
+.co-radio::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: var(--sun); transform: scale(0); transition: transform .35s cubic-bezier(.3, 1.4, .5, 1); }
+.co-method.on .co-radio { border-color: var(--sun); }
+.co-method.on .co-radio::after { transform: scale(1); }
+.co-card { margin: 12px 5.7% 0; padding: 14px 16px 6px; border-radius: 18px; background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--lift);
+  animation: co-open .35s var(--ease); }
+@keyframes co-open { from { opacity: 0; transform: translateY(-6px); } }
+.co-card label { display: block; margin-bottom: 10px; }
+.co-card label span { display: block; margin: 0 0 5px 2px; color: var(--muted); font: 600 .75rem var(--font); }
+.co-card input { width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--hair); background: var(--sunk); color: var(--ink);
+  font: 600 1rem var(--num); letter-spacing: .02em; outline: none; user-select: text; -webkit-user-select: text; transition: border-color .2s, background .2s; }
+.co-card input:focus { background: var(--surface); border-color: var(--ink); }
+.co-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.co-error { margin: 14px 7% 0; color: #d4483b; font: 600 .85rem/1.4 var(--font); }
+.co-note { margin: 14px 7% 0; color: var(--muted); font: 500 .82rem/1.45 var(--font); }
+.co-pay { display: flex; align-items: center; justify-content: center; gap: 10px; width: calc(100% - 11.4%); margin: 22px 5.7% 0; padding: 16px; border: 0; border-radius: 999px;
+  background: var(--ink); color: var(--stage); font: 800 1rem var(--font); cursor: pointer; transition: opacity .25s, transform .2s var(--ease); }
+.co-pay:active { transform: scale(.98); }
+.co-pay:disabled { opacity: .35; cursor: default; }
+.co-pay.busy { opacity: 1; }
+.co-dot, .pay-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--sun); animation: co-breathe 1.6s ease-in-out infinite; }
+@keyframes co-breathe { 0%, 100% { transform: scale(.7); opacity: .6; } 50% { transform: scale(1.15); opacity: 1; } }
+.co-trust { margin: 14px 7% 0; display: flex; align-items: center; justify-content: center; gap: 7px; color: var(--muted); font: 600 .75rem/1.35 var(--font); text-align: center; }
+.co-trust svg { flex: none; }
+.co-fine { margin: 6px 9% 0; color: var(--muted); font: 500 .72rem/1.45 var(--font); text-align: center; opacity: .85; }
+.co-guest { margin: 0 5.7%; }
+.co-guest p { margin: 0 2% 0; color: var(--muted); font: 500 .9rem/1.5 var(--font); }
+.co-guest .co-pay { width: 100%; margin: 18px 0 0; }
+
+.pay-qr { display: flex; flex-direction: column; align-items: center; margin-top: 14px; }
+.pay-qr .co-label { margin: 0 0 12px; }
+.qr-box { width: min(64cqw, 260px); aspect-ratio: 1; padding: 14px; border-radius: 22px; background: #fff; box-shadow: var(--lift); animation: co-open .5s var(--ease); }
+.qr-box img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.pay-hint { margin: 14px 10% 0; text-align: center; color: var(--muted); font: 500 .8rem/1.5 var(--font); }
+.pay-save { margin-top: 10px; color: var(--ink); font: 700 .85rem var(--font); text-underline-offset: 3px; }
+.pay-wait { display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 28px 8% 0; text-align: center; }
+.pay-wait .pay-dot { width: 14px; height: 14px; margin-bottom: 6px; }
+.pay-wait p { margin: 0; font: 700 .95rem var(--font); }
+.pay-wait small { color: var(--muted); font: 500 .78rem var(--font); }
+.pay-done { display: flex; flex-direction: column; align-items: center; text-align: center; margin: 12cqh 7% 0; }
+.pay-done h2 { margin: 22px 0 6px; font: 800 1.4rem var(--font); letter-spacing: -.02em; }
+.pay-done p { margin: 0; color: var(--muted); font: 500 .9rem/1.5 var(--font); }
+.pay-done .co-pay { width: 100%; margin-top: 28px; }
+.pay-done.failed { margin-top: 8cqh; }
+/* paid: the dot settles into its ring, like the opening screen */
+.pay-ring { position: relative; width: 64px; height: 64px; border-radius: 50%; border: 7px solid var(--sun); box-sizing: border-box;
+  animation: pay-ring .8s cubic-bezier(.3, 1.3, .5, 1) both; box-shadow: 0 0 22px color-mix(in srgb, var(--sun) 35%, transparent); }
+.pay-ring i { position: absolute; inset: 14px; border-radius: 50%; background: var(--sun); animation: pay-dot .6s cubic-bezier(.3, 1.4, .5, 1) .45s both; }
+@keyframes pay-ring { from { transform: scale(1.6); opacity: 0; } }
+@keyframes pay-dot { from { transform: scale(0); } }
+@media (prefers-reduced-motion: reduce) { .co-dot, .pay-dot, .pay-ring, .pay-ring i, .co-card, .qr-box { animation: none; } }

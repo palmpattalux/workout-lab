@@ -10,6 +10,9 @@ import ThemesPage from './pages/ThemesPage'
 import PreviewBar from './components/PreviewBar'
 import LockNote from './components/LockNote'
 import PlansPage from './pages/PlansPage'
+import CheckoutPage from './pages/CheckoutPage'
+import PayPage from './pages/PayPage'
+import { refreshSubscription } from './lib/billing'
 import NotePage from './pages/NotePage'
 import WeekPage from './pages/WeekPage'
 import LicensesPage from './pages/LicensesPage'
@@ -32,6 +35,8 @@ import { t } from './lib/i18n'
 //   login, signup  log in / sign up (anyone not signed in can use the app as a guest first)
 //   save        sign up after a guest's first session: "Sign in to save your workout"
 //   plans       subscription plans (gear > Plan)
+//   checkout-<plan>  paying for a plan (website only)
+//   pay         waiting for a payment / the result (also where banks and wallets send people back)
 //   note-<id>   one note (page B Notes, Book > Notes)
 //   licenses    open-source credits (gear)
 //   week        weekly summary (Book > This week, Exclusive)
@@ -40,6 +45,8 @@ import { t } from './lib/i18n'
 // The log-in page only opens when asked for (gear, the sign-up guide, or ending a guest's
 // session), never on its own when the app is opened.
 if (['login', 'signup', 'save'].includes(location.hash.slice(1))) history.replaceState(null, '', location.pathname + location.search)
+// back from a bank's or wallet's payment page (?pay=return): show how the payment went
+if (new URLSearchParams(location.search).get('pay') === 'return') history.replaceState(null, '', location.pathname + '#pay')
 
 function go(hash: string) {
   location.hash = hash
@@ -64,6 +71,7 @@ function Screen() {
     if (user && ['login', 'signup', 'save'].includes(location.hash.slice(1))) location.replace('#')
     // device accounts can't prove an email, so only online accounts are checked for ownership
     if (supabase && user !== undefined) checkOwnerEmail(user?.email)
+    if (user !== undefined) refreshSubscription(user?.id)
   }, [user])
 
   useEffect(() => {
@@ -83,7 +91,9 @@ function Screen() {
   if (recovering) return <NewPasswordPage />
   const guest = !user
 
-  if (hash === 'plans') return <PlansPage />
+  if (hash === 'plans') return <PlansPage userId={user?.id ?? null} />
+  if (hash === 'checkout-premium' || hash === 'checkout-exclusive') return <CheckoutPage key={hash} tier={hash.slice(9) as 'premium' | 'exclusive'} guest={!user} />
+  if (hash === 'pay') return <PayPage userId={user?.id ?? null} />
   if (hash.startsWith('note-')) return <NotePage key={hash} id={hash.slice(5)} workouts={workouts} />
   if (hash === 'licenses') return <LicensesPage />
   if (hash === 'week') return <WeekPage workouts={workouts} />

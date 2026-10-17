@@ -25,6 +25,10 @@ const ui = {
   weight: <><path d="M9.5 7.5a2.5 2.5 0 1 1 5 0" /><path d="M7.2 9h9.6l2 10.5H5.2z" /></>,
   numbers: <path d="M9 4 7 20M17 4l-2 16M4.5 9h16M3.5 15h16" />,
   write: <><path d="M15.5 4.5 19.5 8.5 9 19H5v-4z" /><path d="M13.5 6.5l4 4" /></>,
+  card: <><rect x="3" y="5.5" width="18" height="13" rx="2.5" /><path d="M3 10h18M6.5 15h3" /></>,
+  qr: <><rect x="4" y="4" width="6" height="6" rx="1" /><rect x="14" y="4" width="6" height="6" rx="1" /><rect x="4" y="14" width="6" height="6" rx="1" /><path d="M14 14h2.5v2.5M20 14v6h-3.5M14 18v2" /></>,
+  wallet: <><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H18v3" /><rect x="4" y="7.5" width="16" height="12" rx="2.5" /><path d="M16 13.5h1.5" /></>,
+  shield: <><path d="M12 3.5 19 6v5.5c0 4.2-2.9 7.7-7 9-4.1-1.3-7-4.8-7-9V6z" /><path d="m9 12 2.2 2.2L15.5 10" /></>,
 }
 
 // The 8 workout icons offered when dragging up from "+" on page A: body parts, then equipment.
