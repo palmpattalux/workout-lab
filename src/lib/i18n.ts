@@ -162,6 +162,7 @@ const ROWS: [string, string, string, string][] = [
   ['{n} tries left.', 'เหลืออีก {n} ครั้ง', '残り{n}回です。', '还剩 {n} 次。'],
   ['1 try left.', 'เหลืออีก 1 ครั้ง', '残り1回です。', '还剩 1 次。'],
   ['Too many tries. Wait {n} seconds, then try again.', 'ลองหลายครั้งเกินไป รอ {n} วินาทีแล้วลองใหม่', '試行回数が多すぎます。{n}秒待ってからもう一度お試しください。', '尝试次数过多。请等待 {n} 秒后重试。'],
+  ['You already have an account with {email}. Enter your password to log in, or tap "Forgot password".', 'คุณมีบัญชีที่ใช้ {email} อยู่แล้ว ใส่รหัสผ่านเพื่อเข้าสู่ระบบ หรือแตะ "ลืมรหัสผ่าน"', '{email} のアカウントは既にあります。パスワードを入力してログインするか、「パスワードを忘れた」をタップしてください。', '{email} 已有账户。请输入密码登录，或点按“忘记密码”。'],
   ['There is already an account with that email. Log in instead.', 'มีบัญชีที่ใช้อีเมลนี้แล้ว เข้าสู่ระบบแทน', 'このメールアドレスのアカウントは既にあります。ログインしてください。', '该邮箱已注册，请直接登录。'],
   ['Verify your email first: open the link we sent you, then log in.', 'ยืนยันอีเมลก่อน: เปิดลิงก์ที่เราส่งให้ แล้วเข้าสู่ระบบ', '先にメールアドレスを確認してください：送ったリンクを開いてからログインします。', '请先验证邮箱：打开我们发送的链接，然后登录。'],
   ['Too many emails sent. Wait a minute, then try again.', 'ส่งอีเมลบ่อยเกินไป รอสักครู่แล้วลองใหม่', 'メールの送信が多すぎます。少し待ってからもう一度お試しください。', '邮件发送过于频繁。请稍等一分钟后重试。'],

@@ -144,11 +144,13 @@ export async function signIn(email: string, password: string) {
 }
 
 // Returns 'confirm' when Supabase sent a confirmation email before the account can be used.
-export async function signUp(email: string, password: string): Promise<{ error: string | null; confirm: boolean }> {
+// `exists` when the email already has an account (Supabase sends nothing then).
+export async function signUp(email: string, password: string): Promise<{ error: string | null; confirm: boolean; exists?: boolean }> {
   if (!supabase) return { error: await localSignUp(email, password), confirm: false }
   const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: home() } })
   // An email that already has an account comes back with no identities: not new.
-  if (!error && data.user && data.user.identities?.length) markNewAccount(data.user.id)
+  if (!error && data.user && !data.user.identities?.length) return { error: null, confirm: false, exists: true }
+  if (!error && data.user) markNewAccount(data.user.id)
   return { error: friendly(error?.message), confirm: !error && !data.session }
 }
 

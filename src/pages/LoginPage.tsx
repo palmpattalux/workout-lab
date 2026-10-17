@@ -34,6 +34,18 @@ export default function LoginPage({ start, note }: { start?: 'login' | 'signup';
       setError(await signIn(email.trim(), password))
     } else {
       const r = await signUp(email.trim(), password)
+      if (r.exists) {
+        // Already has an account: try logging straight in with what they typed;
+        // otherwise move to Log in and say plainly what to do.
+        const err = await signIn(email.trim(), password)
+        if (err) {
+          setMode('login')
+          setInfo(t('You already have an account with {email}. Enter your password to log in, or tap "Forgot password".', { email: email.trim() }))
+          if (err === t('Verify your email first: open the link we sent you, then log in.')) setError(err)
+        }
+        setBusy(false)
+        return
+      }
       setError(r.error)
       if (!r.error) { try { localStorage.setItem('workout-lab:has-account', '1') } catch { /* fine */ } }
       if (r.confirm) { setMode('sent'); setCooldown(60) }
