@@ -35,7 +35,7 @@ import { t } from './lib/i18n'
 //   login, signup  log in / sign up (anyone not signed in can use the app as a guest first)
 //   save        sign up after a guest's first session: "Sign in to save your workout"
 //   plans       subscription plans (gear > Plan)
-//   checkout-<plan>  paying for a plan (website only)
+//   checkout-<plan>  paying for a plan (website only); checkout-theme-<key> buying one theme
 //   pay         waiting for a payment / the result (also where banks and wallets send people back)
 //   note-<id>   one note (page B Notes, Book > Notes)
 //   licenses    open-source credits (gear)
@@ -94,6 +94,7 @@ function Screen() {
 
   if (hash === 'plans') return <PlansPage userId={user?.id ?? null} />
   if (hash === 'checkout-premium' || hash === 'checkout-exclusive') return <CheckoutPage key={hash} tier={hash.slice(9) as 'premium' | 'exclusive'} guest={!user} />
+  if (hash.startsWith('checkout-theme-')) return <CheckoutPage key={hash} theme={hash.slice(15)} guest={!user} />
   if (hash === 'pay') return <PayPage userId={user?.id ?? null} />
   if (hash.startsWith('note-')) return <NotePage key={hash} id={hash.slice(5)} workouts={workouts} />
   if (hash === 'licenses') return <LicensesPage />

@@ -6,6 +6,9 @@ import { createClient } from '@supabase/supabase-js'
 // Prices live here, on the server, so a page can't be edited to pay less. Satang (฿1 = 100).
 export const PRICES = { premium: 14900, exclusive: 32900 }
 export const NAMES = { premium: 'Premium', exclusive: 'Exclusive' }
+// Single themes, bought once and kept for good (keys match src/lib/theme.ts).
+export const THEME_PRICE = 14900
+export const THEME_NAMES = { sakura: 'Sakura', nightcity: 'Night City', neon: 'Neon', manga: 'Manga' }
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://cafxkuokunjgtvexqaar.supabase.co'
 let admin = null
@@ -48,6 +51,7 @@ const ymd = (d) => d.toISOString().slice(0, 10)
 export async function grant(charge) {
   if (!charge || charge.status !== 'successful') return null
   const meta = charge.metadata || {}
+  if (meta.theme) return grantTheme(charge, meta)
   let { data: sub } = meta.user_id
     ? await db().from('subscriptions').select('*').eq('user_id', meta.user_id).maybeSingle()
     : await db().from('subscriptions').select('*').eq('omise_customer', charge.customer || '-').maybeSingle()
@@ -82,4 +86,12 @@ export async function grant(charge) {
   }
   await db().from('subscriptions').upsert(next)
   return next
+}
+
+// A theme bought on its own: recorded once, owned for good.
+async function grantTheme(charge, meta) {
+  if (!meta.user_id || !THEME_NAMES[meta.theme]) return null
+  const { error: dup } = await db().from('payments').insert({ charge_id: charge.id, user_id: meta.user_id, tier: 'theme:' + meta.theme, amount: charge.amount, method: meta.method || 'card' })
+  if (!dup) await db().from('owned_themes').upsert({ user_id: meta.user_id, theme: meta.theme, charge_id: charge.id })
+  return { theme: meta.theme }
 }

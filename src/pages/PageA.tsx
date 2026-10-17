@@ -532,10 +532,10 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
             <span className="lang-now">{t(tierName(plan))}</span>
             <span className="chev"><Icon name="back" size="18px" /></span>
           </button>
-          {canGroup && <button className="set-row themes-link" onClick={onThemes}>
+          <button className="set-row themes-link" onClick={onThemes}>
             <span>{t('Themes')}</span>
             <span className="chev"><Icon name="back" size="18px" /></span>
-          </button>}
+          </button>
           <button className="set-row themes-link credits-link" onClick={() => { setSettingsOpen(false); location.hash = 'licenses' }}>
             <span>{t('Open-source licences')}</span>
             <span className="chev"><Icon name="back" size="18px" /></span>

@@ -1,17 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from '../components/icons'
 import ThemeScene from '../components/ThemeScene'
-import { THEMES, THEME_SLOTS, setPreview, usePreview, useApplied, applyTheme, canUseTheme } from '../lib/theme'
-import { usePlan, tierName } from '../lib/plan'
+import { THEMES, THEME_SLOTS, THEME_PRICE, setPreview, usePreview, useApplied, useOwnedThemes, applyTheme, canUseTheme } from '../lib/theme'
+import { usePlan, atLeast } from '../lib/plan'
+import { canPay } from '../lib/billing'
 import { sound } from '../lib/sound'
 import { t } from '../lib/i18n'
 
-// Swipe through the theme slots like a scenery picker: the centred card is big,
-// its neighbours shrink away. Each theme belongs to a plan; "View" tries it on without that plan.
+// The theme shop: swipe through the slots like skins in a game. The centred card is big,
+// its neighbours shrink away. Each theme can be bought on its own (฿149, kept for good) or
+// comes with a plan; "Try on" previews it first.
 export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
   const preview = usePreview()
   const plan = usePlan()
   const applied = useApplied()
+  const ownedThemes = useOwnedThemes()
   const track = useRef<HTMLDivElement>(null)
   const [pos, setPos] = useState(0)
   const last = useRef(0)
@@ -39,6 +42,10 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
   const theme = THEMES[index]
   const viewing = theme && preview === theme.key
   const owner = !!theme && canUseTheme(theme.key, plan)
+  const bought = !!theme && ownedThemes.includes(theme.key)
+  const price = '฿' + THEME_PRICE
+  const has = (key: string) => ownedThemes.includes(key) || atLeast(plan, THEMES.find((x) => x?.key === key)?.tier ?? 'premium')
+  const buy = (key: string) => { setPreview(null); sound.tap(); location.hash = 'checkout-theme-' + key }
 
   function goTo(i: number) {
     const el = track.current
@@ -71,6 +78,7 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
                 aria-label={th ? `${th.name} theme` : `Empty slot ${i + 1}`}
                 onClick={() => goTo(i)}
               >
+                {th && <span className={`price-pill${has(th.key) ? ' owned' : ''}`}>{has(th.key) ? <><Icon name="check" size="13px" strokeWidth={2.8} />{t('Owned')}</> : price}</span>}
                 {th ? (
                   <div className={`theme-art skin-${th.key}`} data-skin={th.key}>
                     <ThemeScene skin={th.key} />
@@ -92,17 +100,27 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
         <p className="theme-count">{index + 1} / {THEME_SLOTS}</p>
         <h2>{theme ? theme.name : t('Empty slot')}</h2>
         <p className="theme-blurb">{theme ? t(theme.blurb) : t('A new theme will land here.')}</p>
-        {theme && (
+        {theme && (owner ? (
           <>
-            <span className={`owned-tag tier-tag${owner ? ' yes' : ''}`}>{t(tierName(theme.tier))}</span>
-            {owner ? (applied === theme.key
+            <span className="owned-tag yes"><Icon name="check" size="12px" strokeWidth={2.8} />{bought ? t('Owned') : t('Included in your plan')}</span>
+            {applied === theme.key
               ? <button className="theme-view on" onClick={() => { applyTheme(null); sound.tap() }}>{t('In use · Turn off')}</button>
-              : <button className="theme-view" onClick={() => { applyTheme(theme.key); sound.pop(); onViewed() }}>{t('Use')}</button>)
-            : viewing
-              ? <button className="theme-view on" onClick={() => setPreview(null)}>{t('Stop viewing')}</button>
-              : <button className="theme-view" onClick={() => { setPreview(theme.key); sound.pop(); onViewed() }}>{t('View')}</button>}
+              : <button className="theme-view" onClick={() => { applyTheme(theme.key); sound.pop(); onViewed() }}>{t('Use')}</button>}
           </>
-        )}
+        ) : (
+          <>
+            <span className="owned-tag">{t('{price} · yours to keep', { price })}</span>
+            <div className="theme-buy">
+              {viewing
+                ? <button className="theme-view on" onClick={() => setPreview(null)}>{t('Stop trying')}</button>
+                : <button className="theme-view on" onClick={() => { setPreview(theme.key); sound.pop(); onViewed() }}>{t('Try on')}</button>}
+              {canPay
+                ? <button className="theme-view" onClick={() => buy(theme.key)}>{t('Buy {price}', { price })}</button>
+                : <button className="theme-view" disabled>{t('Coming soon')}</button>}
+            </div>
+            <button className="theme-plan-link" onClick={() => { setPreview(null); location.hash = 'plans' }}>{t('Or get every theme with Premium')}</button>
+          </>
+        ))}
       </div>
 
       <div className="theme-pips" aria-hidden="true">

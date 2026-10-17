@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     const charge = await omise('/charges/' + id)
     if (charge.metadata?.user_id !== user.id) return send(res, 404, { error: 'Not found' })
     const sub = await grant(charge)
-    send(res, 200, { status: charge.status, tier: charge.metadata.tier, paidUntil: sub?.paid_until ?? null, failure: charge.failure_message || null })
+    send(res, 200, { status: charge.status, tier: charge.metadata.tier ?? null, theme: charge.metadata.theme ?? null, paidUntil: sub?.paid_until ?? null, failure: charge.failure_message || null })
   } catch (e) {
     send(res, 500, { error: e.message })
   }

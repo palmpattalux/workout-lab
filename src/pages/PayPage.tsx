@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Icon } from '../components/icons'
 import { PLANS } from '../lib/plan'
+import { THEMES, THEME_PRICE, applyTheme } from '../lib/theme'
 import { chargeStatus, getPending, clearPending, refreshSubscription } from '../lib/billing'
 import { formatDate } from '../lib/format'
 import { t } from '../lib/i18n'
@@ -13,7 +14,8 @@ export default function PayPage({ userId }: { userId: string | null }) {
   const [pending] = useState(getPending)
   const [view, setView] = useState<View>(pending ? 'waiting' : 'none')
   const [until, setUntil] = useState<string | null>(null)
-  const plan = pending ? PLANS.find((p) => p.tier === pending.tier) : undefined
+  const plan = pending?.tier ? PLANS.find((p) => p.tier === pending.tier) : undefined
+  const theme = pending?.theme ? THEMES.find((th) => th?.key === pending.theme) ?? null : null
 
   useEffect(() => {
     if (!pending) return
@@ -41,7 +43,7 @@ export default function PayPage({ userId }: { userId: string | null }) {
 
       {view === 'waiting' && pending?.method === 'promptpay' && pending.qr && (
         <section className="pay-qr">
-          <p className="co-label">{t('Scan to pay {price}', { price: '฿' + (plan?.price ?? 0).toLocaleString() })}</p>
+          <p className="co-label">{t('Scan to pay {price}', { price: '฿' + (theme ? THEME_PRICE : plan?.price ?? 0).toLocaleString() })}</p>
           <div className="qr-box"><img src={pending.qr} alt={t('PromptPay QR code')} /></div>
           <p className="pay-hint">{t('Open any Thai banking app and scan. On this phone? Save the QR, then pick it from your gallery in the banking app.')}</p>
           <a className="pay-save" href={pending.qr} download="dotset-promptpay.png" target="_blank" rel="noreferrer">{t('Save QR')}</a>
@@ -59,9 +61,12 @@ export default function PayPage({ userId }: { userId: string | null }) {
       {view === 'done' && (
         <div className="pay-done" role="status">
           <span className="pay-ring"><i /></span>
-          <h2>{t("You're on {plan}", { plan: t(plan?.name ?? '') })}</h2>
-          {until && <p>{pending?.method === 'card' ? t('Renews on {date}', { date: formatDate(new Date(until).getTime()) }) : t('Active until {date}', { date: formatDate(new Date(until).getTime()) })}</p>}
-          <button className="co-pay" onClick={() => { location.hash = '' }}>{t('Start training')}</button>
+          <h2>{theme ? t('{theme} is yours', { theme: theme.name }) : t("You're on {plan}", { plan: t(plan?.name ?? '') })}</h2>
+          {theme && <p>{t('It stays on your account for good.')}</p>}
+          {!theme && until && <p>{pending?.method === 'card' ? t('Renews on {date}', { date: formatDate(new Date(until).getTime()) }) : t('Active until {date}', { date: formatDate(new Date(until).getTime()) })}</p>}
+          {theme
+            ? <button className="co-pay" onClick={() => { applyTheme(theme.key); location.hash = '' }}>{t('Use it now')}</button>
+            : <button className="co-pay" onClick={() => { location.hash = '' }}>{t('Start training')}</button>}
         </div>
       )}
 
@@ -69,7 +74,7 @@ export default function PayPage({ userId }: { userId: string | null }) {
         <div className="pay-done failed" role="alert">
           <h2>{t("Payment didn't go through")}</h2>
           <p>{t('Nothing was charged. You can try again or pick another way to pay.')}</p>
-          <button className="co-pay" onClick={() => { location.hash = 'checkout-' + (pending?.tier ?? 'premium') }}>{t('Try again')}</button>
+          <button className="co-pay" onClick={() => { location.hash = pending?.theme ? 'checkout-theme-' + pending.theme : 'checkout-' + (pending?.tier ?? 'premium') }}>{t('Try again')}</button>
         </div>
       )}
 

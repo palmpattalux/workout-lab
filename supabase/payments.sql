@@ -30,3 +30,16 @@ drop policy if exists "read own" on public.subscriptions;
 create policy "read own" on public.subscriptions for select to authenticated using (user_id = auth.uid());
 drop policy if exists "read own" on public.payments;
 create policy "read own" on public.payments for select to authenticated using (user_id = auth.uid());
+
+
+-- Themes bought one at a time (฿149 each, kept for good). Safe to run again.
+create table if not exists public.owned_themes (
+  user_id     uuid not null references auth.users on delete cascade,
+  theme       text not null,
+  charge_id   text,
+  created_at  timestamptz not null default now(),
+  primary key (user_id, theme)
+);
+alter table public.owned_themes enable row level security;
+drop policy if exists "read own" on public.owned_themes;
+create policy "read own" on public.owned_themes for select to authenticated using (user_id = auth.uid());

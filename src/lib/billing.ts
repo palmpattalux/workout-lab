@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import { supabase } from './auth'
 import { setPaidTier, type Tier } from './plan'
+import { setOwnedThemes } from './theme'
 
 // Paying for a plan on the website. Omise (Opn Payments) takes the payment; our server
 // (api/*.js on Vercel) checks it and records the plan in Supabase, which the app reads here.
@@ -23,8 +24,12 @@ function setSub(next: Subscription) {
 export function useSubscription(): Subscription { return useSyncExternalStore((fn) => { listeners.add(fn); return () => { listeners.delete(fn) } }, () => sub) }
 
 export async function refreshSubscription(userId: string | null | undefined) {
-  if (!supabase || !userId) return setSub(null)
-  const { data } = await supabase.from('subscriptions').select('tier, paid_until, method, renews').eq('user_id', userId).maybeSingle()
+  if (!supabase || !userId) { setOwnedThemes([]); return setSub(null) }
+  const [{ data }, themes] = await Promise.all([
+    supabase.from('subscriptions').select('tier, paid_until, method, renews').eq('user_id', userId).maybeSingle(),
+    supabase.from('owned_themes').select('theme').eq('user_id', userId),
+  ])
+  setOwnedThemes(((themes.data ?? []) as { theme: string }[]).map((r) => r.theme))
   setSub((data as Subscription) ?? null)
 }
 
@@ -41,16 +46,19 @@ async function api<T>(path: string, body?: unknown): Promise<T> {
 }
 
 export type Started = { charge: string; status: string; authorizeUri: string | null; qr: string | null; expiresAt: string | null; failure: string | null }
-export const startCheckout = (tier: Tier, method: Method, extra: { token?: string; phone?: string } = {}) =>
-  api<Started>('/api/checkout', { tier, method, ...extra })
+// what is being bought: a plan, or one theme
+export type Item = { tier: Tier; theme?: undefined } | { theme: string; tier?: undefined }
+export const startCheckout = (item: Item, method: Method, extra: { token?: string; phone?: string } = {}) =>
+  api<Started>('/api/checkout', { ...item, method, ...extra })
 export const chargeStatus = (id: string) =>
-  api<{ status: string; tier: Tier; paidUntil: string | null; failure: string | null }>('/api/charge?id=' + encodeURIComponent(id))
+  api<{ status: string; tier: Tier | null; theme: string | null; paidUntil: string | null; failure: string | null }>('/api/charge?id=' + encodeURIComponent(id))
 export const cancelRenewal = () => api<{ ok: true }>('/api/subscription', { action: 'cancel' })
 
 // The payment being waited on survives the trip to a bank or wallet page and back.
 const PENDING = 'workout-lab:pending-charge'
-export const savePending = (p: { charge: string; tier: Tier; method: Method; qr?: string | null; expiresAt?: string | null }) => { try { localStorage.setItem(PENDING, JSON.stringify(p)) } catch { /* fine */ } }
-export const getPending = (): { charge: string; tier: Tier; method: Method; qr?: string | null; expiresAt?: string | null } | null => { try { return JSON.parse(localStorage.getItem(PENDING) || 'null') } catch { return null } }
+export type Pending = { charge: string; tier?: Tier; theme?: string; method: Method; qr?: string | null; expiresAt?: string | null }
+export const savePending = (p: Pending) => { try { localStorage.setItem(PENDING, JSON.stringify(p)) } catch { /* fine */ } }
+export const getPending = (): Pending | null => { try { return JSON.parse(localStorage.getItem(PENDING) || 'null') } catch { return null } }
 export const clearPending = () => { try { localStorage.removeItem(PENDING) } catch { /* fine */ } }
 
 // Card numbers go straight from the page to Omise (Omise.js); our server only ever sees a token.

@@ -41,7 +41,12 @@ export function previewBlocked() { nudge?.() }
 const SKIN_KEY = 'workout-lab:skin'
 let applied: string | null = (() => { try { return localStorage.getItem(SKIN_KEY) } catch { return null } })()
 export const themeTier = (key: string): Tier => THEMES.find((t) => t?.key === key)?.tier ?? 'premium'
-export const canUseTheme = (key: string, plan: Tier = getPlan()) => atLeast(plan, themeTier(key))
+// Any single theme can also be bought on its own, once, and kept (billing.ts loads them).
+export const THEME_PRICE = 149
+let owned: string[] = []
+export function setOwnedThemes(keys: string[]) { owned = keys; paint() }
+export const ownsTheme = (key: string) => owned.includes(key)
+export const canUseTheme = (key: string, plan: Tier = getPlan()) => ownsTheme(key) || atLeast(plan, themeTier(key))
 const inUse = () => (applied && canUseTheme(applied) ? applied : null)
 
 function paint() {
@@ -59,6 +64,7 @@ export function getPreview() { return preview }
 export function usePreview(): string | null { return useSyncExternalStore(subscribe, () => preview) }
 
 export function useApplied(): string | null { return useSyncExternalStore(subscribe, inUse) }
+export function useOwnedThemes(): string[] { return useSyncExternalStore(subscribe, () => owned) }
 // what the home page should show: the theme being tried on, else the one in use
 export function useSkin(): string | null { return useSyncExternalStore(subscribe, () => preview ?? inUse()) }
 
