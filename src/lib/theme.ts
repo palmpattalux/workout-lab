@@ -12,7 +12,8 @@ export const THEMES: (Theme | null)[] = [
   { key: 'nightcity', name: 'Night City', blurb: 'A gothic skyline in the rain. Searchlights and lightning by night, the sun about to rise by day.', tier: 'premium' },
   { key: 'neon', name: 'Neon', blurb: 'A cyber city. Neon rooftops and light trails by night, a clean black and white skyline by day.', tier: 'premium' },
   { key: 'manga', name: 'Manga', blurb: 'Black ink on paper. Speech bubbles at home, sword slashes once a session starts.', tier: 'premium' },
-  ...Array.from({ length: THEME_SLOTS - 4 }, () => null),
+  { key: 'summit', name: 'To the Top', blurb: 'Stone pillars in an ink painting. Each set you finish pushes the boulder further up the mountain.', tier: 'premium' },
+  ...Array.from({ length: THEME_SLOTS - 5 }, () => null),
 ]
 
 let preview: string | null = null

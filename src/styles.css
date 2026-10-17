@@ -1413,3 +1413,56 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .share-actions { display: flex; gap: 10px; }
 .share-actions > * { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
 .share-save { height: 52px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 700 1.05rem var(--font); cursor: pointer; }
+
+/* ---------- To the Top theme: a Chinese ink painting of stone pillars ----------
+   Light = rice paper with a vermilion sun, dark = moonlit ink. Page B during a session:
+   a figure pushes a boulder up the trail on the middle mountain, one step per set. */
+:root[data-skin="summit"], .theme-art[data-skin="summit"] {
+  --stage: #f4f0e7; --bg: #e7e1d4; --surface: #fbf9f4; --sunk: #ece7dc;
+  --ink: #1f1e1b; --muted: #6f6b62;
+  --sun: #c4462e; --active: #b8442e; --active-soft: #f3dfd5;
+  --tt-ink: #23221f; --tt-far: .18; --tt-near: .3; --tt-main: .34;
+  --tt-sun: #d4583c; --tt-sun-o: .72; --tt-mist: #f4f0e7; --tt-figure: #1f1e1b; --tt-trail: rgba(35, 34, 31, .28);
+}
+:root[data-skin="summit"][data-mode="dark"], :root[data-mode="dark"] .theme-art[data-skin="summit"] {
+  --stage: #121418; --bg: #0a0b0d; --surface: #1c1f24; --sunk: #16181c;
+  --ink: #ece8df; --muted: #979389;
+  --sun: #e2765c; --active: #e2765c; --active-soft: #3a2621;
+  --tt-ink: #b9c2cc; --tt-far: .12; --tt-near: .2; --tt-main: .26;
+  --tt-sun: #ece6d6; --tt-sun-o: .85; --tt-mist: #121418; --tt-figure: #ece8df; --tt-trail: rgba(236, 232, 223, .22);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="summit"]:not([data-mode="light"]), :root:not([data-mode="light"]) .theme-art[data-skin="summit"] {
+    --stage: #121418; --bg: #0a0b0d; --surface: #1c1f24; --sunk: #16181c;
+    --ink: #ece8df; --muted: #979389;
+    --sun: #e2765c; --active: #e2765c; --active-soft: #3a2621;
+    --tt-ink: #b9c2cc; --tt-far: .12; --tt-near: .2; --tt-main: .26;
+    --tt-sun: #ece6d6; --tt-sun-o: .85; --tt-mist: #121418; --tt-figure: #ece8df; --tt-trail: rgba(236, 232, 223, .22);
+    color-scheme: dark;
+  }
+}
+.theme-art[data-skin="summit"] { color: var(--ink); }
+.summit-scene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.summit-scene .tt-art { position: absolute; inset: 0; width: 100%; height: 100%; }
+.summit-scene svg * { stroke: none; }
+.tt-sun { fill: var(--tt-sun); opacity: var(--tt-sun-o); }
+.summit-scene.top .tt-sun { animation: tt-glow 3.2s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+@keyframes tt-glow { to { opacity: 1; transform: scale(1.08); } }
+.summit-scene .tt-cun path { fill: none; stroke: var(--tt-ink); stroke-width: 1.2; stroke-linecap: round; opacity: calc(var(--tt-main) * .55); }
+.summit-scene .tt-pine ellipse { fill: var(--tt-ink); opacity: calc(var(--tt-main) * 1.6); }
+.summit-scene .tt-pine .tt-trunk { fill: none; stroke: var(--tt-ink); stroke-width: 1.6; stroke-linecap: round; opacity: calc(var(--tt-main) * 1.6); }
+.summit-scene .tt-trail { fill: none; stroke: var(--tt-trail); stroke-width: 1.6; stroke-dasharray: 1 6; stroke-linecap: round; stroke-linejoin: round; }
+.summit-scene .tt-trail.done { stroke: var(--active); stroke-width: 1.6; opacity: .5; }
+.summit-scene .tt-rock { fill: var(--tt-figure); opacity: .82; }
+.summit-scene .tt-crack { fill: none; stroke: var(--stage); stroke-width: 1.2; stroke-linecap: round; opacity: .5; }
+.summit-scene .tt-figure path { fill: none; stroke: var(--tt-figure); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.summit-scene .tt-figure circle { fill: var(--tt-figure); }
+.tt-mist { position: absolute; left: -40%; width: 180%; height: 13cqh; border-radius: 50%;
+  background: radial-gradient(closest-side, var(--tt-mist), transparent); opacity: .9;
+  animation: tt-drift 40s ease-in-out infinite alternate; }
+.tt-mist.low { top: auto; bottom: -4cqh; height: 26cqh; opacity: 1; animation-duration: 60s; }
+@keyframes tt-drift { from { transform: translateX(-8%); } to { transform: translateX(8%); } }
+.tt-birds { position: absolute; top: 20%; left: 0; width: 44px; height: auto; opacity: .5; animation: tt-fly 34s linear infinite; animation-delay: -6s; }
+.tt-birds path { fill: none !important; stroke: var(--tt-ink) !important; stroke-width: 1.3 !important; stroke-linecap: round; }
+@keyframes tt-fly { from { transform: translate(-60px, 0); } 50% { transform: translate(55cqw, -4cqh); } to { transform: translate(115cqw, 2cqh); } }

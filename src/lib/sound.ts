@@ -87,5 +87,8 @@ export const sound = {
   // a blade cutting the air (a fast swish rising in pitch), then the bite of the cut
   slash() { noise(0.2, 0.26, 'bandpass', 420, 3800, 0, 0.6); noise(0.06, 0.2, 'highpass', 5200, 2600, 0.16, 0.7); noise(0.12, 0.08, 'bandpass', 1800, 900, 0.18, 1.5) },
   bubble() { tone(420, 880, 0.09, 0.08, 'sine') },
+  // To the Top theme: a boulder rolling over stone, and a soft bell at the summit
+  roll() { noise(0.9, 0.14, 'lowpass', 380, 120, 0, 0.7); tone(70, 52, 0.5, 0.12, 'sine'); buzz(12) },
+  summit() { tone(392, 390, 1.6, 0.09, 'sine'); tone(588, 586, 1.3, 0.05, 'sine') },
   impact() { tone(140, 42, 0.32, 0.3, 'sine'); noise(0.18, 0.16, 'lowpass', 1400, 200); buzz(18) },
 }

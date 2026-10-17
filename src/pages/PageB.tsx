@@ -1,4 +1,5 @@
 import { MangaBattle } from '../components/MangaScene'
+import { SummitClimb } from '../components/SummitScene'
 import { useSkin } from '../lib/theme'
 import { useEffect, useState } from 'react'
 import { Icon, WorkoutMark } from '../components/icons'
@@ -73,6 +74,8 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
   return (
     <main className="page" aria-label="Page B">
       {skin === 'manga' && inSession && <MangaBattle set={set} />}
+      {/* To the Top: every set moved on, across the whole session, is a step up the mountain */}
+      {skin === 'summit' && inSession && <SummitClimb steps={Object.values(session.setOf).reduce((a, n) => a + Math.max(0, n - 1), 0)} />}
       <div className="tabs">
         <button className={`btn pill${session ? ' live' : ''}${endHint ? ' holo-target' : ''}`} id="b1" aria-label={session ? t('Active session: tap to end') : t('Active')} onClick={() => session && setConfirmEnd(true)}>
           <span className="led" />{t('Active')}
