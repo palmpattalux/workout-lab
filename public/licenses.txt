@@ -1,4 +1,4 @@
-Sidekick uses the following open-source software. Thank you to their authors.
+Dotset uses the following open-source software. Thank you to their authors.
 
 @supabase/auth-js 2.117.3 (MIT)
 ------------------------------------------------------------

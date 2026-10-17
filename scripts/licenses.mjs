@@ -34,6 +34,6 @@ AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR 
 WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
 NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE
 OF THIS SOFTWARE.`)
-const head = 'Sidekick uses the following open-source software. Thank you to their authors.\n\n'
+const head = 'Dotset uses the following open-source software. Thank you to their authors.\n\n'
 writeFileSync('public/licenses.txt', head + parts.join('\n\n\n') + '\n')
 console.log(`public/licenses.txt: ${parts.length} packages`)

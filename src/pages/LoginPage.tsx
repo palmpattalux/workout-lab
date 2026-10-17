@@ -87,7 +87,7 @@ export default function LoginPage({ start, note }: { start?: 'login' | 'signup';
       {!arrivedFromEmailLink && <button className="icon-btn login-close" aria-label={t('Back')} onClick={() => { if (history.length > 1) history.back(); else location.replace('#') }}><Icon name="close" size="22px" /></button>}
       <form className="login-form" onSubmit={submit}>
         {note && <p className="login-note"><Icon name="check" size="16px" strokeWidth={2.6} />{note}</p>}
-        <h1>Sidekick</h1>
+        <h1>Dotset</h1>
         <p className="muted">{isLogin ? t('Log in to your notes.') : t('Make an account to keep your notes.')}</p>
 
         <input id="email" className="field" type="email" autoComplete="email" placeholder={t('Email')} required
