@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Icon, WorkoutMark } from '../components/icons'
 import { useSessions, type Session, type Workout } from '../lib/store'
 import { day, duration } from '../lib/format'
 import { statOf } from '../lib/progress'
 import { t } from '../lib/i18n'
+import { statsOf } from '../lib/sticker'
+import ShareSticker from '../components/ShareSticker'
 
 // Shown right after a session ends: this session's numbers count up from the last
 // session's, the change pops in, then everything settles still (good for a screenshot).
@@ -37,6 +39,7 @@ function Delta({ d, unit, delay }: { d: number | null; unit?: string; delay: num
 
 export default function SummaryPage({ id, workouts, onDone }: { id: string; workouts: Workout[]; onDone: () => void }) {
   const sessions = useSessions()
+  const [sharing, setSharing] = useState(false)
   const index = sessions.findIndex((x) => x.id === id)
   const s = sessions[index]
   if (!s) return <main className="page summary"><p className="empty-note">{t('Session not found.')}</p></main>
@@ -50,6 +53,7 @@ export default function SummaryPage({ id, workouts, onDone }: { id: string; work
     return { wid, now, prev, info }
   }).filter((r) => r.now)
 
+  const stats = useMemo(() => statsOf(s, workouts), [s, workouts])
   const totalSets = rows.reduce((n, r) => n + r.now!.sets, 0)
   const isTimed = (r: { wid: string; info?: { mode?: string; count?: string } }) => r.info?.mode === 'progression' && r.info?.count === 'sec'
   const totalReps = rows.filter((r) => !isTimed(r)).reduce((n, r) => n + r.now!.reps, 0)
@@ -107,6 +111,9 @@ export default function SummaryPage({ id, workouts, onDone }: { id: string; work
           )
         })}
       </ol>
+
+      {rows.length > 0 && <button className="share-btn" onClick={() => setSharing(true)}><Icon name="share" size="18px" />{t('Share')}</button>}
+      {sharing && <ShareSticker stats={stats} onClose={() => setSharing(false)} />}
 
       <button className="btn circle big save-new" aria-label={t('Done')} onClick={onDone}>
         <Icon name="check" strokeWidth={2.2} />
