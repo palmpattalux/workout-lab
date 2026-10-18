@@ -1794,3 +1794,22 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .theme-feats .tf { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; padding: 0; border: 1px solid var(--hair); background: var(--surface); color: var(--muted); cursor: pointer; }
 .tf-tell { position: absolute; right: 0; bottom: calc(100% + 30px); padding: 6px 10px; border-radius: 10px; background: var(--ink); color: var(--stage); font: 600 .72rem var(--font); white-space: nowrap; animation: tc-tell 2s ease both; pointer-events: none; z-index: 5; }
 .co-error .co-reason { display: block; margin-top: 4px; font-size: .74rem; opacity: .75; }
+
+/* home: plan running out */
+.renew-scrim { position: absolute; inset: 0; z-index: 40; display: flex; align-items: flex-end; justify-content: center; padding: 0 4% 5cqh; background: color-mix(in srgb, var(--stage) 40%, transparent); backdrop-filter: blur(3px); animation: fade-in .25s ease; }
+@keyframes fade-in { from { opacity: 0; } }
+.renew-card {
+  width: 100%; max-width: 380px; padding: 22px 22px 12px; border-radius: 28px; text-align: center;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--hair); box-shadow: var(--float); animation: rise .3s var(--ease);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.renew-card h2 { margin: 4px 0 0; font: 800 1.25rem var(--font); letter-spacing: -.02em; }
+.renew-card p { margin: 0 0 8px; color: var(--muted); font-size: .9rem; line-height: 1.45; }
+.renew-badge { font: 700 .66rem var(--font); letter-spacing: .1em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; background: var(--active-soft); color: var(--active); }
+.renew-badge.ended { background: var(--sunk); color: var(--muted); }
+.renew-go { width: 100%; border: 0; border-radius: 999px; padding: 14px; background: var(--ink); color: var(--stage); font: 800 1rem var(--font); cursor: pointer; box-shadow: var(--lift); }
+.renew-go:active { transform: scale(.97); }
+.renew-skip { border: 0; background: none; padding: 10px 16px; color: var(--muted); opacity: .7; font: 600 .78rem var(--font); cursor: pointer; }
+/* book: exercises kept while on Free */
+.kept-note { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; margin-top: 6px; border-radius: 16px; border: 1px dashed var(--line); color: var(--muted); font-size: .84rem; }
+.kept-note button { flex: none; border: 0; border-radius: 999px; padding: 6px 12px; background: var(--sunk); color: var(--ink); font: 700 .78rem var(--font); cursor: pointer; }

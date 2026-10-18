@@ -1,5 +1,5 @@
 import { sound } from './lib/sound'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import PageA from './pages/PageA'
 import PageB from './pages/PageB'
 import CreatePage from './pages/CreatePage'
@@ -17,11 +17,11 @@ import { refreshSubscription } from './lib/billing'
 import NotePage from './pages/NotePage'
 import WeekPage from './pages/WeekPage'
 import LicensesPage from './pages/LicensesPage'
-import { useWorkouts, setScope } from './lib/store'
+import { useWorkouts, setScope, type Workout } from './lib/store'
 import { supabase, useUser, useRecovering, arrivedFromEmailLink } from './lib/auth'
 import { switchTo } from './lib/session'
 import { getPreview } from './lib/theme'
-import { checkOwnerEmail, getPlan, atLeast, FREE_WORKOUTS } from './lib/plan'
+import { checkOwnerEmail, getPlan, atLeast, usePlan, FREE_WORKOUTS } from './lib/plan'
 import { usePrefs } from './lib/prefs'
 import { t } from './lib/i18n'
 
@@ -58,10 +58,23 @@ export default function App() {
   return <><PreviewBar /><Screen /><LockNote /></>
 }
 
+// On Free only the first FREE_WORKOUTS exercises (oldest first) are shown. The rest are never
+// deleted: they stay saved and come straight back when the account has a plan again.
+function useVisibleWorkouts(): Workout[] {
+  const all = useWorkouts()
+  const plan = usePlan()
+  return useMemo(() => {
+    if (atLeast(plan, 'premium') || all.length <= FREE_WORKOUTS) return all
+    const keep = new Set([...all].sort((a, b) => a.createdAt - b.createdAt).slice(0, FREE_WORKOUTS).map((w) => w.id))
+    return all.filter((w) => keep.has(w.id))
+  }, [all, plan])
+}
+
 function Screen() {
   const [hash, setHash] = useState(() => location.hash.slice(1))
   const [draft, setDraft] = useState<{ icon: string; letter: string } | null>(null)
-  const workouts = useWorkouts()
+  const workouts = useVisibleWorkouts()
+  const kept = useWorkouts().length - workouts.length
   const user = useUser()
   const recovering = useRecovering()
 
@@ -126,6 +139,7 @@ function Screen() {
     return (
       <BookPage
         workouts={workouts}
+        kept={kept}
         view={hash === 'sessions' ? 'sessions' : hash === 'notes' ? 'notes' : hash === 'presets' || hash.startsWith('preset-') ? 'presets' : 'exercises'}
         openId={hash.startsWith('book-') ? hash.slice(5) : null}
         presetId={hash.startsWith('preset-') ? hash.slice(7) : null}

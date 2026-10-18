@@ -12,7 +12,7 @@ export const canPay = !!supabase && !!PUBLIC_KEY
 export type Method = 'card' | 'promptpay' | 'truemoney'
 export type Subscription = { tier: Tier; paid_until: string; method: Method; renews: boolean } | null
 // a card renewal is charged on the day the plan ends, so allow a few days for it to land
-const GRACE = 3 * 86400000
+export const GRACE = 3 * 86400000
 
 let sub: Subscription = null
 const listeners = new Set<() => void>()

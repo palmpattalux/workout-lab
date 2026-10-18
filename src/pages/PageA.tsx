@@ -15,6 +15,7 @@ import { t, LANGS } from '../lib/i18n'
 import { LangPicker } from '../components/Flag'
 import { usePlan, atLeast, tierName, FREE_WORKOUTS, showLocked } from '../lib/plan'
 import { useNewWeek } from '../lib/week'
+import RenewNotice from '../components/RenewNotice'
 
 // Exercise dot positions, as % of the screen: low and toward the right, in easy reach of a
 // right thumb. The first four are always shown; the rest fill in as more workouts exist.
@@ -100,10 +101,11 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
   // First tap on a workout dot arms it: it turns into a glowing fingerprint (tap again to start)
   // and a pen (edit) appears above it.
   const [chosen, setChosen] = useState<string | null>(null)
-  const units = unitsOf(workouts)
   // Free plan: grouping is locked and only FREE_WORKOUTS exercises can be made
   const plan = usePlan()
   const canGroup = atLeast(plan, 'premium')
+  // groups made on a plan show as single exercises on Free (kept, and back on renewal)
+  const units = unitsOf(canGroup ? workouts : workouts.map((w) => (w.group ? { ...w, group: undefined } : w)))
   const atLimit = !canGroup && workouts.length >= FREE_WORKOUTS
   const canPreset = atLeast(plan, 'exclusive')
 
@@ -345,6 +347,7 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
       onPointerDown={onBlankDown} onPointerMove={onBlankMove} onPointerUp={onBlankUp} onPointerCancel={onBlankUp}
       onClick={(e) => { if (e.target === e.currentTarget) { setChosen(null); setSettingsOpen(false); setRing(null); setPresetOpen(false); setArmedPreset(null) } }}>
       <ThemeScene skin={skin} />
+      <RenewNotice />
       {themePop && (
         <div className="theme-pop" style={{ left: Math.min(Math.max(themePop.x, 80), (typeof window !== 'undefined' ? window.innerWidth : 390) - 80), top: themePop.y }}>
           <button onClick={() => { setThemePop(null); onThemes() }}><Icon name="palette" size="18px" strokeWidth={2} />{t('Themes')}</button>

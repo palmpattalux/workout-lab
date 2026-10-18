@@ -14,8 +14,10 @@ import { t, locale } from '../lib/i18n'
 // per preset, tap for only the sessions done from it. Notes: every note, newest first.
 // "This week" (Exclusive) opens the weekly summary.
 type View = 'exercises' | 'sessions' | 'presets' | 'notes'
-export default function BookPage({ workouts, view, openId, presetId, onOpen, onOpenPreset, onView }: {
+export default function BookPage({ workouts, kept = 0, view, openId, presetId, onOpen, onOpenPreset, onView }: {
   workouts: Workout[]
+  // exercises saved but not shown on Free (they come back with a plan)
+  kept?: number
   view: View
   openId: string | null
   presetId: string | null
@@ -75,6 +77,12 @@ export default function BookPage({ workouts, view, openId, presetId, onOpen, onO
               </button>
             </li>
           ))}
+          {kept > 0 && (
+            <li className="kept-note">
+              <span>{t('{n} more saved. They come back when you renew.', { n: kept })}</span>
+              <button onClick={() => { location.hash = 'plans' }}>{t('Plans')}</button>
+            </li>
+          )}
         </ul>
       )}
     </main>
