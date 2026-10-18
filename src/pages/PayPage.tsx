@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Icon } from '../components/icons'
 import { PLANS } from '../lib/plan'
-import { THEMES, THEME_PRICE, applyTheme } from '../lib/theme'
+import { THEME_PRICE, applyTheme, shopItem } from '../lib/theme'
+import { setPrefs } from '../lib/prefs'
 import { chargeStatus, getPending, clearPending, refreshSubscription } from '../lib/billing'
 import { formatDate } from '../lib/format'
 import { t } from '../lib/i18n'
@@ -15,7 +16,7 @@ export default function PayPage({ userId }: { userId: string | null }) {
   const [view, setView] = useState<View>(pending ? 'waiting' : 'none')
   const [until, setUntil] = useState<string | null>(null)
   const plan = pending?.tier ? PLANS.find((p) => p.tier === pending.tier) : undefined
-  const theme = pending?.theme ? THEMES.find((th) => th?.key === pending.theme) ?? null : null
+  const theme = pending?.theme ? shopItem(pending.theme) : null
 
   useEffect(() => {
     if (!pending) return
@@ -61,11 +62,11 @@ export default function PayPage({ userId }: { userId: string | null }) {
       {view === 'done' && (
         <div className="pay-done" role="status">
           <span className="pay-ring"><i /></span>
-          <h2>{theme ? t('{theme} is yours', { theme: theme.name }) : t("You're on {plan}", { plan: t(plan?.name ?? '') })}</h2>
+          <h2>{theme ? t('{theme} is yours', { theme: t(theme.name) }) : t("You're on {plan}", { plan: t(plan?.name ?? '') })}</h2>
           {theme && <p>{t('It stays on your account for good.')}</p>}
           {!theme && until && <p>{pending?.method === 'card' ? t('Renews on {date}', { date: formatDate(new Date(until).getTime()) }) : t('Active until {date}', { date: formatDate(new Date(until).getTime()) })}</p>}
           {theme
-            ? <button className="co-pay" onClick={() => { applyTheme(theme.key); location.hash = '' }}>{t('Use it now')}</button>
+            ? <button className="co-pay" onClick={() => { if (theme.kind === 'icons') setPrefs({ pack: 'tokyo' }); else applyTheme(theme.key); location.hash = '' }}>{t('Use it now')}</button>
             : <button className="co-pay" onClick={() => { location.hash = '' }}>{t('Start training')}</button>}
         </div>
       )}

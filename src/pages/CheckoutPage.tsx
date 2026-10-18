@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import { Icon, type IconName } from '../components/icons'
 import { PLANS, type Tier } from '../lib/plan'
-import { THEMES, THEME_PRICE } from '../lib/theme'
+import { THEME_PRICE, shopItem } from '../lib/theme'
+import { TokyoIcon } from './IconsPage'
 import ThemeScene from '../components/ThemeScene'
 import { startCheckout, cardToken, savePending, loadOmise, useSubscription, type Method } from '../lib/billing'
 import { t } from '../lib/i18n'
@@ -15,7 +16,7 @@ const METHODS: { key: Method; icon: IconName; name: string; note: string }[] = [
 ]
 
 export default function CheckoutPage({ tier = 'premium', theme: themeKey, guest }: { tier?: Tier; theme?: string; guest: boolean }) {
-  const theme = themeKey ? THEMES.find((th) => th?.key === themeKey) ?? null : null
+  const theme = themeKey ? shopItem(themeKey) : null
   const plan = PLANS.find((p) => p.tier === tier)!
   const sub = useSubscription()
   const [method, setMethod] = useState<Method>('promptpay')
@@ -67,10 +68,12 @@ export default function CheckoutPage({ tier = 'premium', theme: themeKey, guest 
 
       {theme ? (
         <section className="co-plan co-theme">
-          <div className={`co-theme-art theme-art skin-${theme.key}`} data-skin={theme.key} aria-hidden="true"><ThemeScene skin={theme.key} /></div>
+          {theme.kind === 'icons'
+            ? <div className="co-theme-art co-icons" aria-hidden="true"><TokyoIcon /></div>
+            : <div className={`co-theme-art theme-art skin-${theme.key}`} data-skin={theme.key} aria-hidden="true"><ThemeScene skin={theme.key} /></div>}
           <div>
-            <h2>{theme.name}</h2>
-            <p>{t('Theme · yours to keep')}</p>
+            <h2>{t(theme.name)}</h2>
+            <p>{theme.kind === 'icons' ? t('Icon set · yours to keep') : t('Theme · yours to keep')}</p>
           </div>
           <span className="plan-price">{price}<small>{t('one time')}</small></span>
         </section>
@@ -122,7 +125,7 @@ export default function CheckoutPage({ tier = 'premium', theme: themeKey, guest 
             {busy ? <><i className="co-dot" />{t('Securing your payment…')}</> : t('Pay {price}', { price })}
           </button>
           <p className="co-trust"><Icon name="shield" size="16px" />{t('Secure payment by Opn Payments. Dotset never sees your card or bank details.')}</p>
-          <p className="co-fine">{theme ? t('One payment of {price}. {theme} is yours to keep, on every device you log in to.', { price, theme: theme.name }) : method === 'card' ? t('Charged {price} today, then every month. Turn off renewing anytime in Plan.', { price }) : t('One month of {plan}. Nothing renews by itself: pay again from Plan when it ends.', { plan: t(plan.name) })}</p>
+          <p className="co-fine">{theme ? t('One payment of {price}. {theme} is yours to keep, on every device you log in to.', { price, theme: t(theme.name) }) : method === 'card' ? t('Charged {price} today, then every month. Turn off renewing anytime in Plan.', { price }) : t('One month of {plan}. Nothing renews by itself: pay again from Plan when it ends.', { plan: t(plan.name) })}</p>
         </form>
       )}
     </main>

@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { Icon, WorkoutIcon, WorkoutMark, packIcons, packLetters } from '../components/icons'
-import { usePrefs } from '../lib/prefs'
+import { useIconPack } from '../lib/iconpack'
 import { addWorkout, updateWorkout, deleteWorkout, TINTS, type Workout } from '../lib/store'
 import { t } from '../lib/i18n'
 
 // The workout adding page, traced from the reference sketch.
 // With `editing` it is the edit page for that workout, filled with what's saved.
 export default function CreatePage({ icon: icon0, letter: letter0, editing, onClose }: { icon: string; letter: string; editing?: Workout; onClose: () => void }) {
-  const { pack } = usePrefs()
+  const pack = useIconPack()
   const [icon, setIcon] = useState(icon0)
   const [letter, setLetter] = useState(letter0)
   const [picking, setPicking] = useState(false)

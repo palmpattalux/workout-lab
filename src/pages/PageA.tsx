@@ -4,6 +4,7 @@ import HoldPicker from '../components/HoldPicker'
 import { updateWorkout, usePresets, addPreset, updatePreset, type Workout } from '../lib/store'
 import { sound } from '../lib/sound'
 import { usePrefs, setPrefs } from '../lib/prefs'
+import { useIconPack } from '../lib/iconpack'
 import { useSkin, getPreview } from '../lib/theme'
 import { useSessions } from '../lib/store'
 import { useSession } from '../lib/session'
@@ -93,7 +94,7 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
 }) {
   // "+" flow: first drag up picks the workout icon, second drag up picks the body-part letter.
   const [pickedIcon, setPickedIcon] = useState<string | null>(null)
-  const { pack } = usePrefs()
+  const pack = useIconPack()
   const iconOptions = iconOptionsOf(pack)
   const letterOptions = letterOptionsOf(pack)
   // First tap on a workout dot arms it: it turns into a glowing fingerprint (tap again to start)

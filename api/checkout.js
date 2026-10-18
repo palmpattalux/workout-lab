@@ -17,7 +17,7 @@ export default async function handler(req, res) {
       if (owned) return send(res, 409, { error: 'You already own this theme' })
       amount = THEME_PRICE
       metadata = { user_id: user.id, theme, method }
-      description = `Dotset theme: ${THEME_NAMES[theme]}`
+      description = `Dotset: ${THEME_NAMES[theme]}`
     } else {
       amount = PRICES[tier]
       if (!amount) return send(res, 400, { error: 'Unknown plan' })

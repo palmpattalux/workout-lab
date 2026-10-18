@@ -1,15 +1,37 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Icon } from '../components/icons'
 import ThemeScene from '../components/ThemeScene'
-import { THEMES, THEME_SLOTS, THEME_PRICE, setPreview, usePreview, useApplied, useOwnedThemes, applyTheme, canUseTheme } from '../lib/theme'
+import { type Feature, THEMES, THEME_SLOTS, THEME_PRICE, setPreview, usePreview, useApplied, useOwnedThemes, applyTheme, canUseTheme } from '../lib/theme'
 import { usePlan, atLeast } from '../lib/plan'
 import { canPay } from '../lib/billing'
 import { sound } from '../lib/sound'
+import { TierChip } from '../components/TierChip'
 import { t } from '../lib/i18n'
 
 // The theme shop: swipe through the slots like skins in a game. The centred card is big,
 // its neighbours shrink away. Each theme can be bought on its own (฿149, kept for good) or
 // comes with a plan; "Try on" previews it first.
+// under each picture, bottom right: animated, custom sounds, reacts to what you do
+const FEATS: { key: Feature; icon: 'sparkle' | 'speaker' | 'hand'; label: string }[] = [
+  { key: 'anim', icon: 'sparkle', label: 'Animated' },
+  { key: 'sound', icon: 'speaker', label: 'Custom sounds' },
+  { key: 'live', icon: 'hand', label: 'Interactive' },
+]
+function Feats({ has, style }: { has: Feature[]; style: CSSProperties }) {
+  const [told, setTold] = useState<Feature | null>(null)
+  useEffect(() => { if (!told) return; const tm = setTimeout(() => setTold(null), 2000); return () => clearTimeout(tm) }, [told])
+  return (
+    <div className="theme-feats" style={style}>
+      {told && <span key={told} className="tf-tell">{t(FEATS.find((f) => f.key === told)!.label)}</span>}
+      {FEATS.filter((f) => has.includes(f.key)).map((f) => (
+        <button key={f.key} className="tf" aria-label={t(f.label)} title={t(f.label)} onClick={() => setTold(f.key)}>
+          <Icon name={f.icon} size="14px" strokeWidth={2} />
+        </button>
+      ))}
+    </div>
+  )
+}
+
 export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
   const preview = usePreview()
   const plan = usePlan()
@@ -70,6 +92,8 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
         <h1>{t('Themes')}</h1>
         <button className="icon-btn" aria-label={t('Back')} onClick={() => history.back()}><Icon name="back" size="22px" /></button>
       </header>
+      {/* every theme: buy it once and keep it, or get it free with the plan it belongs to */}
+      <p className="themes-note">{t('Buy a theme to keep forever, or get them all free with a plan.')}</p>
 
       <div
         className="theme-track"
@@ -84,11 +108,12 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
           return (
             <div key={i} className="theme-cell">
               <button
-                className={`theme-card${th ? '' : ' empty'}${th && preview === th.key ? ' viewing' : ''}`}
+                className={`theme-card${th ? '' : ' empty'}${th && preview === th.key ? ' viewing' : ''}${th?.tier === 'exclusive' ? ' exclusive' : ''}`}
                 style={{ transform: `scale(${1 - d * 0.16})`, opacity: 1 - d * 0.45 }}
                 aria-label={th ? `${th.name} theme` : `Empty slot ${i + 1}`}
                 onClick={() => goTo(i)}
               >
+                {th && d < 0.5 && <TierChip tier={th.tier} />}
                 {th && <span className={`price-pill${has(th.key) ? ' owned' : ''}`}>{has(th.key) ? <><Icon name="check" size="13px" strokeWidth={2.8} />{t('Owned')}</> : price}</span>}
                 {th ? (
                   <div className={`theme-art skin-${th.key}${settled === i ? '' : ' paused'}`} data-skin={th.key}>
@@ -102,6 +127,7 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
                   <div className="theme-art blank"><span>{i + 1}</span><small>{t('Coming soon')}</small></div>
                 )}
               </button>
+              {th && <Feats has={th.has} style={{ transform: `scale(${1 - d * 0.16})`, opacity: 1 - d * 0.45 }} />}
             </div>
           )
         })}
@@ -129,13 +155,13 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
                 ? <button className="theme-view" onClick={() => buy(theme.key)}>{t('Buy {price}', { price })}</button>
                 : <button className="theme-view" disabled>{t('Coming soon')}</button>}
             </div>
-            <button className="theme-plan-link" onClick={() => { setPreview(null); location.hash = 'plans' }}>{t('Or get every theme with Premium')}</button>
+            <button className="theme-plan-link" onClick={() => { setPreview(null); location.hash = 'plans' }}>{t('Or get it free with {plan}', { plan: theme.tier === 'exclusive' ? t('Exclusive') : t('Premium') })}</button>
           </>
         ))}
       </div>
 
       <div className="theme-pips" aria-hidden="true">
-        {THEMES.map((_, i) => <i key={i} className={i === index ? 'on' : undefined} />)}
+        {THEMES.map((th, i) => <i key={i} className={`${i === index ? 'on' : ''}${th?.tier === 'exclusive' ? ' gold' : ''}`} />)}
       </div>
     </main>
   )

@@ -491,7 +491,7 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .theme-track::-webkit-scrollbar { display: none; }
 .theme-cell { flex: 0 0 100%; scroll-snap-align: center; display: grid; place-items: center; }
 .theme-card {
-  width: 92%; aspect-ratio: 9 / 16; max-height: 52cqh; padding: 0; border: 0; border-radius: 26px; overflow: hidden;
+  width: 92%; aspect-ratio: 9 / 16; max-height: 47cqh; padding: 0; border: 0; border-radius: 26px; overflow: hidden;
   background: var(--surface); box-shadow: var(--float); cursor: pointer; transition: transform .12s linear, opacity .12s linear, box-shadow .3s;
 }
 .theme-card.viewing { box-shadow: var(--float), 0 0 0 3px var(--sun); }
@@ -1758,3 +1758,38 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 @keyframes sb-flash { 0% { opacity: 0; transform: translateY(4px); } 12%, 70% { opacity: 1; transform: none; } 100% { opacity: 0; } }
 .sb-name.ask { animation: rise .2s var(--ease); }
 .sb-remove { flex: none; border: 0; border-radius: 999px; padding: 6px 12px; background: #d9480f; color: #fff; font: 700 .78rem var(--font); cursor: pointer; }
+
+/* "Free with Premium" / gold "Exclusive" chips on themes and icon sets; tap for who gets it free */
+.themes-note { margin: 2px 7% 0; color: var(--muted); font-size: .82rem; }
+.tier-chip {
+  position: absolute; z-index: 4; top: 10px; right: 10px; display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 10px; border-radius: 999px; background: var(--surface); color: var(--ink); box-shadow: var(--lift);
+  font: 700 .68rem var(--font); letter-spacing: .02em; white-space: nowrap; cursor: help;
+}
+.tier-chip.exclusive { background: linear-gradient(135deg, #f6e7b8, #d9b45a); color: #3a2a06; }
+.tier-chip.compact { top: 6px; right: 6px; padding: 3px 7px; font-size: .58rem; }
+.tc-lock { width: 12px; height: 12px; stroke-width: 2.4; overflow: visible; }
+.tc-shackle { transform-box: fill-box; transform-origin: 100% 100%; animation: tc-unlock 4.5s var(--ease) infinite; }
+@keyframes tc-unlock { 0%, 30% { transform: none; } 45%, 85% { transform: translateY(-2px) rotate(28deg); } 100% { transform: none; } }
+.tc-tell {
+  position: absolute; top: calc(100% + 6px); right: 0; padding: 7px 11px; border-radius: 12px; z-index: 5;
+  background: var(--ink); color: var(--stage); font: 600 .74rem var(--font); letter-spacing: 0; white-space: nowrap;
+  box-shadow: var(--float); animation: tc-tell 2.4s ease both; pointer-events: none;
+}
+@keyframes tc-tell { 0% { opacity: 0; transform: translateY(-4px); } 10%, 82% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+/* exclusive themes: a thin gold frame round the picture */
+.theme-card.exclusive { box-shadow: var(--float), 0 0 0 2px #d9b45a, 0 0 0 5px rgba(217, 180, 90, .18); }
+.theme-card.exclusive.viewing { box-shadow: var(--float), 0 0 0 2px #d9b45a, 0 0 0 5px var(--sun); }
+.theme-pips i.gold { background: #d9b45a; }
+/* icon sets you don't have yet */
+.icon-tile { position: relative; }
+.icon-tile.look { box-shadow: var(--lift), inset 0 0 0 1.5px var(--line); }
+.icon-tile small.price { color: var(--ink); font-family: var(--num, var(--font)); }
+.pack-buy { display: flex; flex-direction: column; align-items: center; gap: 2px; margin: -22px 5.7% 40px; text-align: center; }
+.co-icons { display: grid; place-items: center; background: var(--sunk); }
+/* theme features: small icons under the picture, bottom right */
+.theme-cell { flex-direction: column; }
+.theme-cell { display: flex; align-items: center; justify-content: center; }
+.theme-feats { position: relative; width: 92%; display: flex; justify-content: flex-end; gap: 4px; margin-top: 8px; transform-origin: top center; }
+.theme-feats .tf { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; padding: 0; border: 1px solid var(--hair); background: var(--surface); color: var(--muted); cursor: pointer; }
+.tf-tell { position: absolute; right: 0; bottom: calc(100% + 30px); padding: 6px 10px; border-radius: 10px; background: var(--ink); color: var(--stage); font: 600 .72rem var(--font); white-space: nowrap; animation: tc-tell 2s ease both; pointer-events: none; z-index: 5; }

@@ -13,7 +13,7 @@ export const MAX_SETS = 5
 
 export type Plan = { tier: Exclude<Tier, 'free'>; name: string; price: number; perks: string[] }
 export const PLANS: Plan[] = [
-  { tier: 'premium', name: 'Premium', price: 149, perks: ['Unlimited workouts', '15+ premium themes', 'Group exercises on the home screen', 'Up to 5 sets per exercise'] },
+  { tier: 'premium', name: 'Premium', price: 149, perks: ['Unlimited workouts', '15+ premium themes', 'Group exercises on the home screen', 'Up to 5 sets per exercise', 'Tokyo icon set'] },
   { tier: 'exclusive', name: 'Exclusive', price: 329, perks: ['Everything in Premium', 'Preset exercises for sessions', '30+ premium and exclusive themes', 'Weekly performance summary'] },
   { tier: 'unlimited', name: 'Unlimited', price: 599, perks: [] },
 ]
