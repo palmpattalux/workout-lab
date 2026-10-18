@@ -9,7 +9,7 @@ import SessionsList from './SessionsPage'
 import { supabase, signOut } from '../lib/auth'
 import { t, locale } from '../lib/i18n'
 
-// A2 book: three tabs. Exercises: one box per workout, tap for its notes, details and
+// A2 book: three tabs. Exercises: one row per workout, tap for its notes, details and
 // past sessions. Sessions: every session, newest first. Presets (Exclusive): one row
 // per preset, tap for only the sessions done from it. Notes: every note, newest first.
 // "This week" (Exclusive) opens the weekly summary.
@@ -65,14 +65,17 @@ export default function BookPage({ workouts, view, openId, presetId, onOpen, onO
         : workouts.length === 0 ? (
         <p className="empty-note">{t('No workouts yet. Hold the + on the first page to make one.')}</p>
       ) : (
-        <div className="boxes">
+        <ul className="ex-rows">
           {workouts.map((w) => (
-            <button key={w.id} className="box" onClick={() => onOpen(w.id)}>
-              <WorkoutMark icon={w.icon} letter={w.letter} size="1.3em" />
-              <span className="box-name">{w.exercise || t('Untitled')}</span>
-            </button>
+            <li key={w.id}>
+              <button className="ex-row" onClick={() => onOpen(w.id)}>
+                <span className={`ex-mark${w.color ? ' tinted tint-' + w.color : ''}`}><WorkoutMark icon={w.icon} letter={w.letter} size="1.15em" /></span>
+                <span className="ex-name">{w.exercise || t('Untitled')}<small>{w.mode === 'equipment' ? w.equipment || t('Equipment, {unit}', { unit: w.unit }) : t('Progressions')}</small></span>
+                <span className="chev"><Icon name="back" size="18px" /></span>
+              </button>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </main>
   )

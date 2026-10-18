@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Icon, WorkoutIcon, WorkoutMark, WORKOUT_ICONS, BODY_LETTERS } from '../components/icons'
-import { addWorkout, updateWorkout, deleteWorkout, type Workout } from '../lib/store'
+import { addWorkout, updateWorkout, deleteWorkout, TINTS, type Workout } from '../lib/store'
 import { t } from '../lib/i18n'
 
 // The workout adding page, traced from the reference sketch.
@@ -9,6 +9,7 @@ export default function CreatePage({ icon: icon0, letter: letter0, editing, onCl
   const [icon, setIcon] = useState(icon0)
   const [letter, setLetter] = useState(letter0)
   const [picking, setPicking] = useState(false)
+  const [color, setColor] = useState(editing?.color ?? '')
   const [confirmRemove, setConfirmRemove] = useState(false)
   const [exercise, setExercise] = useState(editing?.exercise ?? '')
   const [equipment, setEquipment] = useState(editing?.equipment ?? '')
@@ -19,7 +20,7 @@ export default function CreatePage({ icon: icon0, letter: letter0, editing, onCl
   const [notes, setNotes] = useState(editing?.notes ?? '')
 
   function save() {
-    const fields = { icon, letter, exercise: exercise.trim(), equipment: equipment.trim(), mode, unit, count, focus: focus.trim(), notes: notes.trim() }
+    const fields = { icon, letter, color: color || undefined, exercise: exercise.trim(), equipment: equipment.trim(), mode, unit, count, focus: focus.trim(), notes: notes.trim() }
     if (editing) updateWorkout(editing.id, fields)
     else addWorkout(fields)
     onClose()
@@ -32,7 +33,7 @@ export default function CreatePage({ icon: icon0, letter: letter0, editing, onCl
       <header className="create-head">
         <h1>
           <button className="mark-btn" aria-label={t('Change icon and body part')} aria-expanded={picking} onClick={() => setPicking(!picking)}>
-            <WorkoutMark icon={icon} letter={letter} size="1em" />
+            <span className={color ? 'tinted tint-' + color : undefined}><WorkoutMark icon={icon} letter={letter} size="1em" /></span>
             <svg className="caret" viewBox="0 0 24 24" style={{ strokeWidth: 2.4 }} aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
           </button>
         </h1>
@@ -47,6 +48,12 @@ export default function CreatePage({ icon: icon0, letter: letter0, editing, onCl
               <button key={i.key} aria-label={t(i.name)} aria-pressed={i.key === icon} className={i.key === icon ? 'on' : undefined} onClick={() => setIcon(i.key)}>
                 <WorkoutIcon k={i.key} size="56%" strokeWidth={1.9} />
               </button>
+            ))}
+          </div>
+          <h2>{t('Colour')}</h2>
+          <div className="tint-row">
+            {['', ...TINTS].map((k) => (
+              <button key={k || 'none'} className={`tint-dot${k ? ' tint-' + k : ' none'}${k === color ? ' on' : ''}`} aria-label={k ? t(k[0].toUpperCase() + k.slice(1)) : t('No colour')} aria-pressed={k === color} onClick={() => setColor(k)} />
             ))}
           </div>
           <h2>{t('Body part')}</h2>
@@ -95,11 +102,11 @@ export default function CreatePage({ icon: icon0, letter: letter0, editing, onCl
           </>
         )}
 
-        <textarea id="focus" className="field box" placeholder={t('Specific focus')} value={focus} onChange={(e) => setFocus(e.target.value)} />
+        <textarea id="focus" className="field area" placeholder={t('Specific focus')} value={focus} onChange={(e) => setFocus(e.target.value)} />
         <p className="hint">{t('Reminder in your next session')}</p>
 
-        <textarea id="notes" className="field box" placeholder={t('General notes')} value={notes} onChange={(e) => setNotes(e.target.value)} />
-        <p className="hint">{t('Control your variables')}</p>
+        <textarea id="notes" className="field area quiet" placeholder={t('General notes')} value={notes} onChange={(e) => setNotes(e.target.value)} />
+        <p className="hint quiet">{t('Control your variables')}</p>
 
         {editing && <button className="remove" onClick={() => setConfirmRemove(true)}>{t('Remove exercise')}</button>}
       </div>

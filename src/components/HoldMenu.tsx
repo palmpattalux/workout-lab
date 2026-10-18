@@ -2,36 +2,39 @@ import { useRef, useState, type CSSProperties, type PointerEvent, type ReactNode
 import { sound } from '../lib/sound'
 import { getPreview, previewBlocked } from '../lib/theme'
 
-const HOLD_MS = 280
 const SIZE = 54 // px, each popped-up button
+const DRAG_PX = 8
 
 export type MenuItem = { key: string; node: ReactNode; label: string; current?: boolean; num?: number }
 
-// A round button that, when pressed and held, pops buttons up in an arc around
-// it. Slide onto one and let go to pick it. A quick tap calls onTap instead.
-export default function HoldMenu({ items, onPick, onTap, className, style, ariaLabel, children }: {
+// A round button with two ways in, no holding:
+// - drag from it: buttons pop up in an arc; slide onto one and let go to pick it
+// - tap it: a list of every item opens above it; tap one to pick, anywhere else to close
+export default function HoldMenu({ items, onPick, className, style, ariaLabel, children }: {
   items: MenuItem[]
   onPick: (key: string) => void
-  onTap?: () => void
   className: string
   style: CSSProperties
   ariaLabel: string
   children: ReactNode
 }) {
   const btn = useRef<HTMLButtonElement>(null)
-  const timer = useRef<number | null>(null)
-  const start = useRef({ x: 0, y: 0 })
+  const start = useRef<{ x: number; y: number } | null>(null)
   const [spots, setSpots] = useState<{ x: number; y: number }[] | null>(null)
   const [hover, setHover] = useState<number | null>(null)
+  const [list, setList] = useState<{ x: number; bottom: number } | null>(null)
   const origin = useRef({ x: 0, y: 0, px: 0, py: 0 })
 
-  function open() {
-    if (items.length === 0) return
+  function geometry() {
     const el = btn.current!
     const page = el.offsetParent!.getBoundingClientRect()
     const r = el.getBoundingClientRect()
-    const cx = r.left - page.left + r.width / 2
-    const cy = r.top - page.top + r.height / 2
+    return { page, r, cx: r.left - page.left + r.width / 2, cy: r.top - page.top + r.height / 2 }
+  }
+
+  function open() {
+    if (items.length === 0) return
+    const { page, r, cx, cy } = geometry()
     origin.current = { x: cx, y: cy, px: page.left, py: page.top }
     // spread over the upper half-circle, wider when there are more items
     const n = items.length
@@ -48,12 +51,12 @@ export default function HoldMenu({ items, onPick, onTap, className, style, ariaL
   function onPointerDown(e: PointerEvent<HTMLButtonElement>) {
     start.current = { x: e.clientX, y: e.clientY }
     e.currentTarget.setPointerCapture(e.pointerId)
-    timer.current = window.setTimeout(() => { timer.current = null; open() }, HOLD_MS)
   }
 
   function onPointerMove(e: PointerEvent<HTMLButtonElement>) {
+    if (!start.current) return
     if (!spots) {
-      if (timer.current && Math.hypot(e.clientX - start.current.x, e.clientY - start.current.y) > 12) cancel()
+      if (Math.hypot(e.clientX - start.current.x, e.clientY - start.current.y) > DRAG_PX) { setList(null); open() }
       return
     }
     const x = e.clientX - origin.current.px
@@ -69,27 +72,38 @@ export default function HoldMenu({ items, onPick, onTap, className, style, ariaL
   }
 
   function cancel() {
-    if (timer.current) { clearTimeout(timer.current); timer.current = null }
+    start.current = null
     setSpots(null)
     setHover(null)
   }
 
+  function pick(key: string) {
+    if (getPreview()) { previewBlocked(); return }
+    onPick(key)
+  }
+
   function release() {
-    const wasTap = timer.current !== null
+    if (!start.current) return
+    const dragged = !!spots
     const picked = spots && hover !== null ? items[hover].key : null
     cancel()
-    if (getPreview()) { if (picked) previewBlocked(); return }
-    if (picked) onPick(picked)
-    else if (wasTap) onTap?.()
+    if (dragged) { if (picked) pick(picked); return }
+    // a tap: open (or close) the list
+    if (list) { setList(null); return }
+    if (items.length === 0) return
+    const { page, cx, cy, r } = geometry()
+    setList({ x: Math.max(120, Math.min(page.width - 120, cx)), bottom: page.height - cy + r.height / 2 + 12 })
+    sound.pop()
   }
 
   return (
     <>
       <button
         ref={btn}
-        className={`btn circle holdable ${className}${spots ? ' holding' : ''}`}
+        className={`btn circle holdable ${className}${spots || list ? ' holding' : ''}`}
         style={style}
         aria-label={ariaLabel}
+        aria-expanded={!!list}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={release}
@@ -113,6 +127,23 @@ export default function HoldMenu({ items, onPick, onTap, className, style, ariaL
         <div className="pop-label" style={{ left: origin.current.x, top: Math.min(...spots.map((s) => s.y)) - SIZE / 2 - 30 }}>
           {items[hover].label}
         </div>
+      )}
+
+      {list && (
+        <>
+          <div className="menu-scrim" onPointerDown={() => setList(null)} />
+          <ul className="menu-list" role="menu" style={{ left: list.x, bottom: list.bottom }}>
+            {items.map((it) => (
+              <li key={it.key}>
+                <button role="menuitem" className={it.current ? 'current' : undefined} onClick={() => { setList(null); pick(it.key) }}>
+                  {it.num !== undefined && <i className="ml-num">{it.num}</i>}
+                  <span className="ml-mark">{it.node}</span>
+                  <span className="ml-name">{it.label}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </>
   )

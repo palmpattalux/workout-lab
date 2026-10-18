@@ -12,7 +12,7 @@ import ThemeScene from '../components/ThemeScene'
 import { useEmail, signOut, canResetPassword } from '../lib/auth'
 import { t, LANGS } from '../lib/i18n'
 import { LangPicker } from '../components/Flag'
-import { usePlan, atLeast, tierName, FREE_WORKOUTS } from '../lib/plan'
+import { usePlan, atLeast, tierName, FREE_WORKOUTS, showLocked } from '../lib/plan'
 import { useNewWeek } from '../lib/week'
 
 // Exercise dot positions, as % of the screen: low and toward the right, in easy reach of a
@@ -291,6 +291,27 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
     sound.tap()
   }
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [slideHint, setSlideHint] = useState(0)
+  // hold on an empty spot: a small pop with a way to the themes
+  const [themePop, setThemePop] = useState<{ x: number; y: number } | null>(null)
+  const blank = useRef<{ x: number; y: number; timer: number } | null>(null)
+  function onBlankDown(e: PointerEvent<HTMLElement>) {
+    const el = e.target as Element
+    if (el.closest('button, a, input, textarea, .settings, .preset-list, .theme-pop, .holo')) return
+    setThemePop(null)
+    const r = e.currentTarget.getBoundingClientRect()
+    const at = { x: e.clientX - r.left, y: e.clientY - r.top }
+    blank.current = { ...at, timer: window.setTimeout(() => { blank.current = null; sound.pop(); setThemePop(at) }, 520) }
+  }
+  function onBlankMove(e: PointerEvent<HTMLElement>) {
+    const b = blank.current
+    if (!b) return
+    const r = e.currentTarget.getBoundingClientRect()
+    if (Math.hypot(e.clientX - r.left - b.x, e.clientY - r.top - b.y) > 10) { clearTimeout(b.timer); blank.current = null }
+  }
+  function onBlankUp() { if (blank.current) { clearTimeout(blank.current.timer); blank.current = null } }
+  // just back from a session summary: the book shows it was kept
+  const [savedSign] = useState(() => { try { const v = sessionStorage.getItem('dotset:saved'); sessionStorage.removeItem('dotset:saved'); return !!v } catch { return false } })
   const [moreOpen, setMoreOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false) // flags stay folded until the arrow is tapped
   const lastTap = useRef(0)
@@ -317,9 +338,19 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
   return (
     <main className={`page${picking ? ' picking' : ''}`} aria-label="Page A"
       onPointerDownCapture={(e) => { if (pickedIcon && !(e.target as Element).closest('.add')) setPickedIcon(null) }}
+      onPointerDown={onBlankDown} onPointerMove={onBlankMove} onPointerUp={onBlankUp} onPointerCancel={onBlankUp}
       onClick={(e) => { if (e.target === e.currentTarget) { setChosen(null); setSettingsOpen(false); setRing(null); setPresetOpen(false); setArmedPreset(null) } }}>
       <ThemeScene skin={skin} />
-      <button className="btn pill" id="a2" aria-label={t('Book')} onClick={onOpenBook}>
+      {themePop && (
+        <div className="theme-pop" style={{ left: Math.min(Math.max(themePop.x, 80), (typeof window !== 'undefined' ? window.innerWidth : 390) - 80), top: themePop.y }}>
+          <button onClick={() => { setThemePop(null); onThemes() }}><Icon name="palette" size="18px" strokeWidth={2} />{t('Themes')}</button>
+        </div>
+      )}
+      {themePop && <div className="theme-pop-scrim" onPointerDown={() => setThemePop(null)} />}
+      {savedSign && (
+        <span className="saved-sign" aria-live="polite"><Icon name="check" size="13px" strokeWidth={2.6} />{t('Saved in your book')}</span>
+      )}
+      <button className={`btn pill${savedSign ? ' just-saved' : ''}`} id="a2" aria-label={t('Book')} onClick={onOpenBook}>
         <Icon name="book" size="46%" />
         {newWeek && <span className="new-dot" aria-label={t('New summary')} />}
       </button>
@@ -340,7 +371,8 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
         const pos = { left: dragging ? drag.x : `${s.left}%`, top: dragging ? drag.y : `${s.top}%`, animationDelay: armedMember ? undefined : `${-i * 0.7}s` }
         const nums = u.members.map((w) => numOf(w.id)).filter((n) => n > 0).sort((a, b) => a - b)
         const badge = nums.length > 0 && <span className="pnum">{nums.join(',')}</span>
-        const cls = `btn circle dot filled float${nums.length ? ' in-preset' : ''}${armedMember ? ' armed' : ''}${dragging ? ' dragging' : ''}${isGroup ? ' group' : ''}${merging ? (groupWith!.ready ? ' merge ready' : ' merge') : ''}${fanned ? ' fanned' : ''}`
+        const tint = !isGroup && u.members[0].color ? ` tinted tint-${u.members[0].color}` : ''
+        const cls = `btn circle dot filled float${tint}${nums.length ? ' in-preset' : ''}${armedMember ? ' armed' : ''}${dragging ? ' dragging' : ''}${isGroup ? ' group' : ''}${merging ? (groupWith!.ready ? ' merge ready' : ' merge') : ''}${fanned ? ' fanned' : ''}`
         if (!isGroup) {
           const w = u.members[0]
           return (
@@ -437,13 +469,20 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
         </>
       )}
 
-      {atLimit && pickedIcon === null ? null : pickedIcon === null ? (
+      {atLimit && pickedIcon === null ? (
+        // Free plan, 5 exercises made: the + stays, faded, and says why
+        <button className="btn circle dot add float limit" style={{ left: '20%', top: '87%' }} aria-label={t('Exercise limit reached for your plan')}
+          onClick={() => showLocked(t('You have reached the exercise limit for your plan'))}>
+          <Icon name="plus" strokeWidth={2.6} />
+        </button>
+      ) : pickedIcon === null ? (
         <HoldPicker
           options={iconOptions}
           maxStep={40}
           instant
+          onTap={() => setSlideHint((n) => n + 1)}
           onPick={(i) => setPickedIcon(iconOptions[i].key)}
-          className="dot add float"
+          className={`dot add float${slideHint ? ' hint-hidden' : ''}`}
           style={{ left: '20%', top: '87%' }}
           ariaLabel="Add workout, drag up to pick an icon"
         >
@@ -463,6 +502,12 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
           <WorkoutIcon k={pickedIcon} size="40%" />
           <span className="badge" aria-hidden="true">?</span>
         </HoldPicker>
+      )}
+      {/* tapped + instead of sliding it: show the slide, like a tall switch */}
+      {slideHint > 0 && pickedIcon === null && !atLimit && (
+        <div key={slideHint} className="add-hint" style={{ left: '20%', top: '87%' }} aria-hidden="true" onAnimationEnd={() => setSlideHint(0)}>
+          <span className="add-hint-knob"><Icon name="plus" size="38%" strokeWidth={2.6} /></span>
+        </div>
       )}
 
       {/* presets: list button on the right, above the exercises */}
@@ -545,6 +590,10 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
           </button>
           <button className="set-row themes-link" onClick={onThemes}>
             <span>{t('Themes')}</span>
+            <span className="chev"><Icon name="back" size="18px" /></span>
+          </button>
+          <button className="set-row themes-link icons-link" onClick={() => { setSettingsOpen(false); location.hash = 'icons' }}>
+            <span>{t('Icon')}</span>
             <span className="chev"><Icon name="back" size="18px" /></span>
           </button>
           {/* Settings: the rarely used things, folded away */}

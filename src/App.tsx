@@ -5,6 +5,7 @@ import PageB from './pages/PageB'
 import CreatePage from './pages/CreatePage'
 import BookPage from './pages/BookPage'
 import SummaryPage from './pages/SummaryPage'
+import IconsPage from './pages/IconsPage'
 import LoginPage, { NewPasswordPage } from './pages/LoginPage'
 import ThemesPage from './pages/ThemesPage'
 import PreviewBar from './components/PreviewBar'
@@ -100,6 +101,7 @@ function Screen() {
   if (hash === 'licenses') return <LicensesPage />
   if (hash === 'week') return <WeekPage workouts={workouts} />
   if (hash === 'themes') return <ThemesPage onViewed={() => location.replace('#')} />
+  if (hash === 'icons') return <IconsPage />
   if (hash.startsWith('b-')) {
     const key = hash.slice(2)
     return <PageB key={key} guest={guest} workout={workouts.find((w) => w.id === key) ?? null} workouts={workouts} onGo={(id) => location.replace('#b-' + id)} onHome={() => go('')} onEnded={(sid) => location.replace(guest ? '#save' : '#summary-' + sid)} />

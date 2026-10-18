@@ -145,7 +145,7 @@ export default function SummaryPage({ id, workouts, onDone }: { id: string; work
       {rows.length > 0 && <button className="share-btn" onClick={() => setSharing(true)}><Icon name="share" size="18px" />{t('Share')}</button>}
       {sharing && <ShareSticker {...shareData()} onClose={() => setSharing(false)} />}
 
-      <button className="btn circle big save-new" aria-label={t('Done')} onClick={onDone}>
+      <button className="btn circle big save-new" aria-label={t('Done')} onClick={() => { try { sessionStorage.setItem('dotset:saved', '1') } catch { /* blocked */ } onDone() }}>
         <Icon name="check" strokeWidth={2.2} />
       </button>
     </main>

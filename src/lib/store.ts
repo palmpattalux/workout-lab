@@ -2,6 +2,9 @@ import { useSyncExternalStore } from 'react'
 import { supabase } from './auth'
 
 // One saved workout, created from the "+" flow on page A.
+// Soft colours an exercise's icon can take on page A (CSS: .tint-<key>)
+export const TINTS = ['sage', 'sky', 'rose', 'sand', 'lilac', 'teal']
+
 export type Workout = {
   id: string
   icon: string            // key in WORKOUT_ICONS
@@ -16,6 +19,7 @@ export type Workout = {
   count?: 'reps' | 'sec'  // progression only: count reps or hold seconds on page B
   slot?: number           // where its dot sits on page A (index in SLOTS), set by dragging
   group?: string          // workouts sharing a group id sit together in one bubble on page A
+  color?: string          // a soft tint for its icon on page A (key in TINTS), to tell exercises apart
   createdAt: number
 }
 

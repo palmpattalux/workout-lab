@@ -11,7 +11,7 @@ import { useSession, switchTo, goToSet, record, recordAt, recordMove, endSession
 import { useTimer, startTimer, stopTimer, timerState } from '../lib/timer'
 import { sound } from '../lib/sound'
 import { t } from '../lib/i18n'
-import { usePlan, atLeast, MAX_SETS, FREE_SETS } from '../lib/plan'
+import { usePlan, atLeast, MAX_SETS, FREE_SETS, showLocked } from '../lib/plan'
 import { useSessions } from '../lib/store'
 
 // Weights on the line: whole kilos; in pounds 2.5 lb steps to 15, then 5 lb steps (2.5 lb plates
@@ -19,6 +19,14 @@ import { useSessions } from '../lib/store'
 const steps = (from: number, to: number, by: number) => Array.from({ length: Math.round((to - from) / by) + 1 }, (_, i) => from + i * by)
 const LOADS_KG = steps(1, 300, 1)
 const LOADS_LB = [...steps(2.5, 15, 2.5), ...steps(20, 500, 5)]
+// how often the exercise switcher was used this week (Mon-based), to stop hinting at it
+const weekKey = () => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d.getTime() }
+function swapUsesThisWeek() {
+  try { const v = JSON.parse(localStorage.getItem('dotset:swap-uses') || 'null'); return v && v.week === weekKey() ? v.n : 0 } catch { return 0 }
+}
+function noteSwapUsed() {
+  try { localStorage.setItem('dotset:swap-uses', JSON.stringify({ week: weekKey(), n: swapUsesThisWeek() + 1 })) } catch { /* blocked */ }
+}
 const repOptions = Array.from({ length: 25 }, (_, i) => ({ key: String(i + 1), node: i + 1 }))
 // timed holds: every second from 1 to 60 (45 on the line, scrolling on to 60); longer ones are typed.
 // The line is tight, so only every fifth second is numbered.
@@ -75,6 +83,24 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
   const countValue = (i: number) => i + 1
 
   const [setsOpen, setSetsOpen] = useState(false)
+  // the exercises the switcher offers (a preset's, in its order, else all)
+  const switchable = preset ? preset.items.map((pid) => workouts.find((w) => w.id === pid)).filter((w): w is Workout => !!w) : workouts
+  // From set 2 on, each set change fades a couple of the other exercises' icons through the
+  // switch button, as a hint it's there. Once it has been used twice in a week, no more hints.
+  const [swapHint, setSwapHint] = useState<{ n: number; marks: Workout[] } | null>(null)
+  const lastSet = useRef(set)
+  useEffect(() => {
+    const changed = set !== lastSet.current
+    lastSet.current = set
+    if (!inSession || !changed || set < 2 || swapUsesThisWeek() >= 2) return
+    const others = switchable.filter((w) => w.id !== id).slice(0, 2)
+    if (others.length === 0) return
+    setSwapHint({ n: Date.now(), marks: others })
+    const tm = setTimeout(() => setSwapHint(null), 900 * others.length + 1100)
+    return () => clearTimeout(tm)
+  }, [set])
+  // a session just started: the set arrow, weight and reps buttons glow once
+  const [startPulse] = useState(() => inSession && Date.now() - session!.startedAt < 4000)
   // typing a number instead of dragging: tap the load or sec button
   const [typing, setTyping] = useState<'weight' | 'reps' | null>(null)
   // hold timer: slide onto it from the sec line, a 5 s countdown, then it counts up.
@@ -163,7 +189,11 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
           </button>
           {setsOpen && (
             <div className="set-menu" role="listbox" aria-label={t('Choose set')}>
-              {Array.from({ length: setCap }, (_, i) => i + 1).map((n) => (
+              {/* every set number shows; ones past the plan's limit are faded and say why */}
+              {Array.from({ length: MAX_SETS }, (_, i) => i + 1).map((n) => n > setCap ? (
+                <button key={n} role="option" aria-selected={false} aria-disabled="true" className="limit"
+                  onClick={() => showLocked(t('You have reached the set limit for your plan'))}>{n}</button>
+              ) : (
                 <button key={n} role="option" aria-selected={n === set} className={n === set ? 'on' : undefined}
                   onClick={() => { goToSet(n); setSetsOpen(false) }}>{n}</button>
               ))}
@@ -178,7 +208,7 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
         </button>
       )}
       {set < setCap && (
-        <button className="btn circle big" style={{ left: '85.1%', top: '43.2%' }} aria-label={t('Next set')}
+        <button className={`btn circle big${startPulse ? ' start-pulse' : ''}`} style={{ left: '85.1%', top: '43.2%' }} aria-label={t('Next set')}
           onClick={() => { if (inSession) goToSet(set + 1) }}>
           <Icon name="arrowRight" />
         </button>
@@ -202,14 +232,14 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
               instant
               onTap={() => setAdding(!adding)}
               onPick={(i) => { if (inSession) recordMove(moves[i]) }}
-              className="mid"
+              className={`mid${startPulse ? ' start-pulse' : ''}`}
               style={{ left: '35.1%', top: '64.1%' }}
               ariaLabel={`Progression${chosenMove ? `: ${chosenMove}` : ''}. Tap to add one, drag up to choose`}
             >
               <Icon name="stairs" />
             </HoldPicker>
           ) : (
-            <button className="btn circle mid" style={{ left: '35.1%', top: '64.1%' }} aria-label="Load: add progression" onClick={() => setAdding(!adding)}>
+            <button className={`btn circle mid${startPulse ? ' start-pulse' : ''}`} style={{ left: '35.1%', top: '64.1%' }} aria-label="Load: add progression" onClick={() => setAdding(!adding)}>
               <Icon name="stairs" />
             </button>
           )}
@@ -230,7 +260,7 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
           onChange={(i) => put('weight', loads[i])}
           onPick={(i) => put('weight', loads[i])}
           onTap={() => setTyping('weight')}
-          className="mid load"
+          className={`mid load${startPulse ? ' start-pulse' : ''}`}
           style={{ left: '35.1%', top: '64.1%' }}
           ariaLabel={`Load (B3)${weight ? `: ${weight} ${unit}` : ` in ${unit}`}, drag up to set`}
         >
@@ -248,7 +278,7 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
         onChange={(i) => { if (!timerHere) put('reps', countValue(i)) }}
         onPick={(i) => { if (timerHere) stopTimer(); put('reps', countValue(i)) }}
         onTap={timed ? () => (timerHere ? stopWatch() : setTyping('reps')) : undefined}
-        className={`mid reps${timed ? ' dense' : ''}${timerHere ? (ts?.counting ? ' timing counting' : ' timing') : ''}`}
+        className={`mid reps${startPulse ? ' start-pulse' : ''}${timed ? ' dense' : ''}${timerHere ? (ts?.counting ? ' timing counting' : ' timing') : ''}`}
         style={{ left: '69%', top: '64.1%' }}
         ariaLabel={timerHere ? t('Timer running: tap to stop') : `${timed ? 'Seconds' : 'Reps'} (B4)${reps ? `: ${reps}` : ''}, ${timed ? 'tap to type, ' : ''}drag up to set`}
       >
@@ -269,21 +299,26 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
         />
       )}
 
-      {/* pen: hold to pick an exercise and start/continue a session; tap to end the session */}
+      {/* switch exercise: tap for the list of all of them, or drag and let go on one */}
       <HoldMenu
-        items={(preset ? preset.items.map((pid) => workouts.find((w) => w.id === pid)).filter((w): w is Workout => !!w) : workouts).map((w, i) => ({
+        items={switchable.map((w, i) => ({
           key: w.id,
           label: w.exercise || t('Untitled'),
           current: w.id === id,
           num: preset ? i + 1 : undefined,
           node: <WorkoutMark icon={w.icon} letter={w.letter} size="1.1em" />,
         }))}
-        onPick={(wid) => { switchTo(wid); onGo(wid) }}
-        className="big pen"
+        onPick={(wid) => { noteSwapUsed(); switchTo(wid); onGo(wid) }}
+        className={`big pen${swapHint ? ' hinting' : ''}`}
         style={{ left: '52%', top: '89.2%' }}
-        ariaLabel="Hold to switch exercise"
+        ariaLabel={t('Switch exercise: tap for the list, or drag')}
       >
-        <Icon name="swap" />
+        <span className="swap-face"><Icon name="swap" /></span>
+        {swapHint && (
+          <span key={swapHint.n} className="swap-hint" aria-hidden="true">
+            {swapHint.marks.map((w, i) => <span key={w.id} style={{ animationDelay: `${i * 0.9}s` }}><WorkoutMark icon={w.icon} letter={w.letter} size="1em" /></span>)}
+          </span>
+        )}
       </HoldMenu>
     </main>
   )

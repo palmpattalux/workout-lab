@@ -57,17 +57,19 @@ export default function SessionsList({ workouts, only }: { workouts: Workout[]; 
         return (
           <li key={s.id} className={s.live ? 'live' : undefined}>
             <button className="session-row" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : s.id)}>
-              <span className="when">
-                <b>{day(s.startedAt)}</b>
-                <small>{s.live ? t('In progress since {time}', { time: time(s.startedAt) }) : `${time(s.startedAt)} · ${duration(s.startedAt, s.endedAt ?? s.startedAt)}`}</small>
-              </span>
-              {gains > 0 && <span className="gain-badge" aria-label={t('{n} improved', { n: gains })}>▲ {gains}</span>}
-              {notes.length > 0 && <span className="note-badge" aria-label={t('{n} notes', { n: notes.length })}><Icon name="note" size="13px" strokeWidth={2.2} />{notes.length}</span>}
+              {/* what was trained first, when it was on the right */}
               <span className="marks">
                 {s.order.map((id) => {
                   const info = s.snap?.[id] ?? workouts.find((w) => w.id === id)
-                  return info ? <WorkoutMark key={id} icon={info.icon} letter={info.letter} size="1em" /> : null
+                  const tint = workouts.find((w) => w.id === id)?.color
+                  return info ? <span key={id} className={tint ? 'tinted tint-' + tint : undefined}><WorkoutMark icon={info.icon} letter={info.letter} size="1em" /></span> : null
                 })}
+              </span>
+              {gains > 0 && <span className="gain-badge" aria-label={t('{n} improved', { n: gains })}>▲ {gains}</span>}
+              {notes.length > 0 && <span className="note-badge" aria-label={t('{n} notes', { n: notes.length })}><Icon name="note" size="13px" strokeWidth={2.2} />{notes.length}</span>}
+              <span className="when">
+                <b>{day(s.startedAt)}</b>
+                <small>{s.live ? t('In progress since {time}', { time: time(s.startedAt) }) : `${time(s.startedAt)} · ${duration(s.startedAt, s.endedAt ?? s.startedAt)}`}</small>
               </span>
             </button>
             {isOpen && editing === s.id && !s.live && (

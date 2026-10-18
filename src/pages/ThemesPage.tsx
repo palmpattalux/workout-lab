@@ -36,6 +36,17 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
     return () => { el.removeEventListener('scroll', onScroll); cancelAnimationFrame(raf) }
   }, [])
 
+  // Only the theme you stop on comes to life (after a moment): the others stay still,
+  // and scenes far from the centre aren't drawn at all, so swiping stays smooth.
+  const [settled, setSettled] = useState(-1)
+  const near = Math.abs(pos - Math.round(pos)) < 0.04
+  useEffect(() => {
+    setSettled(-1)
+    if (!near) return
+    const tm = setTimeout(() => setSettled(Math.round(pos)), 1400)
+    return () => clearTimeout(tm)
+  }, [near, Math.round(pos)])
+
   // mouse users can drag the strip too (touch scrolls natively)
   const drag = useRef<{ x: number; left: number } | null>(null)
   const index = Math.min(THEME_SLOTS - 1, Math.max(0, Math.round(pos)))
@@ -80,8 +91,8 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
               >
                 {th && <span className={`price-pill${has(th.key) ? ' owned' : ''}`}>{has(th.key) ? <><Icon name="check" size="13px" strokeWidth={2.8} />{t('Owned')}</> : price}</span>}
                 {th ? (
-                  <div className={`theme-art skin-${th.key}`} data-skin={th.key}>
-                    <ThemeScene skin={th.key} />
+                  <div className={`theme-art skin-${th.key}${settled === i ? '' : ' paused'}`} data-skin={th.key}>
+                    {Math.abs(i - pos) < 1.6 && <ThemeScene skin={th.key} />}
                     <span className="mini-dot" style={{ left: '58%', top: '57%' }} />
                     <span className="mini-dot" style={{ left: '82%', top: '55%' }} />
                     <span className="mini-dot" style={{ left: '40%', top: '70%' }} />
