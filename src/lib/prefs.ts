@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react'
 
 // Per-device settings from the gear on page A.
-export type Prefs = { theme: 'auto' | 'light' | 'dark'; sound: boolean; lang: 'en' | 'th' | 'ja' | 'zh' }
+export type Prefs = { theme: 'auto' | 'light' | 'dark'; sound: boolean; lang: 'en' | 'th' | 'ja' | 'zh'; pack: 'default' | 'tokyo' }
 
 // First visit: follow the phone's language when it is one the app speaks.
 function guessLang(): Prefs['lang'] {
@@ -13,7 +13,7 @@ let prefs: Prefs = read()
 const listeners = new Set<() => void>()
 
 function read(): Prefs {
-  const base: Prefs = { theme: 'auto', sound: true, lang: guessLang() }
+  const base: Prefs = { theme: 'auto', sound: true, lang: guessLang(), pack: 'default' }
   try { return { ...base, ...JSON.parse(localStorage.getItem(KEY) || '{}') } } catch { return base }
 }
 

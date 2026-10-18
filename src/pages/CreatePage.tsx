@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import { Icon, WorkoutIcon, WorkoutMark, WORKOUT_ICONS, BODY_LETTERS } from '../components/icons'
+import { Icon, WorkoutIcon, WorkoutMark, packIcons, packLetters } from '../components/icons'
+import { usePrefs } from '../lib/prefs'
 import { addWorkout, updateWorkout, deleteWorkout, TINTS, type Workout } from '../lib/store'
 import { t } from '../lib/i18n'
 
 // The workout adding page, traced from the reference sketch.
 // With `editing` it is the edit page for that workout, filled with what's saved.
 export default function CreatePage({ icon: icon0, letter: letter0, editing, onClose }: { icon: string; letter: string; editing?: Workout; onClose: () => void }) {
+  const { pack } = usePrefs()
   const [icon, setIcon] = useState(icon0)
   const [letter, setLetter] = useState(letter0)
   const [picking, setPicking] = useState(false)
@@ -44,7 +46,7 @@ export default function CreatePage({ icon: icon0, letter: letter0, editing, onCl
         <div className="mark-sheet">
           <h2>{t('Icon')}</h2>
           <div className="mark-grid">
-            {WORKOUT_ICONS.map((i) => (
+            {packIcons(pack).map((i) => (
               <button key={i.key} aria-label={t(i.name)} aria-pressed={i.key === icon} className={i.key === icon ? 'on' : undefined} onClick={() => setIcon(i.key)}>
                 <WorkoutIcon k={i.key} size="56%" strokeWidth={1.9} />
               </button>
@@ -56,9 +58,9 @@ export default function CreatePage({ icon: icon0, letter: letter0, editing, onCl
               <button key={k || 'none'} className={`tint-dot${k ? ' tint-' + k : ' none'}${k === color ? ' on' : ''}`} aria-label={k ? t(k[0].toUpperCase() + k.slice(1)) : t('No colour')} aria-pressed={k === color} onClick={() => setColor(k)} />
             ))}
           </div>
-          <h2>{t('Body part')}</h2>
-          <div className="mark-grid letters">
-            {BODY_LETTERS.map((l) => (
+          <h2>{pack === 'tokyo' ? t('Letter') : t('Body part')}</h2>
+          <div className={`mark-grid letters${pack === 'tokyo' ? ' five' : ''}`}>
+            {packLetters(pack).map((l) => (
               <button key={l.key} aria-label={l.name} aria-pressed={l.key === letter} className={l.key === letter ? 'on' : undefined} onClick={() => setLetter(l.key)}>
                 {l.key}
               </button>

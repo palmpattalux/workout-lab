@@ -75,6 +75,28 @@ const OLD_ICONS: { key: string; svg: ReactNode }[] = [
 // Letters A–H offered on the second drag (just labels, not body parts).
 export const BODY_LETTERS: { key: string; name: string }[] = 'ABCDEFGH'.split('').map((k) => ({ key: k, name: k }))
 
+// The Tokyo pack (gear > Icon): ten Japanese icons and ten katakana in place of the above.
+const petal = 'M12 12c-1.9-2.2-2.2-5-1.2-7.4l1.2 1.1 1.2-1.1c1 2.4.7 5.2-1.2 7.4Z'
+export const TOKYO_ICONS: { key: string; name: string; svg: ReactNode }[] = [
+  { key: 'katana', name: 'Katana', svg: <path d="M21 3c-4.8 2.6-9 6.2-12.4 10.1l2.3 2.3C14.4 12 18 7.8 21 3ZM6.6 11.8l5.6 5.6M8.3 15.7 3.5 20.5" /> },
+  { key: 'torii', name: 'Torii', svg: <path d="M2.5 5c3 .9 6.2 1.3 9.5 1.3s6.5-.4 9.5-1.3M4.5 10h15M6.5 6.6V21M17.5 6.6V21M12 6.4V10" /> },
+  { key: 'fuji', name: 'Mt Fuji', svg: <path d="M2 19.5 9.2 8.4c.6-.9 1.4-1.3 2.8-1.3s2.2.4 2.8 1.3L22 19.5ZM7.6 10.9l2 1.4 2.4-1.7 2.4 1.7 2-1.4" /> },
+  { key: 'sakura', name: 'Sakura', svg: <>{[0, 72, 144, 216, 288].map((a) => <path key={a} d={petal} transform={`rotate(${a} 12 12)`} />)}<circle cx="12" cy="12" r=".6" /></> },
+  { key: 'lantern', name: 'Lantern', svg: <><path d="M12 2.5V5M9 5h6M9 19h6M12 19v2.5M6.4 9.5c3.7 1 7.5 1 11.2 0M6.4 14.5c3.7-1 7.5-1 11.2 0" /><ellipse cx="12" cy="12" rx="6" ry="7" /></> },
+  { key: 'koi', name: 'Koi', svg: <><path d="M20 12c-2-3.6-5.4-5.4-8.8-4.9C8.7 7.5 6.8 9.4 5.5 12c1.3 2.6 3.2 4.5 5.7 4.9 3.4.5 6.8-1.3 8.8-4.9ZM5.5 12 2.5 8.5c.8 1.6.8 5.4 0 7Z" /><path d="M10 9.4c1.2.9 1.5 2.4.9 3.8" /><circle cx="16.6" cy="11" r=".5" /></> },
+  { key: 'fan', name: 'Fan', svg: <><path d="M12 20 3.2 10.9a12.6 12.6 0 0 1 17.6 0Z" /><path d="M12 20 7.6 7.9M12 20V7.3M12 20l4.4-12.1M7.6 15.4a6.5 6.5 0 0 1 8.8 0" /></> },
+  { key: 'onigiri', name: 'Onigiri', svg: <path d="M12 4c1.2 0 2 .7 2.6 1.7l5.6 9.8c1.2 2.2-.2 4.5-2.7 4.5h-11c-2.5 0-3.9-2.3-2.7-4.5l5.6-9.8C10 4.7 10.8 4 12 4ZM9.2 20v-5.2h5.6V20" /> },
+  { key: 'ramen', name: 'Ramen', svg: <path d="M3 12h18c0 4.4-3.6 7.5-8 7.5h-2c-4.4 0-8-3.1-8-7.5ZM9 19.5V21h6v-1.5M9.5 12 19.5 4.5M12.5 12 21 7M5.5 9.5c0-1.5 1.5-1.5 1.5-3M8.5 9.5c0-1.5 1.5-1.5 1.5-3" /> },
+  { key: 'daruma', name: 'Daruma', svg: <><path d="M12 3c4.4 0 7.5 3.8 7.5 9 0 5-3.2 9-7.5 9s-7.5-4-7.5-9c0-5.2 3.1-9 7.5-9Z" /><ellipse cx="12" cy="10.5" rx="4" ry="3.4" /><circle cx="10.4" cy="9.9" r=".5" /><path d="M13 9.9h1.4M10.2 12.4c.6-.4 1.2-.4 1.8 0 .6-.4 1.2-.4 1.8 0" /></> },
+]
+export const TOKYO_LETTERS: { key: string; name: string }[] = [
+  ['ア', 'a'], ['カ', 'ka'], ['サ', 'sa'], ['シ', 'shi'], ['ツ', 'tsu'], ['ミ', 'mi'], ['ヤ', 'ya'], ['ル', 'ru'], ['ワ', 'wa'], ['ン', 'n'],
+].map(([k, r]) => ({ key: k, name: `${k} ${r}` }))
+
+export type IconPack = 'default' | 'tokyo'
+export const packIcons = (p: IconPack) => p === 'tokyo' ? TOKYO_ICONS : WORKOUT_ICONS
+export const packLetters = (p: IconPack) => p === 'tokyo' ? TOKYO_LETTERS : BODY_LETTERS
+
 export type IconName = keyof typeof ui
 
 function Svg({ children, size, strokeWidth }: { children: ReactNode; size: string; strokeWidth: number }) {
@@ -90,7 +112,7 @@ export function Icon({ name, size = '42%', strokeWidth = 1.8 }: { name: IconName
 }
 
 export function WorkoutIcon({ k, size = '42%', strokeWidth = 1.8 }: { k: string; size?: string; strokeWidth?: number }) {
-  const found = WORKOUT_ICONS.find((i) => i.key === k) ?? OLD_ICONS.find((i) => i.key === k)
+  const found = WORKOUT_ICONS.find((i) => i.key === k) ?? TOKYO_ICONS.find((i) => i.key === k) ?? OLD_ICONS.find((i) => i.key === k)
   return <Svg size={size} strokeWidth={strokeWidth}>{found?.svg}</Svg>
 }
 

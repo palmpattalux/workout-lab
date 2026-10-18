@@ -1,5 +1,5 @@
 import { useRef, useState, type PointerEvent } from 'react'
-import { Icon, WorkoutIcon, WorkoutMark, WORKOUT_ICONS, BODY_LETTERS } from '../components/icons'
+import { Icon, WorkoutIcon, WorkoutMark, packIcons, packLetters, type IconPack } from '../components/icons'
 import HoldPicker from '../components/HoldPicker'
 import { updateWorkout, usePresets, addPreset, updatePreset, type Workout } from '../lib/store'
 import { sound } from '../lib/sound'
@@ -77,8 +77,8 @@ function fan(slot: number, n: number) {
   })
 }
 
-const iconOptions = WORKOUT_ICONS.map((i) => ({ key: i.key, label: i.name, node: <WorkoutIcon k={i.key} size="24px" strokeWidth={2} /> }))
-const letterOptions = BODY_LETTERS.map((l) => ({ key: l.key, label: l.name, node: <b className="letter">{l.key}</b> }))
+const iconOptionsOf = (p: IconPack) => packIcons(p).map((i) => ({ key: i.key, label: t(i.name), node: <WorkoutIcon k={i.key} size="24px" strokeWidth={2} /> }))
+const letterOptionsOf = (p: IconPack) => packLetters(p).map((l) => ({ key: l.key, label: l.name, node: <b className="letter">{l.key}</b> }))
 
 export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdit, onOpenBook, onThemes, onPlans, onCreate }: {
   guest: boolean
@@ -93,6 +93,9 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
 }) {
   // "+" flow: first drag up picks the workout icon, second drag up picks the body-part letter.
   const [pickedIcon, setPickedIcon] = useState<string | null>(null)
+  const { pack } = usePrefs()
+  const iconOptions = iconOptionsOf(pack)
+  const letterOptions = letterOptionsOf(pack)
   // First tap on a workout dot arms it: it turns into a glowing fingerprint (tap again to start)
   // and a pen (edit) appears above it.
   const [chosen, setChosen] = useState<string | null>(null)
