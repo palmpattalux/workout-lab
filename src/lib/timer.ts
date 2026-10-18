@@ -4,7 +4,7 @@ import { scopedKey, onScopeChange } from './store'
 // The hold timer on page B: a 5 second countdown, then it counts up until stopped.
 // Kept in this browser (like the running session) so leaving page B doesn't lose it;
 // it belongs to the exercise and set it was started on.
-export type Timer = { goAt: number; workoutId: string; set: number }
+export type Timer = { goAt: number; workoutId: string; set: string | number } // set: its key, e.g. 2 or "2L"
 export const COUNTDOWN = 5
 
 const listeners = new Set<() => void>()
@@ -20,7 +20,7 @@ function put(next: Timer | null) {
   listeners.forEach((fn) => fn())
 }
 
-export function startTimer(workoutId: string, set: number) { put({ goAt: Date.now() + COUNTDOWN * 1000, workoutId, set }) }
+export function startTimer(workoutId: string, set: string | number) { put({ goAt: Date.now() + COUNTDOWN * 1000, workoutId, set }) }
 export function stopTimer(): Timer | null { const t = timer; if (t) put(null); return t }
 export function getTimer() { return timer }
 export function useTimer(): Timer | null {

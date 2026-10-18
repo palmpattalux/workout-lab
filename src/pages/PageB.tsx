@@ -8,7 +8,7 @@ import HoldPicker from '../components/HoldPicker'
 import HoldMenu from '../components/HoldMenu'
 import NumberPrompt from '../components/NumberPrompt'
 import { updateWorkout, usePresets, addNote, type Workout } from '../lib/store'
-import { useSession, switchTo, goToSet, record, recordAt, recordMove, endSession, discardSession, removeFromSession } from '../lib/session'
+import { useSession, switchTo, goToSet, setSided, setKey, record, recordAt, recordMove, endSession, discardSession, removeFromSession } from '../lib/session'
 import { useTimer, startTimer, stopTimer, timerState } from '../lib/timer'
 import { sound } from '../lib/sound'
 import { t } from '../lib/i18n'
@@ -67,7 +67,13 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
   const trying = !!usePreview() && !inSession
   const [demo, setDemo] = useState(0)
   const set = inSession ? session.setOf[id] ?? 1 : trying ? (demo % setCap) + 1 : 1
-  const entry = inSession ? session.sets[id]?.[String(set)] : undefined
+  // one side at a time: each set is done Left, then Right (the right arrow goes to the other side first)
+  const sided = inSession && !!workout?.sided
+  const side = sided ? session.side?.[id] ?? 'L' : undefined
+  const key = setKey(set, side)
+  // the set before this one: same set's Left when on Right, else the last set (its Right side)
+  const prevKey = side === 'R' ? setKey(set, 'L') : setKey(set - 1, side && 'R')
+  const entry = inSession ? session.sets[id]?.[key] : undefined
 
   // Outside a session values are only shown, not documented.
   const [loose, setLoose] = useState<{ reps: number | null; weight: number | null }>({ reps: null, weight: null })
@@ -80,12 +86,12 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
   const loads = unit === 'lbs' ? LOADS_LB : LOADS_KG
   const loadOptions = loads.map((n) => ({ key: String(n), node: n, label: `${n} ${unit}` }))
   // open on this set's weight, else the last set's (closest step), else the lightest
-  const near = weight ?? (inSession ? session.sets[id!]?.[String(set - 1)]?.weight ?? null : null)
+  const near = weight ?? (inSession ? session.sets[id!]?.[prevKey]?.weight ?? null : null)
   const loadStart = near ? loads.reduce((b, n, i) => (Math.abs(n - near) < Math.abs(loads[b] - near) ? i : b), 0) : 0
   const isProgression = workout?.mode === 'progression'
   // progressions: the one done this set, else last set's, else the newest
   const moves = workout?.progressions ?? []
-  const chosenMove = (inSession ? entry?.move ?? session.sets[id!]?.[String(set - 1)]?.move : undefined) ?? moves.at(-1)
+  const chosenMove = (inSession ? entry?.move ?? session.sets[id!]?.[prevKey]?.move : undefined) ?? moves.at(-1)
   const timed = isProgression && workout?.count === 'sec'
   const countValue = (i: number) => i + 1
 
@@ -113,7 +119,7 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
   // hold timer: slide onto it from the sec line, a 5 s countdown, then it counts up.
   // It lives outside this page (home shows it too); tap the sec button to stop and keep the time.
   const timer = useTimer()
-  const timerHere = !!timer && inSession && timer.workoutId === id && timer.set === set
+  const timerHere = !!timer && inSession && timer.workoutId === id && String(timer.set) === key
   const [, tickWatch] = useState(0)
   const ts = timer ? timerState(timer) : null
   useEffect(() => {
@@ -194,8 +200,9 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
       {trying && <span className="set-num" aria-label={`Set ${set}`}><small>{t('set')}</small>{set}</span>}
       {inSession && (
         <>
-          <button className="set-num" aria-label={`Set ${set}, tap to choose`} aria-expanded={setsOpen} onClick={() => setSetsOpen(!setsOpen)}>
+          <button key={key} className={`set-num${side === 'R' ? ' to-right' : side ? ' to-left' : ''}`} aria-label={`Set ${set}${side ? `, ${side === 'L' ? 'left' : 'right'}` : ''}, tap to choose`} aria-expanded={setsOpen} onClick={() => setSetsOpen(!setsOpen)}>
             <small>{t('set')}</small>{set}
+            {side && <span className="set-side">{side === 'L' ? t('Left') : t('Right')}</span>}
           </button>
           {setsOpen && (
             <div className="set-menu" role="listbox" aria-label={t('Choose set')}>
@@ -207,19 +214,25 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
                 <button key={n} role="option" aria-selected={n === set} className={n === set ? 'on' : undefined}
                   onClick={() => { goToSet(n); setSetsOpen(false) }}>{n}</button>
               ))}
+              {/* one side at a time (a single arm or leg): each set gets a Left and a Right */}
+              <button className={`side-toggle${workout?.sided ? ' on' : ''}`} role="switch" aria-checked={!!workout?.sided} aria-label={t('One side at a time')}
+                onClick={() => { setSided(id!, !workout?.sided); setSetsOpen(false) }}>
+                <span>{t('L')}</span><i /><span>{t('R')}</span>
+              </button>
             </div>
           )}
         </>
       )}
 
-      {((inSession && set > 1) || (trying && demo > 0)) && (
-        <button className={`btn circle big${trying ? ' try-step' : ''}`} style={{ left: '14.9%', top: '43.2%' }} aria-label={t('Previous set')} onClick={() => (trying ? setDemo(demo - 1) : goToSet(set - 1))}>
+      {((inSession && (set > 1 || side === 'R')) || (trying && demo > 0)) && (
+        <button className={`btn circle big${trying ? ' try-step' : ''}`} style={{ left: '14.9%', top: '43.2%' }} aria-label={side === 'R' ? t('Other side') : t('Previous set')}
+          onClick={() => (trying ? setDemo(demo - 1) : side === 'R' ? goToSet(set, 'L') : goToSet(set - 1, side && 'R'))}>
           <Icon name="arrowLeft" />
         </button>
       )}
-      {(set < setCap || trying) && (
-        <button className={`btn circle big${startPulse ? ' start-pulse' : ''}${trying ? ' try-step' : ''}`} style={{ left: '85.1%', top: '43.2%' }} aria-label={t('Next set')}
-          onClick={() => { if (trying) setDemo(demo + 1); else if (inSession) goToSet(set + 1) }}>
+      {(set < setCap || side === 'L' || trying) && (
+        <button className={`btn circle big${startPulse ? ' start-pulse' : ''}${trying ? ' try-step' : ''}`} style={{ left: '85.1%', top: '43.2%' }} aria-label={side === 'L' ? t('Next side') : t('Next set')}
+          onClick={() => { if (trying) setDemo(demo + 1); else if (side === 'L') goToSet(set, 'R'); else if (inSession) goToSet(set + 1) }}>
           <Icon name="arrowRight" />
         </button>
       )}
@@ -284,7 +297,7 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
         start={timed && reps ? Math.min(59, reps - 1) : 0}
         maxStep={20}
         instant
-        extra={timed && inSession ? { node: <Icon name="stopwatch" size="22px" />, label: t('Timer'), onPick: () => startTimer(id!, set) } : undefined}
+        extra={timed && inSession ? { node: <Icon name="stopwatch" size="22px" />, label: t('Timer'), onPick: () => startTimer(id!, key) } : undefined}
         onChange={(i) => { if (!timerHere) put('reps', countValue(i)) }}
         onPick={(i) => { if (timerHere) stopTimer(); put('reps', countValue(i)) }}
         onTap={timed ? () => (timerHere ? stopWatch() : setTyping('reps')) : undefined}

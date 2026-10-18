@@ -3,6 +3,8 @@ import { WorkoutMark } from '../components/icons'
 import { useSessions, deleteSession, updateSession, useNotes, type Workout, type Session, type SetEntry } from '../lib/store'
 import { Icon } from '../components/icons'
 import { useSession, discardSession } from '../lib/session'
+import SetList from '../components/SetList'
+import { keyNum, keySide } from '../lib/session'
 import { day, time, duration, setLines } from '../lib/format'
 import { compare } from '../lib/progress'
 import { t } from '../lib/i18n'
@@ -92,7 +94,7 @@ export default function SessionsList({ workouts, only }: { workouts: Workout[]; 
                         </div>
                       )}
                       {lines.length === 0 ? <p className="muted">{t('Nothing recorded')}</p> : (
-                        <ul>{lines.map((l) => <li key={l.set}><span>{t('Set {n}', { n: l.set })}</span>{l.text}</li>)}</ul>
+                        <SetList lines={lines} />
                       )}
                     </div>
                   )
@@ -149,7 +151,7 @@ function SessionEditor({ s, workouts, onClose }: { s: Session; workouts: Workout
         const progression = info?.mode === 'progression'
         const unit = info?.unit ?? 'kg'
         const count = counts[id]
-        const nums = Object.keys(sets[id] ?? {}).sort((a, b) => Number(a) - Number(b))
+        const nums = Object.keys(sets[id] ?? {}).sort((a, b) => keyNum(a) - keyNum(b) || a.localeCompare(b))
         return (
           <div key={id} className="ex">
             <p className="ex-name">{info ? <WorkoutMark icon={info.icon} letter={info.letter} size="1em" /> : null} {info?.exercise || t('Untitled')}</p>
@@ -162,7 +164,7 @@ function SessionEditor({ s, workouts, onClose }: { s: Session; workouts: Workout
               <ul className="set-edit">
                 {nums.map((n) => (
                   <li key={n}>
-                    <span>{t('Set {n}', { n })}</span>
+                    <span>{t('Set {n}', { n: keyNum(n) })}{keySide(n) && <b className="side-tag">{keySide(n) === 'L' ? t('L') : t('R')}</b>}</span>
                     {!progression && (
                       <label><input inputMode="decimal" type="number" min="0" step="any" value={sets[id][n].weight ?? ''} onChange={(e) => put(id, n, 'weight', e.target.value)} aria-label={`Set ${n} load`} /><small>{unit}</small></label>
                     )}

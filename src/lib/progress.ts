@@ -1,4 +1,5 @@
 import type { Session } from './store'
+import { keyNum } from './session'
 
 // One exercise's totals in one session, and how they compare with the last session
 // that had that exercise. Used by the summary page and the session history.
@@ -6,13 +7,14 @@ import type { Session } from './store'
 export type Stat = { reps: number; top: number | null; sets: number }
 
 export function statOf(s: Session, wid: string): Stat | null {
-  const entries = Object.values(s.sets[wid] ?? {}).filter((e) => e.reps !== null || e.weight !== null)
+  const done = Object.entries(s.sets[wid] ?? {}).filter(([, e]) => e.reps !== null || e.weight !== null)
+  const entries = done.map(([, e]) => e)
   if (entries.length === 0) return null
   const weights = entries.map((e) => e.weight).filter((w): w is number => w !== null)
   return {
     reps: entries.reduce((n, e) => n + (e.reps ?? 0), 0),
     top: weights.length ? Math.max(...weights) : null,
-    sets: entries.length,
+    sets: new Set(done.map(([k]) => keyNum(k))).size, // Left and Right count as one set
   }
 }
 

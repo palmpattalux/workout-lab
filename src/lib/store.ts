@@ -20,6 +20,7 @@ export type Workout = {
   slot?: number           // where its dot sits on page A (index in SLOTS), set by dragging
   group?: string          // workouts sharing a group id sit together in one bubble on page A
   color?: string          // a soft tint for its icon on page A (key in TINTS), to tell exercises apart
+  sided?: boolean         // done one side at a time: each set has a Left and a Right (page B set menu)
   createdAt: number
 }
 
@@ -44,7 +45,8 @@ export type Session = {
   preset?: string                                   // preset this session was started from
   order: string[]                                   // workouts in the order they were used
   setOf: Record<string, number>                     // current set per workout
-  sets: Record<string, Record<string, SetEntry>>     // workoutId -> set number -> entry
+  sets: Record<string, Record<string, SetEntry>>     // workoutId -> set key -> entry: "2", or "2L" / "2R" for one side
+  side?: Record<string, 'L' | 'R'>                  // the side on screen, per one-side-at-a-time workout
   // how each exercise was set up when the session ended, so history stays right after edits
   snap?: Record<string, { exercise: string; icon: string; letter: string; mode: Workout['mode']; unit: Workout['unit']; count?: Workout['count']; move?: string }>
 }

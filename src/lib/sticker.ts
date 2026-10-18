@@ -1,5 +1,6 @@
 import type { Session, Workout } from './store'
 import { day, duration } from './format'
+import { keyNum } from './session'
 import { t } from './i18n'
 
 // Shareable images for a finished session (like Strava's): two see-through stickers to lay
@@ -17,9 +18,10 @@ export function statsOf(s: Session, workouts: Workout[]): StickerStats {
     const info = s.snap?.[wid] ?? workouts.find((w) => w.id === wid)
     const timed = info?.mode === 'progression' && info?.count === 'sec'
     const toKg = info?.unit === 'lbs' ? 0.4536 : 1
-    for (const e of Object.values(bySet)) {
+    const counted = new Set<number>()
+    for (const [k, e] of Object.entries(bySet)) {
       if (!e || e.reps == null) continue
-      sets++
+      if (!counted.has(keyNum(k))) { counted.add(keyNum(k)); sets++ } // Left and Right count as one set
       if (!timed) reps += e.reps
       if (info?.mode !== 'progression' && e.weight) lifted += e.reps * e.weight * toKg
     }

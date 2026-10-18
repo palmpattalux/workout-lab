@@ -4,6 +4,7 @@ import { NoteRow } from './NotePage'
 import { useState } from 'react'
 import { usePlan, atLeast } from '../lib/plan'
 import { useNewWeek } from '../lib/week'
+import SetList from '../components/SetList'
 import { day, time, setLines } from '../lib/format'
 import SessionsList from './SessionsPage'
 import { supabase, signOut } from '../lib/auth'
@@ -178,7 +179,7 @@ function Detail({ w }: { w: Workout }) {
               <p className="past-when">{day(s.startedAt)} <small>{time(s.startedAt)}</small></p>
               {move && <p className="muted">{t('Progression: {move}', { move })}</p>}
               {lines.length === 0 ? <p className="muted">{t('Nothing recorded')}</p> : (
-                <ul>{lines.map((l) => <li key={l.set}><span>{t('Set {n}', { n: l.set })}</span>{l.text}</li>)}</ul>
+                <SetList lines={lines} />
               )}
             </div>
           )

@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { stopTimer, getTimer } from './timer'
-import { saveSession, getWorkouts, getPresets, onScopeChange, scopedKey, type Session, type SetEntry } from './store'
+import { saveSession, getWorkouts, updateWorkout, getPresets, onScopeChange, scopedKey, type Session, type SetEntry } from './store'
 
 // The active session, if any. Kept in this browser so a reload doesn't lose it;
 // written to the database once, when the session ends.
@@ -33,22 +33,48 @@ export function switchTo(workoutId: string, preset?: string) {
   })
 }
 
-export function goToSet(n: number) {
+// One side at a time (workout.sided): each set is done Left, then Right, saved as "2L" and "2R".
+export const setKey = (n: number, side?: 'L' | 'R') => side ? `${n}${side}` : String(n)
+export const keyNum = (key: string) => parseInt(key, 10)
+export const keySide = (key: string): 'L' | 'R' | undefined => key.endsWith('L') ? 'L' : key.endsWith('R') ? 'R' : undefined
+const sided = (wid: string) => !!getWorkouts().find((w) => w.id === wid)?.sided
+// the key the current exercise is writing to
+function currentKey(s: Session) {
+  const n = s.setOf[s.current] ?? 1
+  return sided(s.current) ? setKey(n, s.side?.[s.current] ?? 'L') : String(n)
+}
+
+// side: which side to show (one-side-at-a-time workouts); a set picked from the menu starts on Left
+export function goToSet(n: number, side: 'L' | 'R' = 'L') {
   if (!active) return
-  set({ ...active, setOf: { ...active.setOf, [active.current]: n } })
+  set({ ...active, setOf: { ...active.setOf, [active.current]: n }, side: { ...active.side, [active.current]: side } })
+}
+
+// Turn one side at a time on or off for an exercise. Sets already done in this session
+// move with it (on: "2" becomes "2L"; off: "2L" becomes "2"), and nothing is lost.
+export function setSided(workoutId: string, on: boolean) {
+  updateWorkout(workoutId, { sided: on })
+  if (!active?.sets[workoutId]) return
+  const moved: Record<string, SetEntry> = {}
+  for (const [k, e] of Object.entries(active.sets[workoutId])) {
+    const n = keyNum(k)
+    const to = on ? (keySide(k) ? k : setKey(n, 'L')) : keySide(k) === 'L' && !active.sets[workoutId][String(n)] ? String(n) : k
+    moved[to] = e
+  }
+  set({ ...active, sets: { ...active.sets, [workoutId]: moved }, side: { ...active.side, [workoutId]: 'L' } })
 }
 
 export function record(field: 'reps' | 'weight', value: number) {
   if (!active) return
-  recordAt(active.current, active.setOf[active.current] ?? 1, { [field]: value })
+  recordAt(active.current, currentKey(active), { [field]: value })
 }
 // the progression done in the current set
 export function recordMove(move: string) {
   if (!active) return
-  recordAt(active.current, active.setOf[active.current] ?? 1, { move })
+  recordAt(active.current, currentKey(active), { move })
 }
 // write into a given exercise and set (the timer keeps its own, even if you moved on)
-export function recordAt(w: string, setNum: number, change: Partial<SetEntry>) {
+export function recordAt(w: string, setNum: number | string, change: Partial<SetEntry>) {
   if (!active) return
   const n = String(setNum)
   const entry: SetEntry = Object.assign({ reps: null, weight: null }, active.sets[w]?.[n], change)
