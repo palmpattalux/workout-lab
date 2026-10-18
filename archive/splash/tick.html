@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f3f4f2" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      /* opening screen: shows before the app's own code arrives */
+      #splash { --sp-bg: #f3f4f2; --sp-ink: #1b201d; --sp-muted: #7a827c; --sp-sun: #ff9a1f; --sp-glow: rgba(255,154,31,.55); position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: var(--sp-bg); transition: opacity .5s ease, transform .6s cubic-bezier(.2,.8,.2,1); }
+      :root[data-mode="dark"] #splash { --sp-bg: #121514; --sp-ink: #e9ece9; --sp-muted: #868f89; --sp-glow: rgba(255,154,31,.65); }
+      @media (prefers-color-scheme: dark) { :root:not([data-mode="light"]) #splash { --sp-bg: #121514; --sp-ink: #e9ece9; --sp-muted: #868f89; --sp-glow: rgba(255,154,31,.65); } }
+      #splash.out { opacity: 0; transform: scale(1.04); pointer-events: none; }
+      .rn { display: flex; flex-direction: column; align-items: center; gap: 6px; font-family: "Manrope", system-ui, sans-serif; color: var(--sp-ink); }
+      .rn-name { font-weight: 800; font-size: 2.3rem; letter-spacing: -.045em; animation: rn-in .7s cubic-bezier(.2,.8,.2,1) .2s both; }
+      #splash .tk { width: 132px; height: 76px; overflow: visible; fill: none; stroke: var(--sp-muted); stroke-linecap: round; animation: rn-rise .5s cubic-bezier(.2,.8,.2,1) .05s both; }
+      .tk-arc { stroke-width: 2; opacity: .45; }
+      .tk-mark { stroke-width: 2.2; }
+      .tk-hit { stroke: var(--sp-muted); stroke-width: 3; animation: tk-hit .5s ease-out 1s forwards; }
+      .tk-needle { stroke: var(--sp-ink); stroke-width: 3; transform-box: view-box; transform-origin: 66px 66px; transform: rotate(-24deg); animation: tk-tick .32s cubic-bezier(.2,1.8,.4,1) 1s forwards; }
+      .tk-hub { fill: var(--sp-ink); stroke: none; }
+      @keyframes rn-in { from { opacity: 0; transform: translateY(6px); filter: blur(6px); } }
+      @keyframes rn-rise { from { opacity: 0; transform: translateY(8px); } }
+      @keyframes tk-tick { to { transform: rotate(0deg); } }
+      @keyframes tk-hit {
+        0% { stroke: var(--sp-muted); filter: none; }
+        30% { stroke: var(--sp-sun); filter: drop-shadow(0 0 6px var(--sp-glow)) drop-shadow(0 0 14px var(--sp-glow)); }
+        100% { stroke: var(--sp-sun); filter: drop-shadow(0 0 3px var(--sp-glow)); }
+      }
+      @media (prefers-reduced-motion: reduce) { .rn-name, .tk { animation: none; } .tk-needle { animation: none; transform: none; } .tk-hit { animation: none; stroke: var(--sp-sun); } }
+    </style>
+    <script>
+      // apply the saved light/dark choice before anything paints
+      try { var t = JSON.parse(localStorage.getItem('workout-lab:prefs') || '{}').theme; if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-mode', t) } catch (e) {}
+    </script>
+    <title>Tick</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- Opening screen (first load only). To remove it: delete this block, the splash <style>, and hideSplash() in src/main.tsx. -->
+    <div id="splash" aria-label="Tick, loading">
+      <div class="rn">
+        <svg class="tk" viewBox="0 0 132 76" aria-hidden="true"><path class="tk-arc" d="M6.9 76.4A60 60 0 0 1 125.1 76.4"/><line class="tk-mark" x1="17.3" y1="71.1" x2="10.3" y2="71.9"/><line class="tk-mark" x1="19.4" y1="50.9" x2="12.7" y2="48.7"/><line class="tk-mark" x1="29.6" y1="33.2" x2="24.4" y2="28.5"/><line class="tk-mark" x1="46.1" y1="21.2" x2="43.2" y2="14.8"/><line class="tk-hit" x1="66.0" y1="20.0" x2="66.0" y2="10.0"/><line class="tk-mark" x1="85.9" y1="21.2" x2="88.8" y2="14.8"/><line class="tk-mark" x1="102.4" y1="33.2" x2="107.6" y2="28.5"/><line class="tk-mark" x1="112.6" y1="50.9" x2="119.3" y2="48.7"/><line class="tk-mark" x1="114.7" y1="71.1" x2="121.7" y2="71.9"/><line class="tk-needle" x1="66" y1="66" x2="66" y2="24"/><circle class="tk-hub" cx="66" cy="66" r="4.5"/></svg>
+        <div class="rn-name">Tick</div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

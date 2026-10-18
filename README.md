@@ -1,41 +1,43 @@
-# Workout Lab
+# Dotset
 
-Mobile-first web app for experimental workout notes. React + TypeScript on Vite.
+Mobile-first workout tracker. React + TypeScript on Vite, wrapped with Capacitor for the App Store and Google Play.
+Live at https://dotset.app (Vercel deploys every push to `main`).
 
 ## Run it
 
 ```bash
 npm install
-npm run dev        # prints a local address and a network address; open the network one on your phone (same Wi-Fi)
-npm run build      # production site goes to dist/
+npm run dev        # open the network address on your phone (same Wi-Fi)
+npm run build      # website goes to dist/
+npx cap sync       # copy dist/ into the android/ and ios/ apps
 ```
 
-## Saving and accounts
+## Folders
 
-Every change saves to the browser first, so nothing waits on the network, then syncs online in the background.
+| Folder | What's in it |
+| --- | --- |
+| `src/pages/` | One file per screen (see the route list at the top of `src/App.tsx`). |
+| `src/components/` | Shared pieces: pickers, menus, the session bar, and one `*Scene.tsx` per theme. |
+| `src/lib/` | Logic with no UI: saving, login, plans, payments, themes, sounds, languages. |
+| `src/styles.css` | All styles. Theme colours are tokens (`--stage`, `--ink`, `--active`, …) set per theme. |
+| `api/` | Vercel server functions for Omise payments (checkout, charge, webhook, cancel). |
+| `supabase/` | Database setup (`schema.sql`, `payments.sql`), email templates, `SETUP.md`. |
+| `android/`, `ios/` | The native app shells (Capacitor). `.github/workflows/android.yml` builds the Android app. |
+| `public/` | Files served as-is (open-source licence credits). |
+| `scripts/` | `licenses.mjs` regenerates `public/licenses.txt` (`npm run licenses`). |
+| `archive/` | Features and designs we took out, kept so they can be added back. Not part of the build. |
 
-- **Public site** (Supabase keys set): people sign up and log in with email and password. Each account's workouts and sessions are stored in Supabase and only that account can read them (row-level security). See `src/lib/auth.ts`, `src/pages/LoginPage.tsx`, `supabase/schema.sql`.
-- **claude.ai link** (no keys): no accounts; data goes to that page's private built-in database.
+## Main files
 
-## Going live (Supabase + GitHub + Vercel)
+- Screens: `PageA.tsx` (home dots), `PageB.tsx` (exercise and sets), `CreatePage.tsx` (new or edit), `BookPage.tsx` (exercises, sessions, presets, notes), `ThemesPage.tsx`, `IconsPage.tsx`, `PlansPage.tsx`, `CheckoutPage.tsx` / `PayPage.tsx` (paying).
+- Saving: `src/lib/store.ts` saves to the browser first, then to Supabase. `src/lib/session.ts` holds the running session.
+- Accounts: `src/lib/auth.ts`, `src/pages/LoginPage.tsx`.
+- Plans and payments: `src/lib/plan.ts` (what each plan includes), `src/lib/billing.ts` (subscription state), `src/components/RenewNotice.tsx`.
+- Themes: `src/lib/theme.ts` (list, tiers, ownership) and `src/components/ThemeScene.tsx` (which scene to draw).
+- Languages: every UI string goes through `t()` in `src/lib/i18n.ts`, with English, Thai, Japanese and Chinese.
 
-1. **Supabase** (supabase.com, free): create a project. In SQL Editor, paste `supabase/schema.sql` and Run. In Authentication > URL Configuration, set Site URL to your Vercel address once you have it. Copy Project URL and anon public key from Project Settings > API.
-2. **GitHub**: create an empty repo (e.g. `workout-lab`) and push this folder to it.
-3. **Vercel** (vercel.com, sign in with GitHub): Add New > Project > pick the repo. Framework: Vite. Under Environment Variables add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. Deploy. Every push to the repo redeploys automatically.
+## Rules
 
-## Where things are
-
-- `src/pages/PageA.tsx`: first screen. Workout dots (first tap: dot turns into a pulsing orange fingerprint with a pen above it; tap the fingerprint to open and start/continue the session, pen to edit), A1 home, A2 book, and "+" (hold once for a workout icon, hold again for a body-part letter).
-- `src/pages/CreatePage.tsx`: new workout page, also the edit page. Exercise, equipment/progression switch, kg/lbs, specific focus, general notes.
-- `src/pages/PageB.tsx`: exercise screen. Focus reminder, B3 load (kg/lbs: hold 1–15, keep holding at the top for up to 30; progression: stairs, tap to add a move), reps, set number and set arrows, switch button (hold: switch exercise), back arrow to home; tap Active to end the session (Yes/No).
-- `src/pages/BookPage.tsx`: the book. Exercises tab: one box per workout; tap for general notes, details and past sessions. Sessions tab (`SessionsPage.tsx`): every session, newest first, tap a row for its sets.
-- `src/components/HoldPicker.tsx`: the press-and-hold vertical picker used by "+", weights and B4.
-- `src/components/HoldMenu.tsx`: the pen's press-and-hold ring of exercises.
-- `src/lib/session.ts`: the active session and its sets.
-- `src/components/icons.tsx`: the 15 workout icons and the body-part letters.
-- `src/lib/store.ts`: saved workouts and sessions (local first, then Supabase or the claude.ai database).
-- `src/lib/auth.ts`, `src/pages/LoginPage.tsx`: sign up, log in, forgot password, log out (in the book).
-
-## Later: native app
-
-Wrap the same build with Capacitor (`npm i @capacitor/core @capacitor/cli`, `npx cap init`, `npx cap add ios`/`android`) to ship to the app stores without rewriting.
+- Every feature must work in every theme, in light and dark mode.
+- Features a plan lacks are hidden, never shown as locked.
+- A customer's data is never deleted when a plan runs out; extras are only hidden until they renew.

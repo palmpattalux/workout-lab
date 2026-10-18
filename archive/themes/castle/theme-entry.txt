@@ -1,0 +1,1 @@
+10:  { key: 'castle', name: 'Castle', blurb: 'A stone castle above the pines. Morning in light mode, torch-lit night in dark.' },

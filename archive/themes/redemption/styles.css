@@ -1,0 +1,91 @@
+/* Styles removed with RedemptionScene (commit 9299f37). Paste back into src/styles.css to restore. */
+/* ---------- Redemption theme: hazy golden afternoon, painted soft ----------
+   Sun blooming behind a close tree trunk, foliage hanging in from the top, a big
+   soft cloud, a glowing field and dark leaves on the wind. Glass controls on top. */
+:root[data-skin="redemption"], .theme-art[data-skin="redemption"] {
+  --bg: #d9a95a; --stage: #f3d79a; --surface: #fff5df; --sunk: #f5e3bd;
+  --ink: #33281a; --muted: #85694a; --hair: rgba(80, 55, 20, .08); --line: rgba(80, 55, 20, .16);
+  --lift: inset 0 1px 0 rgba(255, 255, 255, .8), 0 1px 2px rgba(110, 70, 20, .1), 0 10px 24px -12px rgba(130, 80, 20, .45);
+  --float: 0 1px 2px rgba(110, 70, 20, .12), 0 20px 44px -14px rgba(130, 80, 20, .5);
+  --sun: #d9861c; --active: #c97a16; --active-soft: #fbe6c0;
+  color-scheme: light;
+}
+.theme-art[data-skin="redemption"] { color: var(--ink); }
+.redemption-scene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.redemption-scene svg * { stroke: none; }
+.rd-sky { position: absolute; inset: 0; background:
+  linear-gradient(180deg, #f2d9a6 0%, #f6dd9c 25%, #f4cf7e 45%, #eeba5c 60%, #e3a548 70%, #d79a44 100%); }
+.rd-haze { position: absolute; inset: 0; background:
+  radial-gradient(60% 25% at 30% 30%, rgba(255, 246, 220, .55), transparent 70%),
+  radial-gradient(70% 20% at 60% 52%, rgba(255, 236, 190, .5), transparent 70%),
+  radial-gradient(50% 18% at 20% 58%, rgba(250, 220, 160, .45), transparent 70%);
+  filter: blur(8px); animation: rd-haze 40s ease-in-out infinite alternate; }
+@keyframes rd-haze { from { transform: translateX(-4%); } to { transform: translateX(4%); } }
+.rd-cloud { position: absolute; border-radius: 50%; filter: blur(9px); }
+.rd-cloud.big { right: -8cqw; top: 15cqh; width: 70cqw; height: 16cqh; background:
+  radial-gradient(35% 55% at 30% 55%, #fffaf0 0 40%, transparent 72%),
+  radial-gradient(30% 60% at 55% 40%, #fffcf4 0 45%, transparent 75%),
+  radial-gradient(35% 50% at 78% 60%, #fff6e4 0 38%, transparent 72%),
+  radial-gradient(60% 40% at 50% 85%, rgba(250, 226, 180, .9), transparent 75%);
+  animation: rd-cloud 60s ease-in-out infinite alternate; }
+.rd-cloud.small { left: 18cqw; top: 8cqh; width: 40cqw; height: 8cqh; opacity: .6; background:
+  radial-gradient(50% 60% at 40% 50%, #fff8ea, transparent 75%); animation: rd-cloud 48s ease-in-out infinite alternate-reverse; }
+@keyframes rd-cloud { from { transform: translateX(-5cqw); } to { transform: translateX(4cqw); } }
+.rd-sun { position: absolute; left: 14cqw; top: 24cqh; width: 75cqw; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%;
+  background: radial-gradient(circle, #fffef6 0 18%, rgba(255, 246, 210, .85) 34%, rgba(255, 228, 160, .35) 58%, transparent 72%);
+  animation: rd-bloom 7s ease-in-out infinite alternate; }
+@keyframes rd-bloom { from { opacity: .85; transform: translate(-50%, -50%) scale(.96); } to { opacity: 1; transform: translate(-50%, -50%) scale(1.04); } }
+.rd-beam { position: absolute; left: 12cqw; top: 22cqh; width: 120cqw; height: 26cqh; transform-origin: 0 0; transform: rotate(14deg);
+  background: linear-gradient(180deg, transparent, rgba(255, 248, 225, .32) 35%, rgba(255, 248, 225, .18) 55%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, #000, transparent 85%); mask-image: linear-gradient(90deg, #000, transparent 85%);
+  filter: blur(6px); animation: rd-beam 9s ease-in-out infinite alternate; }
+@keyframes rd-beam { from { opacity: .55; } to { opacity: 1; } }
+.rd-field { position: absolute; left: 0; right: 0; bottom: 0; height: 40cqh; background:
+  linear-gradient(180deg, rgba(255, 236, 190, 0), rgba(255, 238, 196, .95) 4%, #ecbd6c 12%, #d99a43 35%, #c98634 70%, #b97a2e 100%); filter: blur(1.5px); }
+.rd-grass { position: absolute; left: 0; width: 100%; bottom: 0; }
+.rd-grass.far { height: 34cqh; fill: #b97d30; filter: blur(.5px); opacity: .85; }
+.rd-grass.far .lit { fill: #f3cd7a; }
+.rd-grass.near { height: 22cqh; fill: #a96f27; filter: blur(1.4px); }
+.rd-grass.near .lit { fill: #dca350; }
+.rd-wave { transform-box: fill-box; transform-origin: 50% 100%; animation: rd-wave 5.5s ease-in-out infinite alternate; }
+.rd-wave.near { animation-duration: 4.2s; animation-delay: -1.5s; }
+@keyframes rd-wave { from { transform: skewX(-3deg); } to { transform: skewX(3.5deg); } }
+/* the close trunk on the left, soft with distance-of-field, rim-lit by the sun */
+.rd-trunk { position: absolute; left: -2cqw; top: -2cqh; bottom: -2cqh; width: 11cqw; filter: blur(2.2px);
+  background: linear-gradient(90deg, #2a1f14 0%, #3a2b1a 55%, #6b4a26 82%, rgba(214, 160, 80, .6) 100%);
+  border-radius: 0 40% 0 0 / 0 6% 0 0; }
+.rd-trunk i { position: absolute; inset: 0; background: repeating-linear-gradient(180deg, transparent 0 22px, rgba(0, 0, 0, .12) 22px 26px); mix-blend-mode: multiply; }
+.rd-canopy { position: absolute; left: -2%; top: -3cqh; width: 104%; height: auto; filter: blur(1.3px); }
+.rd-rustle { transform-box: view-box; transform-origin: 50% 0; animation: rd-rustle 6s ease-in-out infinite alternate; }
+@keyframes rd-rustle { from { transform: rotate(-.6deg) translateY(0); } to { transform: rotate(.7deg) translateY(1.5px); } }
+.rd-sparks { position: absolute; inset: 0; }
+.rd-sparks i { position: absolute; border-radius: 50%; background: #fffbe6; box-shadow: 0 0 6px 2px rgba(255, 240, 200, .85); opacity: 0; animation: rd-spark ease-in-out infinite; }
+@keyframes rd-spark { 0% { transform: translate(0, 0); opacity: 0; } 25% { opacity: .95; } 75% { opacity: .5; } 100% { transform: translate(10cqw, -16cqh); opacity: 0; } }
+.rd-leaves { position: absolute; inset: 0; }
+.rd-leaf { position: absolute; width: 0; height: 0; animation: rd-blow linear infinite; }
+.rd-leaf i { position: absolute; border-radius: 0 100% 0 100%; background: #8a6a36; animation: rd-tumble ease-in-out infinite alternate; filter: blur(.3px); }
+.rd-leaf i.dark { background: #3e3420; }
+@keyframes rd-blow {
+  0% { transform: translate(0, 0); opacity: 0; }
+  6% { opacity: .9; }
+  35% { transform: translate(34cqw, calc(var(--drop) * .25)); }
+  60% { transform: translate(62cqw, calc(var(--drop) * .7)); }
+  85% { transform: translate(90cqw, calc(var(--drop) * .6)); opacity: .9; }
+  100% { transform: translate(115cqw, var(--drop)); opacity: 0; }
+}
+@keyframes rd-tumble { from { rotate: -50deg; scale: 1 1; } to { rotate: 230deg; scale: 1 -.35; } }
+.rd-grade { position: absolute; inset: 0; background:
+  radial-gradient(130% 90% at 25% 25%, transparent 50%, rgba(120, 80, 25, .22)),
+  linear-gradient(180deg, rgba(255, 240, 210, .12), transparent 40%); }
+@media (prefers-reduced-motion: reduce) { .redemption-scene * { animation: none !important; } }
+
+/* warm frosted glass over the field */
+:root[data-skin="redemption"] .page[aria-label="Page A"] .btn:not(.empty),
+.theme-art[data-skin="redemption"] .mini-dot {
+  background: rgba(255, 249, 236, .42);
+  -webkit-backdrop-filter: blur(12px) saturate(1.3); backdrop-filter: blur(12px) saturate(1.3);
+  border: 1px solid rgba(255, 255, 255, .55);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .85), inset 0 -10px 22px -14px rgba(217, 134, 28, .4), 0 14px 30px -12px rgba(120, 70, 20, .4);
+}
+:root[data-skin="redemption"] .page[aria-label="Page A"] .dot.empty { border-color: rgba(80, 50, 15, .25); }
+
