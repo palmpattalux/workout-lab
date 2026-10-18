@@ -1,13 +1,14 @@
 import { MangaBattle } from '../components/MangaScene'
 import { SummitClimb } from '../components/SummitScene'
-import { useSkin } from '../lib/theme'
+import { useSkin, usePreview } from '../lib/theme'
+import SessionTray from '../components/SessionTray'
 import { useEffect, useRef, useState } from 'react'
 import { Icon, WorkoutMark } from '../components/icons'
 import HoldPicker from '../components/HoldPicker'
 import HoldMenu from '../components/HoldMenu'
 import NumberPrompt from '../components/NumberPrompt'
 import { updateWorkout, usePresets, addNote, type Workout } from '../lib/store'
-import { useSession, switchTo, goToSet, record, recordAt, recordMove, endSession, discardSession } from '../lib/session'
+import { useSession, switchTo, goToSet, record, recordAt, recordMove, endSession, discardSession, removeFromSession } from '../lib/session'
 import { useTimer, startTimer, stopTimer, timerState } from '../lib/timer'
 import { sound } from '../lib/sound'
 import { t } from '../lib/i18n'
@@ -47,8 +48,10 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
   const id = workout?.id ?? null
 
   // While a session is running, whatever exercise is on screen is part of it.
+  // (except an exercise just taken out of the session, while the page moves off it)
+  const removed = useRef<string | null>(null)
   useEffect(() => {
-    if (session && id && session.current !== id) switchTo(id)
+    if (session && id && session.current !== id && removed.current !== id) switchTo(id)
   }, [session, id])
 
   const inSession = !!session && !!id && session.current === id
@@ -59,7 +62,11 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
   const doneSessions = useSessions()
   const firstSession = !!guest && doneSessions.length === 0
   const preset = session?.preset ? presets.find((p) => p.id === session.preset) : undefined
-  const set = inSession ? session.setOf[id] ?? 1 : 1
+  // Trying a theme on: the set arrows still move (nothing is saved), so the theme's
+  // page B animation can be seen. Sets loop, as if moving on to the next exercise.
+  const trying = !!usePreview() && !inSession
+  const [demo, setDemo] = useState(0)
+  const set = inSession ? session.setOf[id] ?? 1 : trying ? (demo % setCap) + 1 : 1
   const entry = inSession ? session.sets[id]?.[String(set)] : undefined
 
   // Outside a session values are only shown, not documented.
@@ -141,9 +148,9 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
 
   return (
     <main className="page" aria-label="Page B">
-      {skin === 'manga' && inSession && <MangaBattle set={set} />}
+      {skin === 'manga' && (inSession || trying) && <MangaBattle set={trying ? demo + 1 : set} />}
       {/* To the Top: every set moved on, across the whole session, is a step up the mountain */}
-      {skin === 'summit' && inSession && <SummitClimb steps={Object.values(session.setOf).reduce((a, n) => a + Math.max(0, n - 1), 0)} />}
+      {skin === 'summit' && (inSession || trying) && <SummitClimb steps={trying ? demo : Object.values(session!.setOf).reduce((a, n) => a + Math.max(0, n - 1), 0)} />}
       <div className="tabs">
         <button className={`btn pill${session ? ' live' : ''}${endHint ? ' holo-target' : ''}`} id="b1" aria-label={session ? t('Active session: tap to end') : t('Active')} onClick={() => session && setConfirmEnd(true)}>
           <span className="led" />{t('Active')}
@@ -181,7 +188,8 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
         <p className="focus-reminder"><span>{t('Focus')}</span>{workout.focus}</p>
       )}
 
-      {/* set number, only while a session is running */}
+      {/* set number, only while a session is running (or a theme is being tried on) */}
+      {trying && <span className="set-num" aria-label={`Set ${set}`}><small>{t('set')}</small>{set}</span>}
       {inSession && (
         <>
           <button className="set-num" aria-label={`Set ${set}, tap to choose`} aria-expanded={setsOpen} onClick={() => setSetsOpen(!setsOpen)}>
@@ -202,14 +210,14 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
         </>
       )}
 
-      {inSession && set > 1 && (
-        <button className="btn circle big" style={{ left: '14.9%', top: '43.2%' }} aria-label={t('Previous set')} onClick={() => goToSet(set - 1)}>
+      {((inSession && set > 1) || (trying && demo > 0)) && (
+        <button className={`btn circle big${trying ? ' try-step' : ''}`} style={{ left: '14.9%', top: '43.2%' }} aria-label={t('Previous set')} onClick={() => (trying ? setDemo(demo - 1) : goToSet(set - 1))}>
           <Icon name="arrowLeft" />
         </button>
       )}
-      {set < setCap && (
-        <button className={`btn circle big${startPulse ? ' start-pulse' : ''}`} style={{ left: '85.1%', top: '43.2%' }} aria-label={t('Next set')}
-          onClick={() => { if (inSession) goToSet(set + 1) }}>
+      {(set < setCap || trying) && (
+        <button className={`btn circle big${startPulse ? ' start-pulse' : ''}${trying ? ' try-step' : ''}`} style={{ left: '85.1%', top: '43.2%' }} aria-label={t('Next set')}
+          onClick={() => { if (trying) setDemo(demo + 1); else if (inSession) goToSet(set + 1) }}>
           <Icon name="arrowRight" />
         </button>
       )}
@@ -320,6 +328,16 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
           </span>
         )}
       </HoldMenu>
+
+      {/* the exercises already in this session: tap to go back to one, or take out a wrong one */}
+      {inSession && session.order.length > 1 && (
+        <SessionTray
+          items={session.order.map((wid) => workouts.find((w) => w.id === wid)).filter((w): w is Workout => !!w)}
+          current={id}
+          onGo={(wid) => { switchTo(wid); onGo(wid) }}
+          onRemove={(wid) => { removed.current = wid; const next = removeFromSession(wid); if (next && next !== id) onGo(next) }}
+        />
+      )}
     </main>
   )
 }

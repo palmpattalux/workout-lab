@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react'
-import { stopTimer } from './timer'
+import { stopTimer, getTimer } from './timer'
 import { saveSession, getWorkouts, getPresets, onScopeChange, scopedKey, type Session, type SetEntry } from './store'
 
 // The active session, if any. Kept in this browser so a reload doesn't lose it;
@@ -53,6 +53,20 @@ export function recordAt(w: string, setNum: number, change: Partial<SetEntry>) {
   const n = String(setNum)
   const entry: SetEntry = Object.assign({ reps: null, weight: null }, active.sets[w]?.[n], change)
   set({ ...active, sets: { ...active.sets, [w]: { ...active.sets[w], [n]: entry } } })
+}
+
+// Take an exercise out of the running session (picked by mistake): its sets go with it,
+// so nothing of it is saved. Returns the exercise to show next when it was the current one.
+export function removeFromSession(workoutId: string): string | null {
+  if (!active || !active.order.includes(workoutId)) return null
+  const order = active.order.filter((w) => w !== workoutId)
+  if (order.length === 0) return null
+  const { [workoutId]: _s, ...setOf } = active.setOf
+  const { [workoutId]: _e, ...sets } = active.sets
+  if (getTimer()?.workoutId === workoutId) stopTimer()
+  const current = active.current === workoutId ? order[order.length - 1] : active.current
+  set({ ...active, order, setOf, sets, current })
+  return current
 }
 
 export function endSession(): string | null {

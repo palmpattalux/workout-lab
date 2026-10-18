@@ -1718,3 +1718,20 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 @keyframes start-pulse { 0% { box-shadow: var(--lift), 0 0 0 0 color-mix(in srgb, var(--active) 45%, transparent); } 45% { box-shadow: var(--lift), 0 0 0 10px color-mix(in srgb, var(--active) 18%, transparent); } 100% { box-shadow: var(--lift), 0 0 0 16px transparent; } }
 .ex-name { text-align: left; align-items: flex-start; }
 .dot.add.hint-hidden { opacity: 0; transition: opacity .15s; }
+
+/* page B: exercises already in the session, stacked in a small button */
+.tray { color: var(--ink); }
+.tray-stack { display: grid; gap: 1px; justify-items: center; font-size: .72rem; line-height: 1; }
+.tray-stack > span { display: block; }
+.tray-stack > span:not(:last-child) { opacity: .5; }
+.tray-stack.n3 { font-size: .64rem; }
+.tray-count {
+  position: absolute; top: -2px; right: -2px; min-width: 19px; height: 19px; padding: 0 5px; border-radius: 999px;
+  display: grid; place-items: center; background: var(--active); color: var(--surface); font: 800 .66rem var(--num); font-style: normal;
+}
+.menu-list.tray-list { transform: none; width: min(70cqw, 290px); }
+.tray-head { padding: 8px 12px 4px; font: 700 .68rem var(--font); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.tray-row { display: flex; align-items: center; gap: 4px; }
+.tray-row > button:first-child { flex: 1; min-width: 0; }
+.menu-list .tray-remove { flex: none; width: 38px; height: 38px; padding: 0; justify-content: center; border-radius: 50%; color: var(--muted); }
+.menu-list .tray-remove.sure { width: auto; padding: 0 12px; border-radius: 999px; color: #fff; background: #d9480f; font-size: .8rem; }
