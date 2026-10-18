@@ -21,6 +21,7 @@ export type Workout = {
   group?: string          // workouts sharing a group id sit together in one bubble on page A
   color?: string          // a soft tint for its icon on page A (key in TINTS), to tell exercises apart
   sided?: boolean         // done one side at a time: each set has a Left and a Right (page B set menu)
+  first?: 'L' | 'R'       // which side comes first in each set (Left unless chosen)
   createdAt: number
 }
 

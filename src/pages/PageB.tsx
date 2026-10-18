@@ -67,12 +67,14 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
   const trying = !!usePreview() && !inSession
   const [demo, setDemo] = useState(0)
   const set = inSession ? session.setOf[id] ?? 1 : trying ? (demo % setCap) + 1 : 1
-  // one side at a time: each set is done Left, then Right (the right arrow goes to the other side first)
-  const sided = inSession && !!workout?.sided
-  const side = sided ? session.side?.[id] ?? 'L' : undefined
+  // one side at a time: each set is done on one side, then the other (the right arrow goes to
+  // the other side first). `first` is the side each set starts on: Left unless Right was chosen.
+  const first = inSession && workout?.sided ? workout.first ?? 'L' : undefined
+  const second = first && (first === 'L' ? 'R' : 'L')
+  const side = first ? session!.side?.[id!] ?? first : undefined
   const key = setKey(set, side)
-  // the set before this one: same set's Left when on Right, else the last set (its Right side)
-  const prevKey = side === 'R' ? setKey(set, 'L') : setKey(set - 1, side && 'R')
+  // the set before this one: this set's first side when on the second, else the last set's second side
+  const prevKey = side && side === second ? setKey(set, first) : setKey(set - 1, second)
   const entry = inSession ? session.sets[id]?.[key] : undefined
 
   // Outside a session values are only shown, not documented.
@@ -215,24 +217,28 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
                   onClick={() => { goToSet(n); setSetsOpen(false) }}>{n}</button>
               ))}
               {/* one side at a time (a single arm or leg): each set gets a Left and a Right */}
-              <button className={`side-toggle${workout?.sided ? ' on' : ''}`} role="switch" aria-checked={!!workout?.sided} aria-label={t('One side at a time')}
-                onClick={() => { setSided(id!, !workout?.sided); setSetsOpen(false) }}>
-                <span>{t('L')}</span><i /><span>{t('R')}</span>
+              {/* tap to cycle: off, Left first (L|R), Right first (R|L), off */}
+              <button className={`side-toggle${workout?.sided ? ' on' : ''}`} role="switch" aria-checked={!!workout?.sided}
+                aria-label={`${t('One side at a time')}${workout?.sided ? `: ${workout.first === 'R' ? t('Right first') : t('Left first')}` : ''}`}
+                onClick={() => { setSided(id!, !workout?.sided ? 'L' : (workout.first ?? 'L') === 'L' ? 'R' : null); setSetsOpen(false) }}>
+                {workout?.sided && workout.first === 'R'
+                  ? <><span>{t('R')}</span><i /><span>{t('L')}</span></>
+                  : <><span>{t('L')}</span><i /><span>{t('R')}</span></>}
               </button>
             </div>
           )}
         </>
       )}
 
-      {((inSession && (set > 1 || side === 'R')) || (trying && demo > 0)) && (
-        <button className={`btn circle big${trying ? ' try-step' : ''}`} style={{ left: '14.9%', top: '43.2%' }} aria-label={side === 'R' ? t('Other side') : t('Previous set')}
-          onClick={() => (trying ? setDemo(demo - 1) : side === 'R' ? goToSet(set, 'L') : goToSet(set - 1, side && 'R'))}>
+      {((inSession && (set > 1 || (!!side && side === second))) || (trying && demo > 0)) && (
+        <button className={`btn circle big${trying ? ' try-step' : ''}`} style={{ left: '14.9%', top: '43.2%' }} aria-label={side && side === second ? t('Other side') : t('Previous set')}
+          onClick={() => (trying ? setDemo(demo - 1) : side && side === second ? goToSet(set, first) : goToSet(set - 1, second))}>
           <Icon name="arrowLeft" />
         </button>
       )}
-      {(set < setCap || side === 'L' || trying) && (
-        <button className={`btn circle big${startPulse ? ' start-pulse' : ''}${trying ? ' try-step' : ''}`} style={{ left: '85.1%', top: '43.2%' }} aria-label={side === 'L' ? t('Next side') : t('Next set')}
-          onClick={() => { if (trying) setDemo(demo + 1); else if (side === 'L') goToSet(set, 'R'); else if (inSession) goToSet(set + 1) }}>
+      {(set < setCap || (!!side && side === first) || trying) && (
+        <button className={`btn circle big${startPulse ? ' start-pulse' : ''}${trying ? ' try-step' : ''}`} style={{ left: '85.1%', top: '43.2%' }} aria-label={side && side === first ? t('Next side') : t('Next set')}
+          onClick={() => { if (trying) setDemo(demo + 1); else if (side && side === first) goToSet(set, second); else if (inSession) goToSet(set + 1) }}>
           <Icon name="arrowRight" />
         </button>
       )}

@@ -33,35 +33,43 @@ export function switchTo(workoutId: string, preset?: string) {
   })
 }
 
-// One side at a time (workout.sided): each set is done Left, then Right, saved as "2L" and "2R".
+// One side at a time (workout.sided): each set is done on both sides, saved as "2L" and "2R".
+// workout.first says which side comes first (Left unless Right was chosen).
 export const setKey = (n: number, side?: 'L' | 'R') => side ? `${n}${side}` : String(n)
 export const keyNum = (key: string) => parseInt(key, 10)
 export const keySide = (key: string): 'L' | 'R' | undefined => key.endsWith('L') ? 'L' : key.endsWith('R') ? 'R' : undefined
-const sided = (wid: string) => !!getWorkouts().find((w) => w.id === wid)?.sided
+const firstSide = (wid: string) => { const w = getWorkouts().find((x) => x.id === wid); return w?.sided ? w.first ?? 'L' : undefined }
 // the key the current exercise is writing to
 function currentKey(s: Session) {
   const n = s.setOf[s.current] ?? 1
-  return sided(s.current) ? setKey(n, s.side?.[s.current] ?? 'L') : String(n)
+  const first = firstSide(s.current)
+  return first ? setKey(n, s.side?.[s.current] ?? first) : String(n)
 }
 
-// side: which side to show (one-side-at-a-time workouts); a set picked from the menu starts on Left
-export function goToSet(n: number, side: 'L' | 'R' = 'L') {
+// side: which side to show (one-side-at-a-time workouts); a set picked from the menu starts on the first side
+export function goToSet(n: number, side?: 'L' | 'R') {
   if (!active) return
+  side ??= firstSide(active.current) ?? 'L'
   set({ ...active, setOf: { ...active.setOf, [active.current]: n }, side: { ...active.side, [active.current]: side } })
 }
 
 // Turn one side at a time on or off for an exercise. Sets already done in this session
 // move with it (on: "2" becomes "2L"; off: "2L" becomes "2"), and nothing is lost.
-export function setSided(workoutId: string, on: boolean) {
-  updateWorkout(workoutId, { sided: on })
-  if (!active?.sets[workoutId]) return
+// first: the side to start each set on (picking it again just changes the order).
+export function setSided(workoutId: string, first: 'L' | 'R' | null) {
+  const on = !!first
+  const wasOn = !!getWorkouts().find((w) => w.id === workoutId)?.sided
+  updateWorkout(workoutId, { sided: on, first: first ?? undefined })
+  if (!active) return
+  if (on && wasOn) { set({ ...active, side: { ...active.side, [workoutId]: first! } }); return }
+  if (!active.sets[workoutId]) { set({ ...active, side: { ...active.side, [workoutId]: first ?? 'L' } }); return }
   const moved: Record<string, SetEntry> = {}
   for (const [k, e] of Object.entries(active.sets[workoutId])) {
     const n = keyNum(k)
-    const to = on ? (keySide(k) ? k : setKey(n, 'L')) : keySide(k) === 'L' && !active.sets[workoutId][String(n)] ? String(n) : k
+    const to = on ? (keySide(k) ? k : setKey(n, first!)) : keySide(k) === 'L' && !active.sets[workoutId][String(n)] ? String(n) : k
     moved[to] = e
   }
-  set({ ...active, sets: { ...active.sets, [workoutId]: moved }, side: { ...active.side, [workoutId]: 'L' } })
+  set({ ...active, sets: { ...active.sets, [workoutId]: moved }, side: { ...active.side, [workoutId]: first ?? 'L' } })
 }
 
 export function record(field: 'reps' | 'weight', value: number) {

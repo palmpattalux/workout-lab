@@ -138,6 +138,8 @@ const ROWS: [string, string, string, string][] = [
   ['R', 'ข', '右', '右'],
   ['One side at a time', 'ทีละข้าง', '片側ずつ', '单侧交替'],
   ['Next side', 'ข้างถัดไป', '反対側へ', '换另一侧'],
+  ['Left first', 'เริ่มข้างซ้าย', '左から', '先左侧'],
+  ['Right first', 'เริ่มข้างขวา', '右から', '先右侧'],
   ['Other side', 'อีกข้าง', '反対側', '另一侧'],
   ['New move', 'ท่าใหม่', '新しい動き', '新动作'],
   // create / edit
