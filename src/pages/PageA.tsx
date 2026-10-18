@@ -290,6 +290,7 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
     sound.tap()
   }
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [moreOpen, setMoreOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false) // flags stay folded until the arrow is tapped
   const lastTap = useRef(0)
   // While an icon is picked, a double tap on "+" or a press anywhere else means "never mind".
@@ -505,6 +506,13 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
         </div>
       )}
 
+      {/* a session is still running: say so, and tap to get back to it */}
+      {live && !picking && (
+        <button className="btn pill live-chip" onClick={() => openDot(live.current)} aria-label={t('Session active: tap to go back to it')}>
+          <span className="led" />{t('Session active')}
+        </button>
+      )}
+
       {settingsOpen && (
         <div className="settings" role="dialog" aria-label={t('Settings')}>
           <h2>{t('Appearance')}</h2>
@@ -536,25 +544,34 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
             <span>{t('Themes')}</span>
             <span className="chev"><Icon name="back" size="18px" /></span>
           </button>
-          <button className="set-row themes-link credits-link" onClick={() => { setSettingsOpen(false); location.hash = 'licenses' }}>
-            <span>{t('Open-source licences')}</span>
+          {/* Settings: the rarely used things, folded away */}
+          <button className={`set-row themes-link lang-toggle more-toggle${moreOpen ? ' open' : ''}`} aria-expanded={moreOpen} onClick={() => setMoreOpen(!moreOpen)}>
+            <span>{t('Settings')}</span>
             <span className="chev"><Icon name="back" size="18px" /></span>
           </button>
+          {moreOpen && (
+            <div className="set-more">
+              {!guest && canResetPassword && <button className="set-row themes-link" onClick={() => { setSettingsOpen(false); location.hash = 'password' }}>
+                <span>{t('Change password')}</span>
+                <span className="chev"><Icon name="back" size="18px" /></span>
+              </button>}
+              <button className="set-row themes-link credits-link" onClick={() => { setSettingsOpen(false); location.hash = 'licenses' }}>
+                <span>{t('Open-source licences')}</span>
+                <span className="chev"><Icon name="back" size="18px" /></span>
+              </button>
+            </div>
+          )}
           {guest ? (
             <div className="set-row account">
               <span className="who">{t('Not signed in')}</span>
               <button className="logout-btn signup-btn" onClick={() => { setSettingsOpen(false); location.hash = 'signup' }}>{t('Sign up or log in')}</button>
             </div>
-          ) : (<>
-            {canResetPassword && <button className="set-row themes-link" onClick={() => { setSettingsOpen(false); location.hash = 'password' }}>
-              <span>{t('Change password')}</span>
-              <span className="chev"><Icon name="back" size="18px" /></span>
-            </button>}
+          ) : (
             <div className="set-row account">
               <span className="who">{email ?? t('Signed in')}</span>
               <button className="logout-btn" onClick={() => { setSettingsOpen(false); signOut() }}>{t('Log out')}</button>
             </div>
-          </>)}
+          )}
         </div>
       )}
 

@@ -1197,7 +1197,7 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 @media (prefers-reduced-motion: reduce) { .holo-hand, .holo-ring, .holo-pick, #b1.holo-target, .new-dot { animation-duration: 3s; } }
 
 /* gear > open-source licences */
-.settings .credits-link span:first-child { color: var(--muted); font-weight: 500; font-size: .85rem; }
+.settings .credits-link span:first-child { color: var(--ink); }
 .licence-text { margin: 14px 5.7% 40px; padding: 16px; border-radius: 18px; background: var(--surface); border: 1px solid var(--hair); color: var(--ink); font: 500 .72rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; overflow-wrap: anywhere; user-select: text; -webkit-user-select: text; }
 
 /* ---------- Manga theme: black ink on paper. Light = white page, dark = inverted page ----------
@@ -1568,3 +1568,14 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .ruler-extra.on small { color: inherit; }
 .reps.timing { background: var(--active-soft); color: var(--active); }
 .reps.timing .val svg { margin-right: 2px; vertical-align: -1px; }
+
+/* gear > Settings: folded rows (change password, licences) */
+.set-more { display: flex; flex-direction: column; gap: 10px; padding-left: 12px; border-left: 2px solid var(--hair); margin-left: 2px; animation: lang-in .25s var(--ease) both; }
+.set-more .set-row { font-size: .9rem; }
+/* home: a session is still running */
+.live-chip {
+  position: absolute; left: 5.7%; top: calc(18px + env(safe-area-inset-top)); transform: none; z-index: 3; height: 34px; padding: 0 14px;
+  display: flex; align-items: center; gap: 8px; font: 700 .82rem var(--font);
+  background: var(--active-soft); color: var(--active); border: 1px solid color-mix(in srgb, var(--active) 25%, transparent);
+}
+.live-chip .led { width: 7px; height: 7px; border-radius: 50%; background: var(--active); animation: led 2s ease-in-out infinite; }
