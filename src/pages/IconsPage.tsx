@@ -95,7 +95,7 @@ export default function IconsPage() {
         <div className="pack-buy">
           <span className="owned-tag">{t('{price} · yours to keep', { price })}</span>
           {canPay
-            ? <button className="theme-view" onClick={() => { sound.tap(); location.hash = 'checkout-theme-' + PACK_ITEM[look as 'tokyo'] }}>{t('Buy {price}', { price })}</button>
+            ? <button className="theme-view" onClick={() => { sound.tap(); location.hash = 'checkout-theme-' + PACK_ITEM[look as 'tokyo'] }}>{t('Get {price}', { price })}</button>
             : <button className="theme-view" disabled>{t('Coming soon')}</button>}
           <button className="theme-plan-link" onClick={() => { location.hash = 'plans' }}>{t('Or get it free with {plan}', { plan: t('Premium') })}</button>
         </div>

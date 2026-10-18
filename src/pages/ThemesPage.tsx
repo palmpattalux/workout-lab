@@ -152,7 +152,7 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
                 ? <button className="theme-view on" onClick={() => setPreview(null)}>{t('Stop trying')}</button>
                 : <button className="theme-view on" onClick={() => { setPreview(theme.key); sound.pop(); onViewed() }}>{t('Try on')}</button>}
               {canPay
-                ? <button className="theme-view" onClick={() => buy(theme.key)}>{t('Buy {price}', { price })}</button>
+                ? <button className="theme-view" onClick={() => buy(theme.key)}>{t('Get {price}', { price })}</button>
                 : <button className="theme-view" disabled>{t('Coming soon')}</button>}
             </div>
             <button className="theme-plan-link" onClick={() => { setPreview(null); location.hash = 'plans' }}>{t('Or get it free with {plan}', { plan: theme.tier === 'exclusive' ? t('Exclusive') : t('Premium') })}</button>
