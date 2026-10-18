@@ -23,6 +23,7 @@ const ui = {
   lock: <><rect x="5" y="10.5" width="14" height="10" rx="2.5" /><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3" /></>,
   close: <path d="M6 6l12 12M18 6 6 18" />,
   swipe: <><path d="M14 7l5 5-5 5" /><path d="M5 12h14" /></>,
+  stopwatch: <><circle cx="12" cy="13.5" r="7" /><path d="M12 13.5V9.5M10 3h4M12 3v3.5M18 6.5l1.5-1.5" /></>,
   share: <><path d="M12 15V3.5M7.5 8 12 3.5 16.5 8" /><path d="M5.5 11.5v7a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-7" /></>,
   save: <><path d="M12 3.5V15M7.5 10.5 12 15l4.5-4.5" /><path d="M4.5 19.5h15" /></>,
   eye: <><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" /><circle cx="12" cy="12" r="3" /></>,

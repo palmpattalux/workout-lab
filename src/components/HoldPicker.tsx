@@ -14,9 +14,10 @@ export type PickerOption = { key: string; node: ReactNode; label?: string }
 //
 // `visible` shows only that many options at once. Holding the finger at the top
 // of the line keeps scrolling to higher options; at the bottom, back down.
-export default function HoldPicker({ options, visible, start = 0, side = 'above', instant, onTap, onPick, onChange, maxStep, className, style, ariaLabel, children }: {
+export default function HoldPicker({ options, visible, extra, start = 0, side = 'above', instant, onTap, onPick, onChange, maxStep, className, style, ariaLabel, children }: {
   options: PickerOption[]
   visible?: number
+  extra?: { node: ReactNode; label: string; onPick: () => void } // a target left of the line: slide onto it and let go
   start?: number // option the line opens on (e.g. the weight already set), so long lists don't start from the bottom
   side?: 'above' | 'left' // 'left' for buttons near the top of the screen
   instant?: boolean // open as soon as the finger drags up, no hold
@@ -38,6 +39,9 @@ export default function HoldPicker({ options, visible, start = 0, side = 'above'
   const [local, setLocal] = useState(0)
   const pos = useRef({ offset: 0, local: 0 })
   const base = useRef(0)
+  const pageLeft = useRef(0)
+  const [onExtra, setOnExtra] = useState(false)
+  const extraRef = useRef(false)
   const total = options.length
   const shown = Math.min(visible ?? total, total)
 
@@ -57,6 +61,9 @@ export default function HoldPicker({ options, visible, start = 0, side = 'above'
   function open() {
     const el = btn.current!
     const page = el.offsetParent!.getBoundingClientRect()
+    pageLeft.current = page.left
+    extraRef.current = false
+    setOnExtra(false)
     const r = el.getBoundingClientRect()
     if (side === 'left') {
       // line sits beside the button, option 1 level with its center
@@ -105,6 +112,12 @@ export default function HoldPicker({ options, visible, start = 0, side = 'above'
       if (timer.current && Math.abs(e.clientY - startY.current) > 12) cancel()
       return
     }
+    // slid left, past the line, onto the extra target
+    if (extra) {
+      const over = e.clientX - pageLeft.current < ruler.left - 6
+      if (over !== extraRef.current) { extraRef.current = over; setOnExtra(over); if (over) sound.tick() }
+      if (over) { stopScroll(); return }
+    }
     const raw = base.current + (startY.current - e.clientY) / ruler.step
     const l = Math.max(0, Math.min(shown - 1, Math.round(raw)))
     if (l !== pos.current.local) update(pos.current.offset, l)
@@ -123,7 +136,9 @@ export default function HoldPicker({ options, visible, start = 0, side = 'above'
   function release() {
     const picked = ruler ? pos.current.offset + pos.current.local : null
     const held = !!timer.current
+    const toExtra = !!ruler && extraRef.current
     cancel()
+    if (toExtra) { if (getPreview()) previewBlocked(); else extra?.onPick(); return }
     // trying a theme on: the drag can be felt, but nothing is set
     if (getPreview()) { if (picked !== null) previewBlocked(); return }
     if (picked !== null) onPick(picked)
@@ -156,8 +171,13 @@ export default function HoldPicker({ options, visible, start = 0, side = 'above'
             <span key={o.key} className={i === local ? 'on' : undefined}>{o.node}</span>
           ))}
           <div className="fill" style={{ height: (local + 1) * ruler.step }} />
-          {label && (
+          {label && !onExtra && (
             <div className={`tag${side === 'left' ? ' left' : ''}`} style={{ bottom: (local + 0.5) * ruler.step }}>{label}</div>
+          )}
+          {extra && (
+            <div className={`ruler-extra${onExtra ? ' on' : ''}`}>
+              {extra.node}<small>{extra.label}</small>
+            </div>
           )}
         </div>
       )}

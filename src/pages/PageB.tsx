@@ -5,20 +5,22 @@ import { useEffect, useState } from 'react'
 import { Icon, WorkoutMark } from '../components/icons'
 import HoldPicker from '../components/HoldPicker'
 import HoldMenu from '../components/HoldMenu'
+import NumberPrompt from '../components/NumberPrompt'
 import { updateWorkout, usePresets, addNote, type Workout } from '../lib/store'
 import { useSession, switchTo, goToSet, record, endSession, discardSession } from '../lib/session'
 import { t } from '../lib/i18n'
 import { usePlan, atLeast, MAX_SETS, FREE_SETS } from '../lib/plan'
 import { useSessions } from '../lib/store'
 
-// Weights as they come in a gym: small dumbbells, then 2.5 kg steps (1.25 kg plates a side)
-// up to 100 kg, then 5 kg; in pounds 2.5 lb steps to 15, then 5 lb steps (2.5 lb plates a side).
+// Weights on the line: whole kilos; in pounds 2.5 lb steps to 15, then 5 lb steps (2.5 lb plates
+// a side). Anything else is typed: tap the button.
 const steps = (from: number, to: number, by: number) => Array.from({ length: Math.round((to - from) / by) + 1 }, (_, i) => from + i * by)
-const LOADS_KG = [1, 2, 2.5, 3, 4, 5, 6, 7, 7.5, 8, 9, ...steps(10, 100, 2.5), ...steps(105, 250, 5)]
+const LOADS_KG = steps(1, 300, 1)
 const LOADS_LB = [...steps(2.5, 15, 2.5), ...steps(20, 500, 5)]
 const repOptions = Array.from({ length: 25 }, (_, i) => ({ key: String(i + 1), node: i + 1 }))
-// timed holds: 5 s steps up to 3 minutes
-const secOptions = Array.from({ length: 36 }, (_, i) => ({ key: String((i + 1) * 5), node: (i + 1) * 5, label: t('{n} sec', { n: (i + 1) * 5 }) }))
+// timed holds: every second from 1 to 60 (45 on the line, scrolling on to 60); longer ones are typed.
+// The line is tight, so only every fifth second is numbered.
+const secOptions = Array.from({ length: 60 }, (_, i) => ({ key: String(i + 1), node: (i + 1) % 5 === 0 || i === 0 ? i + 1 : <i className="tick" />, label: t('{n} sec', { n: i + 1 }) }))
 
 export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded }: {
   guest?: boolean
@@ -65,9 +67,25 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
   const loadStart = near ? loads.reduce((b, n, i) => (Math.abs(n - near) < Math.abs(loads[b] - near) ? i : b), 0) : 0
   const isProgression = workout?.mode === 'progression'
   const timed = isProgression && workout?.count === 'sec'
-  const countValue = (i: number) => (timed ? (i + 1) * 5 : i + 1)
+  const countValue = (i: number) => i + 1
 
   const [setsOpen, setSetsOpen] = useState(false)
+  // typing a number instead of dragging: tap the load or sec button
+  const [typing, setTyping] = useState<'weight' | 'reps' | null>(null)
+  // stopwatch for timed holds: slide onto it from the sec line; tap the button to stop and keep the time
+  const [watch, setWatch] = useState<number | null>(null)
+  const [, tickWatch] = useState(0)
+  useEffect(() => {
+    if (watch === null) return
+    const iv = setInterval(() => tickWatch((n) => n + 1), 250)
+    return () => clearInterval(iv)
+  }, [watch])
+  const watchSecs = watch === null ? 0 : Math.floor((Date.now() - watch) / 1000)
+  function stopWatch() {
+    if (watch === null) return
+    put('reps', Math.max(1, watchSecs))
+    setWatch(null)
+  }
   const [confirmEnd, setConfirmEnd] = useState(false)
   const endHint = firstSession && inSession && set >= 2 && !confirmEnd
   const [adding, setAdding] = useState(false)
@@ -178,6 +196,7 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
           instant
           onChange={(i) => put('weight', loads[i])}
           onPick={(i) => put('weight', loads[i])}
+          onTap={() => setTyping('weight')}
           className="mid load"
           style={{ left: '35.1%', top: '64.1%' }}
           ariaLabel={`Load (B3)${weight ? `: ${weight} ${unit}` : ` in ${unit}`}, drag up to set`}
@@ -188,17 +207,32 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
       <HoldPicker
         key={timed ? 'sec' : 'reps'}
         options={timed ? secOptions : repOptions}
-        visible={timed ? 15 : undefined}
+        visible={timed ? 45 : undefined}
+        start={timed && reps ? Math.min(59, reps - 1) : 0}
         maxStep={20}
         instant
-        onChange={(i) => put('reps', countValue(i))}
-        onPick={(i) => put('reps', countValue(i))}
-        className="mid reps"
+        extra={timed && inSession ? { node: <Icon name="stopwatch" size="22px" />, label: t('Timer'), onPick: () => setWatch(Date.now()) } : undefined}
+        onChange={(i) => { if (watch === null) put('reps', countValue(i)) }}
+        onPick={(i) => { setWatch(null); put('reps', countValue(i)) }}
+        onTap={timed ? () => (watch !== null ? stopWatch() : setTyping('reps')) : undefined}
+        className={`mid reps${timed ? ' dense' : ''}${watch !== null ? ' timing' : ''}`}
         style={{ left: '69%', top: '64.1%' }}
-        ariaLabel={`${timed ? 'Seconds' : 'Reps'} (B4)${reps ? `: ${reps}` : ''}, drag up to set`}
+        ariaLabel={watch !== null ? t('Timer running: tap to stop') : `${timed ? 'Seconds' : 'Reps'} (B4)${reps ? `: ${reps}` : ''}, ${timed ? 'tap to type, ' : ''}drag up to set`}
       >
-        {reps ? <span className="val">{reps}{timed && <small>{t('sec')}</small>}</span> : timed ? <span className="unit-label">{t('sec')}</span> : <Icon name="numbers" />}
+        {watch !== null
+          ? <span className="val"><Icon name="stopwatch" size="14px" />{watchSecs}<small>{t('sec')}</small></span>
+          : reps ? <span className="val">{reps}{timed && <small>{t('sec')}</small>}</span> : timed ? <span className="unit-label">{t('sec')}</span> : <Icon name="numbers" />}
       </HoldPicker>
+      {typing && (
+        <NumberPrompt
+          title={typing === 'weight' ? t('Weight') : t('Seconds')}
+          unit={typing === 'weight' ? unit : t('sec')}
+          value={typing === 'weight' ? weight : reps}
+          decimal={typing === 'weight'}
+          onSave={(n) => { if (typing === 'reps') setWatch(null); put(typing, n) }}
+          onClose={() => setTyping(null)}
+        />
+      )}
 
       {/* pen: hold to pick an exercise and start/continue a session; tap to end the session */}
       <HoldMenu
