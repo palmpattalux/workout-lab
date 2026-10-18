@@ -1719,19 +1719,21 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .ex-name { text-align: left; align-items: flex-start; }
 .dot.add.hint-hidden { opacity: 0; transition: opacity .15s; }
 
-/* page B: exercises already in the session, stacked in a small button */
-.tray { color: var(--ink); }
-.tray-stack { display: grid; gap: 1px; justify-items: center; font-size: .72rem; line-height: 1; }
-.tray-stack > span { display: block; }
-.tray-stack > span:not(:last-child) { opacity: .5; }
-.tray-stack.n3 { font-size: .64rem; }
-.tray-count {
-  position: absolute; top: -2px; right: -2px; min-width: 19px; height: 19px; padding: 0 5px; border-radius: 999px;
-  display: grid; place-items: center; background: var(--active); color: var(--surface); font: 800 .66rem var(--num); font-style: normal;
+/* page B: the session's exercises as a bar of icons under Notes, the current one biggest */
+.session-bar { position: absolute; left: 5.7%; right: 5.7%; top: calc(3.5% + min(11cqw, 6.2cqh) + 12px); z-index: 3; display: flex; align-items: center; gap: 10px; pointer-events: none; }
+.sb-row { display: flex; align-items: center; gap: 6px; padding: 4px; border-radius: 999px; background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--lift); overflow-x: auto; scrollbar-width: none; pointer-events: auto; max-width: 100%; flex: none; }
+.sb-row::-webkit-scrollbar { display: none; }
+.sb-mark {
+  flex: none; width: 34px; height: 34px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; display: grid; place-items: center;
+  background: transparent; color: var(--muted); font-size: .74rem; transition: width .25s var(--ease), height .25s var(--ease), font-size .25s var(--ease), background .2s;
 }
-.menu-list.tray-list { transform: none; width: min(70cqw, 290px); }
-.tray-head { padding: 8px 12px 4px; font: 700 .68rem var(--font); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-.tray-row { display: flex; align-items: center; gap: 4px; }
-.tray-row > button:first-child { flex: 1; min-width: 0; }
-.menu-list .tray-remove { flex: none; width: 38px; height: 38px; padding: 0; justify-content: center; border-radius: 50%; color: var(--muted); }
-.menu-list .tray-remove.sure { width: auto; padding: 0 12px; border-radius: 999px; color: #fff; background: #d9480f; font-size: .8rem; }
+.sb-mark.tinted { color: color-mix(in srgb, var(--tint) 55%, var(--muted)); }
+.sb-mark.on { width: 46px; height: 46px; font-size: .92rem; background: var(--active-soft); color: var(--active); box-shadow: inset 0 0 0 1.5px var(--active); }
+.sb-mark:active { transform: scale(.9); }
+.sb-name { display: flex; align-items: center; gap: 8px; min-width: 0; font: 700 .88rem var(--font); color: var(--ink); pointer-events: auto; }
+.sb-name span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sb-name.flash { animation: sb-flash 2.2s ease both; pointer-events: none; }
+@keyframes sb-flash { 0% { opacity: 0; transform: translateX(-6px); } 12%, 70% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+.sb-name.ask { animation: rise .2s var(--ease); }
+.sb-remove { flex: none; border: 0; border-radius: 999px; padding: 6px 12px; background: #d9480f; color: #fff; font: 700 .78rem var(--font); cursor: pointer; }
+.focus-reminder.below-bar { top: calc(3.5% + min(11cqw, 6.2cqh) + 76px); }

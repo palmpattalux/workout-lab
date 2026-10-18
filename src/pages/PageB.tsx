@@ -1,7 +1,7 @@
 import { MangaBattle } from '../components/MangaScene'
 import { SummitClimb } from '../components/SummitScene'
 import { useSkin, usePreview } from '../lib/theme'
-import SessionTray from '../components/SessionTray'
+import SessionBar from '../components/SessionBar'
 import { useEffect, useRef, useState } from 'react'
 import { Icon, WorkoutMark } from '../components/icons'
 import HoldPicker from '../components/HoldPicker'
@@ -158,6 +158,15 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
         <button className="btn pill" id="b2" aria-label={t('Notes')}
           onClick={() => { const n = addNote({ sessionId: session?.id, workoutId: id ?? undefined }); location.hash = 'note-' + n.id }}>{t('Notes')}</button>
       </div>
+      {/* the exercises already in this session: tap one to go back to it, or take out a wrong one */}
+      {inSession && session.order.length > 1 && (
+        <SessionBar
+          items={session.order.map((wid) => workouts.find((w) => w.id === wid)).filter((w): w is Workout => !!w)}
+          current={id}
+          onGo={(wid) => { switchTo(wid); onGo(wid) }}
+          onRemove={(wid) => { removed.current = wid; const next = removeFromSession(wid); if (next && next !== id) onGo(next) }}
+        />
+      )}
       {preset && <span className="preset-chip"><Icon name="preset" size="14px" strokeWidth={2.2} />{preset.name}</span>}
 
       {endHint && (
@@ -185,7 +194,7 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
       )}
 
       {workout?.focus && (
-        <p className="focus-reminder"><span>{t('Focus')}</span>{workout.focus}</p>
+        <p className={`focus-reminder${inSession && session.order.length > 1 ? ' below-bar' : ''}`}><span>{t('Focus')}</span>{workout.focus}</p>
       )}
 
       {/* set number, only while a session is running (or a theme is being tried on) */}
@@ -329,15 +338,6 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
         )}
       </HoldMenu>
 
-      {/* the exercises already in this session: tap to go back to one, or take out a wrong one */}
-      {inSession && session.order.length > 1 && (
-        <SessionTray
-          items={session.order.map((wid) => workouts.find((w) => w.id === wid)).filter((w): w is Workout => !!w)}
-          current={id}
-          onGo={(wid) => { switchTo(wid); onGo(wid) }}
-          onRemove={(wid) => { removed.current = wid; const next = removeFromSession(wid); if (next && next !== id) onGo(next) }}
-        />
-      )}
     </main>
   )
 }
