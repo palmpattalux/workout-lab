@@ -1729,7 +1729,7 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .session-bar.away * { pointer-events: none !important; }
 .sb-row {
   display: flex; align-items: center; gap: 4px; padding: 4px; border-radius: 999px; max-width: 100%;
-  background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--lift); overflow-x: auto; scrollbar-width: none;
+  background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--lift);
   pointer-events: auto; touch-action: none;
 }
 .sb-row::-webkit-scrollbar { display: none; }
@@ -1739,9 +1739,15 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
   transition: width .25s var(--ease), height .25s var(--ease), font-size .25s var(--ease), background .2s, transform .15s var(--ease);
 }
 .sb-mark.tinted { color: color-mix(in srgb, var(--tint) 55%, var(--muted)); }
-.sb-mark.on { width: 42px; height: 42px; font-size: .88rem; background: var(--sunk); color: var(--ink); }
+.sb-mark { position: relative; }
+/* the shaded circle sits proud of the bar, above and below it */
+.sb-mark.on { width: 40px; height: 36px; font-size: .9rem; color: var(--ink); z-index: 1; }
+.sb-mark.on::before {
+  content: ''; position: absolute; left: 50%; top: 50%; width: 52px; height: 52px; transform: translate(-50%, -50%); z-index: -1;
+  border-radius: 50%; background: var(--sunk); border: 1px solid var(--hair); box-shadow: var(--lift); animation: sb-pop .22s var(--ease);
+}
+@keyframes sb-pop { from { transform: translate(-50%, -50%) scale(.7); opacity: .4; } }
 .sb-mark.on.tinted { color: color-mix(in srgb, var(--tint) 62%, var(--ink)); }
-.sb-mark.hover { transform: scale(1.18); color: var(--ink); }
 .sb-name {
   display: flex; align-items: center; gap: 8px; max-width: 100%; padding: 4px 6px 4px 12px; border-radius: 999px;
   background: var(--surface); box-shadow: var(--lift); font: 700 .84rem var(--font); color: var(--ink); pointer-events: auto;

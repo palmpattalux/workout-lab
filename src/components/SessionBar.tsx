@@ -35,13 +35,16 @@ export default function SessionBar({ items, current, hidden, onGo, onRemove }: {
 
   function down(e: PointerEvent<HTMLDivElement>) {
     e.currentTarget.setPointerCapture(e.pointerId)
-    drag.current = { x: e.clientX, id: markAt(e.clientX, e.clientY), moved: false }
+    const id = markAt(e.clientX, e.clientY)
+    drag.current = { x: e.clientX, id, moved: false }
+    setHover(id)
   }
   function move(e: PointerEvent<HTMLDivElement>) {
     const d = drag.current
     if (!d) return
     if (!d.moved && Math.abs(e.clientX - d.x) > DRAG_PX) { d.moved = true; setAsking(false) }
     if (!d.moved) return
+    // the shaded circle follows the finger along the bar
     const id = markAt(e.clientX, e.clientY)
     if (id && id !== hover) sound.tick()
     if (id) setHover(id)
@@ -57,7 +60,8 @@ export default function SessionBar({ items, current, hidden, onGo, onRemove }: {
     onGo(picked)
   }
 
-  const named = items.find((w) => w.id === (hover ?? current))
+  const lit = hover ?? current
+  const named = items.find((w) => w.id === lit)
   return (
     <div className={`session-bar${hidden ? ' away' : ''}`} role="toolbar" aria-label={t('Exercises in this session')}>
       {asking && named ? (
@@ -65,7 +69,7 @@ export default function SessionBar({ items, current, hidden, onGo, onRemove }: {
           <span>{named.exercise || t('Untitled')}</span>
           <button className="sb-remove" onClick={() => { setAsking(false); sound.pop(); onRemove(named.id) }}>{t('Remove')}</button>
         </div>
-      ) : hover && named ? (
+      ) : hover && drag.current?.moved && named ? (
         <div className="sb-name"><span>{named.exercise || t('Untitled')}</span></div>
       ) : flash > 0 && named ? (
         <div key={flash} className="sb-name flash" aria-live="polite"><span>{named.exercise || t('Untitled')}</span></div>
@@ -73,7 +77,7 @@ export default function SessionBar({ items, current, hidden, onGo, onRemove }: {
       <div className="sb-row" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={() => { drag.current = null; setHover(null) }}>
         {items.map((w) => (
           <button key={w.id} data-id={w.id}
-            className={`sb-mark${w.id === current ? ' on' : ''}${w.id === hover ? ' hover' : ''}${w.color ? ' tinted tint-' + w.color : ''}`}
+            className={`sb-mark${w.id === lit ? ' on' : ''}${w.color ? ' tinted tint-' + w.color : ''}`}
             aria-label={w.exercise || t('Untitled')} aria-pressed={w.id === current}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (w.id === current) setAsking(!asking); else onGo(w.id) } }}>
             <WorkoutMark icon={w.icon} letter={w.letter} size="1em" />
