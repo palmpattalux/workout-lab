@@ -134,6 +134,8 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
     const st = timerState(t0)
     if (!st.counting) recordAt(t0.workoutId, t0.set, { reps: Math.max(1, st.held) })
   }
+  // the switch button's menu is open: the session bar steps aside
+  const [switching, setSwitching] = useState(false)
   const [confirmEnd, setConfirmEnd] = useState(false)
   const endHint = firstSession && inSession && set >= 2 && !confirmEnd
   const [adding, setAdding] = useState(false)
@@ -158,15 +160,6 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
         <button className="btn pill" id="b2" aria-label={t('Notes')}
           onClick={() => { const n = addNote({ sessionId: session?.id, workoutId: id ?? undefined }); location.hash = 'note-' + n.id }}>{t('Notes')}</button>
       </div>
-      {/* the exercises already in this session: tap one to go back to it, or take out a wrong one */}
-      {inSession && session.order.length > 1 && (
-        <SessionBar
-          items={session.order.map((wid) => workouts.find((w) => w.id === wid)).filter((w): w is Workout => !!w)}
-          current={id}
-          onGo={(wid) => { switchTo(wid); onGo(wid) }}
-          onRemove={(wid) => { removed.current = wid; const next = removeFromSession(wid); if (next && next !== id) onGo(next) }}
-        />
-      )}
       {preset && <span className="preset-chip"><Icon name="preset" size="14px" strokeWidth={2.2} />{preset.name}</span>}
 
       {endHint && (
@@ -194,7 +187,7 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
       )}
 
       {workout?.focus && (
-        <p className={`focus-reminder${inSession && session.order.length > 1 ? ' below-bar' : ''}`}><span>{t('Focus')}</span>{workout.focus}</p>
+        <p className="focus-reminder"><span>{t('Focus')}</span>{workout.focus}</p>
       )}
 
       {/* set number, only while a session is running (or a theme is being tried on) */}
@@ -326,6 +319,7 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
           node: <WorkoutMark icon={w.icon} letter={w.letter} size="1.1em" />,
         }))}
         onPick={(wid) => { noteSwapUsed(); switchTo(wid); onGo(wid) }}
+        onOpenChange={setSwitching}
         className={`big pen${swapHint ? ' hinting' : ''}`}
         style={{ left: '52%', top: '89.2%' }}
         ariaLabel={t('Switch exercise: tap for the list, or drag')}
@@ -338,6 +332,16 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
         )}
       </HoldMenu>
 
+      {/* the exercises already in this session: tap or slide to go back to one, or take out a wrong one */}
+      {inSession && session.order.length > 1 && (
+        <SessionBar
+          items={session.order.map((wid) => workouts.find((w) => w.id === wid)).filter((w): w is Workout => !!w)}
+          current={id}
+          hidden={switching}
+          onGo={(wid) => { switchTo(wid); onGo(wid) }}
+          onRemove={(wid) => { removed.current = wid; const next = removeFromSession(wid); if (next && next !== id) onGo(next) }}
+        />
+      )}
     </main>
   )
 }

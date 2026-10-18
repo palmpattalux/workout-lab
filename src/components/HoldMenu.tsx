@@ -1,4 +1,4 @@
-import { useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from 'react'
 import { sound } from '../lib/sound'
 import { getPreview, previewBlocked } from '../lib/theme'
 
@@ -10,9 +10,10 @@ export type MenuItem = { key: string; node: ReactNode; label: string; current?: 
 // A round button with two ways in, no holding:
 // - drag from it: buttons pop up in an arc; slide onto one and let go to pick it
 // - tap it: a list of every item opens above it; tap one to pick, anywhere else to close
-export default function HoldMenu({ items, onPick, className, style, ariaLabel, children }: {
+export default function HoldMenu({ items, onPick, onOpenChange, className, style, ariaLabel, children }: {
   items: MenuItem[]
   onPick: (key: string) => void
+  onOpenChange?: (open: boolean) => void
   className: string
   style: CSSProperties
   ariaLabel: string
@@ -24,6 +25,8 @@ export default function HoldMenu({ items, onPick, className, style, ariaLabel, c
   const [hover, setHover] = useState<number | null>(null)
   const [list, setList] = useState<{ x: number; bottom: number } | null>(null)
   const origin = useRef({ x: 0, y: 0, px: 0, py: 0 })
+  const isOpen = !!spots || !!list
+  useEffect(() => { onOpenChange?.(isOpen) }, [isOpen])
 
   function geometry() {
     const el = btn.current!

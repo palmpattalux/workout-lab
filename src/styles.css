@@ -1719,21 +1719,36 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .ex-name { text-align: left; align-items: flex-start; }
 .dot.add.hint-hidden { opacity: 0; transition: opacity .15s; }
 
-/* page B: the session's exercises as a bar of icons under Notes, the current one biggest */
-.session-bar { position: absolute; left: 5.7%; right: 5.7%; top: calc(3.5% + min(11cqw, 6.2cqh) + 12px); z-index: 3; display: flex; align-items: center; gap: 10px; pointer-events: none; }
-.sb-row { display: flex; align-items: center; gap: 6px; padding: 4px; border-radius: 999px; background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--lift); overflow-x: auto; scrollbar-width: none; pointer-events: auto; max-width: 100%; flex: none; }
+/* page B: the session's exercises as a bar of icons above the switch button, the current one bigger */
+.session-bar {
+  position: absolute; left: 52%; top: 80.5%; transform: translate(-50%, -100%); z-index: 3; max-width: 88%;
+  display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none;
+  transition: opacity .2s ease, transform .25s var(--ease);
+}
+.session-bar.away { opacity: 0; transform: translate(-50%, -80%) scale(.94); }
+.session-bar.away * { pointer-events: none !important; }
+.sb-row {
+  display: flex; align-items: center; gap: 4px; padding: 4px; border-radius: 999px; max-width: 100%;
+  background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--lift); overflow-x: auto; scrollbar-width: none;
+  pointer-events: auto; touch-action: none;
+}
 .sb-row::-webkit-scrollbar { display: none; }
 .sb-mark {
-  flex: none; width: 34px; height: 34px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; display: grid; place-items: center;
-  background: transparent; color: var(--muted); font-size: .74rem; transition: width .25s var(--ease), height .25s var(--ease), font-size .25s var(--ease), background .2s;
+  flex: none; width: 36px; height: 36px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; display: grid; place-items: center;
+  background: transparent; color: var(--muted); font-size: .74rem;
+  transition: width .25s var(--ease), height .25s var(--ease), font-size .25s var(--ease), background .2s, transform .15s var(--ease);
 }
 .sb-mark.tinted { color: color-mix(in srgb, var(--tint) 55%, var(--muted)); }
-.sb-mark.on { width: 46px; height: 46px; font-size: .92rem; background: var(--active-soft); color: var(--active); box-shadow: inset 0 0 0 1.5px var(--active); }
-.sb-mark:active { transform: scale(.9); }
-.sb-name { display: flex; align-items: center; gap: 8px; min-width: 0; font: 700 .88rem var(--font); color: var(--ink); pointer-events: auto; }
+.sb-mark.on { width: 42px; height: 42px; font-size: .88rem; background: var(--sunk); color: var(--ink); }
+.sb-mark.on.tinted { color: color-mix(in srgb, var(--tint) 62%, var(--ink)); }
+.sb-mark.hover { transform: scale(1.18); color: var(--ink); }
+.sb-name {
+  display: flex; align-items: center; gap: 8px; max-width: 100%; padding: 4px 6px 4px 12px; border-radius: 999px;
+  background: var(--surface); box-shadow: var(--lift); font: 700 .84rem var(--font); color: var(--ink); pointer-events: auto;
+}
+.sb-name:not(.ask) { padding-right: 12px; }
 .sb-name span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sb-name.flash { animation: sb-flash 2.2s ease both; pointer-events: none; }
-@keyframes sb-flash { 0% { opacity: 0; transform: translateX(-6px); } 12%, 70% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+@keyframes sb-flash { 0% { opacity: 0; transform: translateY(4px); } 12%, 70% { opacity: 1; transform: none; } 100% { opacity: 0; } }
 .sb-name.ask { animation: rise .2s var(--ease); }
 .sb-remove { flex: none; border: 0; border-radius: 999px; padding: 6px 12px; background: #d9480f; color: #fff; font: 700 .78rem var(--font); cursor: pointer; }
-.focus-reminder.below-bar { top: calc(3.5% + min(11cqw, 6.2cqh) + 76px); }
