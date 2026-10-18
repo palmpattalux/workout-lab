@@ -271,7 +271,7 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
   display: flex; flex-direction: column; gap: 3px; font-size: .82rem; color: var(--muted);
 }
 .moves li { overflow-wrap: anywhere; }
-.moves li:last-child { font-weight: 800; color: var(--ink); }
+.moves li.on { font-weight: 800; color: var(--ink); }
 .move-form {
   position: absolute; left: 5.7%; top: calc(64.1% + min(17.5cqw, 9.8cqh) / 2 + 10px); z-index: 6;
   display: flex; gap: 6px; width: 70%; padding: 6px; border-radius: 18px;
@@ -1579,3 +1579,9 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
   background: var(--active-soft); color: var(--active); border: 1px solid color-mix(in srgb, var(--active) 25%, transparent);
 }
 .live-chip .led { width: 7px; height: 7px; border-radius: 50%; background: var(--active); animation: led 2s ease-in-out infinite; }
+.live-chip .chip-timer { display: grid; margin-left: 2px; padding-left: 8px; border-left: 1px solid color-mix(in srgb, var(--active) 30%, transparent); animation: chip-tick 1s steps(2) infinite; }
+@keyframes chip-tick { 50% { opacity: .55; } }
+/* hold timer: 5 s countdown on the sec button, then it counts up */
+.reps.counting { background: var(--active); color: var(--surface); }
+.reps .countdown { font-size: 1.7rem; animation: count-pop .9s var(--ease) both; }
+@keyframes count-pop { from { transform: scale(1.5); opacity: 0; } 30% { transform: scale(1); opacity: 1; } }

@@ -1,13 +1,15 @@
 import { MangaBattle } from '../components/MangaScene'
 import { SummitClimb } from '../components/SummitScene'
 import { useSkin } from '../lib/theme'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Icon, WorkoutMark } from '../components/icons'
 import HoldPicker from '../components/HoldPicker'
 import HoldMenu from '../components/HoldMenu'
 import NumberPrompt from '../components/NumberPrompt'
 import { updateWorkout, usePresets, addNote, type Workout } from '../lib/store'
-import { useSession, switchTo, goToSet, record, endSession, discardSession } from '../lib/session'
+import { useSession, switchTo, goToSet, record, recordAt, recordMove, endSession, discardSession } from '../lib/session'
+import { useTimer, startTimer, stopTimer, timerState } from '../lib/timer'
+import { sound } from '../lib/sound'
 import { t } from '../lib/i18n'
 import { usePlan, atLeast, MAX_SETS, FREE_SETS } from '../lib/plan'
 import { useSessions } from '../lib/store'
@@ -66,25 +68,38 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
   const near = weight ?? (inSession ? session.sets[id!]?.[String(set - 1)]?.weight ?? null : null)
   const loadStart = near ? loads.reduce((b, n, i) => (Math.abs(n - near) < Math.abs(loads[b] - near) ? i : b), 0) : 0
   const isProgression = workout?.mode === 'progression'
+  // progressions: the one done this set, else last set's, else the newest
+  const moves = workout?.progressions ?? []
+  const chosenMove = (inSession ? entry?.move ?? session.sets[id!]?.[String(set - 1)]?.move : undefined) ?? moves.at(-1)
   const timed = isProgression && workout?.count === 'sec'
   const countValue = (i: number) => i + 1
 
   const [setsOpen, setSetsOpen] = useState(false)
   // typing a number instead of dragging: tap the load or sec button
   const [typing, setTyping] = useState<'weight' | 'reps' | null>(null)
-  // stopwatch for timed holds: slide onto it from the sec line; tap the button to stop and keep the time
-  const [watch, setWatch] = useState<number | null>(null)
+  // hold timer: slide onto it from the sec line, a 5 s countdown, then it counts up.
+  // It lives outside this page (home shows it too); tap the sec button to stop and keep the time.
+  const timer = useTimer()
+  const timerHere = !!timer && inSession && timer.workoutId === id && timer.set === set
   const [, tickWatch] = useState(0)
+  const ts = timer ? timerState(timer) : null
   useEffect(() => {
-    if (watch === null) return
-    const iv = setInterval(() => tickWatch((n) => n + 1), 250)
+    if (!timerHere) return
+    const iv = setInterval(() => tickWatch((n) => n + 1), 200)
     return () => clearInterval(iv)
-  }, [watch])
-  const watchSecs = watch === null ? 0 : Math.floor((Date.now() - watch) / 1000)
+  }, [timerHere])
+  const lastLeft = useRef(0)
+  useEffect(() => {
+    if (!timerHere || !ts) return
+    const key = ts.counting ? ts.left : 0
+    if (key !== lastLeft.current) { if (ts.counting) sound.tick(); else if (lastLeft.current > 0) sound.pop() }
+    lastLeft.current = key
+  })
   function stopWatch() {
-    if (watch === null) return
-    put('reps', Math.max(1, watchSecs))
-    setWatch(null)
+    const t0 = stopTimer()
+    if (!t0) return
+    const st = timerState(t0)
+    if (!st.counting) recordAt(t0.workoutId, t0.set, { reps: Math.max(1, st.held) })
   }
   const [confirmEnd, setConfirmEnd] = useState(false)
   const endHint = firstSession && inSession && set >= 2 && !confirmEnd
@@ -93,7 +108,7 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
 
   function addMove() {
     const text = move.trim()
-    if (text && workout) updateWorkout(workout.id, { progressions: [...(workout.progressions ?? []), text] })
+    if (text && workout) { updateWorkout(workout.id, { progressions: [...(workout.progressions ?? []), text] }); if (inSession) recordMove(text) }
     setMove('')
     setAdding(false)
   }
@@ -172,14 +187,32 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
       {/* B3 load: kg/lbs number picker for equipment workouts, stairs + "add" for progression workouts */}
       {isProgression ? (
         <>
-          {(workout.progressions?.length ?? 0) > 0 && (
+          {moves.length > 0 && (
             <ul className="moves" aria-label={t('Progressions')}>
-              {workout.progressions!.slice(-4).map((m, i) => <li key={i}>{m}</li>)}
+              {moves.slice(-4).map((m, i) => <li key={i} className={m === chosenMove ? 'on' : undefined}>{m}</li>)}
             </ul>
           )}
-          <button className="btn circle mid" style={{ left: '35.1%', top: '64.1%' }} aria-label="Load: add progression" onClick={() => setAdding(!adding)}>
-            <Icon name="stairs" />
-          </button>
+          {/* tap: add a new progression; drag up: choose which one this set is */}
+          {moves.length > 0 ? (
+            <HoldPicker
+              options={moves.map((m, i) => ({ key: String(i), node: i + 1, label: m }))}
+              visible={Math.min(moves.length, 15)}
+              start={chosenMove ? Math.max(0, moves.lastIndexOf(chosenMove)) : moves.length - 1}
+              maxStep={30}
+              instant
+              onTap={() => setAdding(!adding)}
+              onPick={(i) => { if (inSession) recordMove(moves[i]) }}
+              className="mid"
+              style={{ left: '35.1%', top: '64.1%' }}
+              ariaLabel={`Progression${chosenMove ? `: ${chosenMove}` : ''}. Tap to add one, drag up to choose`}
+            >
+              <Icon name="stairs" />
+            </HoldPicker>
+          ) : (
+            <button className="btn circle mid" style={{ left: '35.1%', top: '64.1%' }} aria-label="Load: add progression" onClick={() => setAdding(!adding)}>
+              <Icon name="stairs" />
+            </button>
+          )}
           {adding && (
             <form className="move-form" onSubmit={(e) => { e.preventDefault(); addMove() }}>
               <input id="move" autoFocus placeholder={t('New move')} value={move} onChange={(e) => setMove(e.target.value)} />
@@ -211,16 +244,18 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
         start={timed && reps ? Math.min(59, reps - 1) : 0}
         maxStep={20}
         instant
-        extra={timed && inSession ? { node: <Icon name="stopwatch" size="22px" />, label: t('Timer'), onPick: () => setWatch(Date.now()) } : undefined}
-        onChange={(i) => { if (watch === null) put('reps', countValue(i)) }}
-        onPick={(i) => { setWatch(null); put('reps', countValue(i)) }}
-        onTap={timed ? () => (watch !== null ? stopWatch() : setTyping('reps')) : undefined}
-        className={`mid reps${timed ? ' dense' : ''}${watch !== null ? ' timing' : ''}`}
+        extra={timed && inSession ? { node: <Icon name="stopwatch" size="22px" />, label: t('Timer'), onPick: () => startTimer(id!, set) } : undefined}
+        onChange={(i) => { if (!timerHere) put('reps', countValue(i)) }}
+        onPick={(i) => { if (timerHere) stopTimer(); put('reps', countValue(i)) }}
+        onTap={timed ? () => (timerHere ? stopWatch() : setTyping('reps')) : undefined}
+        className={`mid reps${timed ? ' dense' : ''}${timerHere ? (ts?.counting ? ' timing counting' : ' timing') : ''}`}
         style={{ left: '69%', top: '64.1%' }}
-        ariaLabel={watch !== null ? t('Timer running: tap to stop') : `${timed ? 'Seconds' : 'Reps'} (B4)${reps ? `: ${reps}` : ''}, ${timed ? 'tap to type, ' : ''}drag up to set`}
+        ariaLabel={timerHere ? t('Timer running: tap to stop') : `${timed ? 'Seconds' : 'Reps'} (B4)${reps ? `: ${reps}` : ''}, ${timed ? 'tap to type, ' : ''}drag up to set`}
       >
-        {watch !== null
-          ? <span className="val"><Icon name="stopwatch" size="14px" />{watchSecs}<small>{t('sec')}</small></span>
+        {timerHere && ts
+          ? ts.counting
+            ? <span key={ts.left} className="val countdown">{ts.left}</span>
+            : <span className="val"><Icon name="stopwatch" size="14px" />{ts.held}<small>{t('sec')}</small></span>
           : reps ? <span className="val">{reps}{timed && <small>{t('sec')}</small>}</span> : timed ? <span className="unit-label">{t('sec')}</span> : <Icon name="numbers" />}
       </HoldPicker>
       {typing && (
@@ -229,7 +264,7 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
           unit={typing === 'weight' ? unit : t('sec')}
           value={typing === 'weight' ? weight : reps}
           decimal={typing === 'weight'}
-          onSave={(n) => { if (typing === 'reps') setWatch(null); put(typing, n) }}
+          onSave={(n) => { if (typing === 'reps' && timerHere) stopTimer(); put(typing, n) }}
           onClose={() => setTyping(null)}
         />
       )}

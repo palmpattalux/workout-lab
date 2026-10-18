@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+import { stopTimer } from './timer'
 import { saveSession, getWorkouts, getPresets, onScopeChange, scopedKey, type Session, type SetEntry } from './store'
 
 // The active session, if any. Kept in this browser so a reload doesn't lose it;
@@ -37,11 +38,20 @@ export function goToSet(n: number) {
   set({ ...active, setOf: { ...active.setOf, [active.current]: n } })
 }
 
-export function record(field: keyof SetEntry, value: number) {
+export function record(field: 'reps' | 'weight', value: number) {
   if (!active) return
-  const w = active.current
-  const n = String(active.setOf[w] ?? 1)
-  const entry: SetEntry = Object.assign({ reps: null, weight: null }, active.sets[w]?.[n], { [field]: value })
+  recordAt(active.current, active.setOf[active.current] ?? 1, { [field]: value })
+}
+// the progression done in the current set
+export function recordMove(move: string) {
+  if (!active) return
+  recordAt(active.current, active.setOf[active.current] ?? 1, { move })
+}
+// write into a given exercise and set (the timer keeps its own, even if you moved on)
+export function recordAt(w: string, setNum: number, change: Partial<SetEntry>) {
+  if (!active) return
+  const n = String(setNum)
+  const entry: SetEntry = Object.assign({ reps: null, weight: null }, active.sets[w]?.[n], change)
   set({ ...active, sets: { ...active.sets, [w]: { ...active.sets[w], [n]: entry } } })
 }
 
@@ -50,9 +60,11 @@ export function endSession(): string | null {
   const snap: NonNullable<Session['snap']> = {}
   for (const w of getWorkouts()) {
     if (!active.order.includes(w.id)) continue
-    snap[w.id] = { exercise: w.exercise, icon: w.icon, letter: w.letter, mode: w.mode, unit: w.unit, count: w.count, move: w.progressions?.at(-1) }
+    const done = Object.entries(active.sets[w.id] ?? {}).sort(([a], [b]) => Number(b) - Number(a)).find(([, e]) => e.move)?.[1].move
+    snap[w.id] = { exercise: w.exercise, icon: w.icon, letter: w.letter, mode: w.mode, unit: w.unit, count: w.count, move: done ?? w.progressions?.at(-1) }
   }
   const id = active.id
+  stopTimer()
   saveSession({ ...active, endedAt: Date.now(), snap })
   set(null)
   return id
@@ -60,6 +72,7 @@ export function endSession(): string | null {
 
 // Throw the running session away without saving it.
 export function discardSession() {
+  stopTimer()
   set(null)
 }
 

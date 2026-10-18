@@ -7,6 +7,7 @@ import { usePrefs, setPrefs } from '../lib/prefs'
 import { useSkin, getPreview } from '../lib/theme'
 import { useSessions } from '../lib/store'
 import { useSession } from '../lib/session'
+import { useTimer } from '../lib/timer'
 import ThemeScene from '../components/ThemeScene'
 import { useEmail, signOut, canResetPassword } from '../lib/auth'
 import { t, LANGS } from '../lib/i18n'
@@ -306,6 +307,7 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
   // their first session starts.
   const pastSessions = useSessions()
   const live = useSession()
+  const timer = useTimer()
   const firstRun = guest && pastSessions.length === 0 && !live
   const showCreateHolo = firstRun && workouts.length === 0 && pickedIcon === null && !settingsOpen
   const tapTarget = firstRun && workouts.length > 0 && !drag && !ring && !settingsOpen ? workouts[0].id : null
@@ -510,6 +512,7 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
       {live && !picking && (
         <button className="btn pill live-chip" onClick={() => openDot(live.current)} aria-label={t('Session active: tap to go back to it')}>
           <span className="led" />{t('Session active')}
+          {timer && <span className="chip-timer" aria-label={t('Timer')}><Icon name="stopwatch" size="15px" strokeWidth={2.2} /></span>}
         </button>
       )}
 

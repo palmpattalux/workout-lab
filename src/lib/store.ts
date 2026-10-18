@@ -29,7 +29,7 @@ export type Preset = { id: string; kind: 'preset'; name: string; items: string[]
 export type Note = { id: string; kind: 'note'; text: string; createdAt: number; updatedAt: number; star?: boolean; sessionId?: string; workoutId?: string }
 
 // One set inside a session, per exercise.
-export type SetEntry = { reps: number | null; weight: number | null }
+export type SetEntry = { reps: number | null; weight: number | null; move?: string } // move: the progression done (progression workouts)
 
 // A session: everything done between starting it (pen hold on page B) and ending it.
 export type Session = {

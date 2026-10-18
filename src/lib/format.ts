@@ -22,10 +22,10 @@ export function setLines(s: Session, workoutId: string, current?: Workout) {
   const progression = info?.mode === 'progression'
   return Object.entries(s.sets[workoutId] ?? {})
     .sort(([a], [b]) => Number(a) - Number(b))
-    .filter(([, e]) => e.reps !== null || e.weight !== null)
+    .filter(([, e]) => e.reps !== null || e.weight !== null || !!e.move)
     .map(([n, e]) => {
       const load = progression ? '' : e.weight !== null ? `${e.weight} ${unit}` : ''
       const reps = e.reps !== null ? (progression && info?.count === 'sec' ? t('{n} sec', { n: e.reps }) : t('{n} reps', { n: e.reps })) : ''
-      return { set: Number(n), text: [load, reps].filter(Boolean).join(' × ') }
+      return { set: Number(n), text: [progression ? e.move ?? '' : load, reps].filter(Boolean).join(' × ') }
     })
 }
