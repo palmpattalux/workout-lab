@@ -23,6 +23,8 @@ export default function CheckoutPage({ tier = 'premium', theme: themeKey, guest 
   const [card, setCard] = useState({ name: '', number: '', exp: '', cvc: '' })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // the reason the bank, Omise or our server gave, in small print under the message
+  const [reason, setReason] = useState<string | null>(null)
   const price = '฿' + (theme ? THEME_PRICE : plan.price).toLocaleString()
 
   function pick(m: Method) {
@@ -36,7 +38,7 @@ export default function CheckoutPage({ tier = 'premium', theme: themeKey, guest 
   async function pay(e: FormEvent) {
     e.preventDefault()
     if (busy || (method === 'card' && !cardReady)) return
-    setBusy(true); setError(null)
+    setBusy(true); setError(null); setReason(null)
     try {
       let token: string | undefined
       if (method === 'card') {
@@ -50,6 +52,7 @@ export default function CheckoutPage({ tier = 'premium', theme: themeKey, guest 
       location.hash = 'pay'
     } catch (err) {
       const m = (err as Error).message
+      setReason(m && m !== 'network' && m !== 'card' && m !== 'declined' ? m : null)
       setError(m === 'network' ? t("Can't reach the server. Check your connection and try again.")
         : m === 'You already have this plan' ? t('You already have this plan.')
         : m === 'You already own this theme' ? t('You already own this theme.')
@@ -116,7 +119,7 @@ export default function CheckoutPage({ tier = 'premium', theme: themeKey, guest 
             </div>
           )}
 
-          {error && <p className="co-error" role="alert">{error}</p>}
+          {error && <p className="co-error" role="alert">{error}{reason && <small className="co-reason">{reason}</small>}</p>}
           {!theme && sub && sub.tier !== tier && new Date(sub.paid_until) > new Date() && (
             <p className="co-note">{t('Your {plan} plan switches to {next} as soon as this payment goes through.', { plan: t(PLANS.find((p) => p.tier === sub.tier)?.name ?? ''), next: t(plan.name) })}</p>
           )}
