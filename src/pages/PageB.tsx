@@ -8,7 +8,7 @@ import HoldPicker from '../components/HoldPicker'
 import HoldMenu from '../components/HoldMenu'
 import NumberPrompt from '../components/NumberPrompt'
 import { updateWorkout, usePresets, addNote, type Workout } from '../lib/store'
-import { useSession, switchTo, goToSet, setSided, setKey, record, recordAt, recordMove, endSession, discardSession, removeFromSession } from '../lib/session'
+import { useSession, switchTo, goToSet, setSided, setKey, keyNum, keySide, record, recordAt, recordMove, endSession, discardSession, removeFromSession } from '../lib/session'
 import { useTimer, startTimer, stopTimer, timerState } from '../lib/timer'
 import { sound } from '../lib/sound'
 import { t } from '../lib/i18n'
@@ -79,10 +79,19 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
 
   // Outside a session values are only shown, not documented.
   const [loose, setLoose] = useState<{ reps: number | null; weight: number | null }>({ reps: null, weight: null })
+  // A new set keeps the weight of the last set that had one (most people stay on the same
+  // load); reps start empty. The carried weight is saved with the set once reps are entered.
+  const order = (k: string) => keyNum(k) * 2 + (keySide(k) && keySide(k) !== first ? 1 : 0)
+  const carried = inSession && entry?.weight == null
+    ? Object.entries(session.sets[id] ?? {}).filter(([k, e]) => e.weight != null && order(k) < order(key)).sort(([a], [b]) => order(a) - order(b)).at(-1)?.[1].weight ?? null
+    : null
   const reps = inSession ? entry?.reps ?? null : loose.reps
-  const weight = inSession ? entry?.weight ?? null : loose.weight
-  const put = (field: 'reps' | 'weight', v: number) =>
-    inSession ? record(field, v) : setLoose((s) => ({ ...s, [field]: v }))
+  const weight = inSession ? entry?.weight ?? carried : loose.weight
+  const put = (field: 'reps' | 'weight', v: number) => {
+    if (!inSession) return setLoose((s) => ({ ...s, [field]: v }))
+    if (field === 'reps' && carried != null) record('weight', carried)
+    record(field, v)
+  }
 
   const unit = workout?.unit ?? 'kg'
   const loads = unit === 'lbs' ? LOADS_LB : LOADS_KG
