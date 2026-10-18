@@ -29,7 +29,7 @@ function pillar(cx: number, w: number, top: number, base: number, k: number) {
 
 // [x, width, top, base]
 const FAR: [number, number, number, number][] = [
-  [24, 40, 330, 700], [72, 22, 410, 700], [300, 28, 300, 700], [346, 46, 236, 700], [386, 24, 372, 700],
+  [24, 40, 330, 870], [72, 22, 410, 870], [300, 28, 300, 870], [346, 46, 236, 870], [386, 24, 372, 870],
 ]
 const NEAR: [number, number, number, number][] = [
   [8, 50, 452, 860], [384, 50, 470, 860],
@@ -102,16 +102,16 @@ function Painting({ gid, climb }: { gid: string; climb?: boolean }) {
       <defs>
         <linearGradient id={gid + 'far'} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 'var(--tt-far)' }} />
-          <stop offset=".6" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 0 }} />
+          <stop offset="1" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 'calc(var(--tt-far) * .55)' }} />
         </linearGradient>
         <linearGradient id={gid + 'near'} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 'var(--tt-near)' }} />
-          <stop offset=".8" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 0 }} />
+          <stop offset="1" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 'calc(var(--tt-near) * .5)' }} />
         </linearGradient>
         <linearGradient id={gid + 'main'} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 'var(--tt-main)' }} />
           <stop offset=".45" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 'calc(var(--tt-main) * .45)' }} />
-          <stop offset=".95" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 0 }} />
+          <stop offset="1" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 'calc(var(--tt-main) * .3)' }} />
         </linearGradient>
         <linearGradient id={gid + 'shade'} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 'calc(var(--tt-main) * .9)' }} />
@@ -125,7 +125,7 @@ function Painting({ gid, climb }: { gid: string; climb?: boolean }) {
         <linearGradient id={gid + 'spur'} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 'var(--tt-near)' }} />
           <stop offset=".22" style={{ stopColor: 'var(--tt-hill)', stopOpacity: 'calc(var(--tt-hill-o) * .7)' }} />
-          <stop offset=".6" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 0 }} />
+          <stop offset="1" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 'calc(var(--tt-near) * .4)' }} />
         </linearGradient>
         <linearGradient id={gid + 'pside'} x1="0" y1="0" x2="1" y2="0">
           <stop offset=".45" style={{ stopColor: 'var(--tt-ink)', stopOpacity: 0 }} />

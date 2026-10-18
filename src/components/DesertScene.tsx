@@ -19,7 +19,7 @@ function cactus(h: number, left = 0.5, right = 0.62) {
     A${aw / 2} ${aw / 2} 0 0 0 ${r + w * 1.1 - aw / 2} ${by - h * 0.2} L${r + w * 1.1 - aw / 2} ${by - aw} L${r - 1} ${by - aw} Z`
 }
 
-const MESAS = 'M-10 470 L-10 430 L18 430 L26 404 L74 402 L82 430 L120 432 L128 446 L250 448 L258 418 L266 396 L318 394 L326 420 L340 422 L346 410 L400 408 L400 470 Z'
+const MESAS = 'M-10 530 L-10 430 L18 430 L26 404 L74 402 L82 430 L120 432 L128 446 L250 448 L258 418 L266 396 L318 394 L326 420 L340 422 L346 410 L400 408 L400 530 L-10 530 Z'
 // dunes far to near: [shape, shaded side]
 const DUNES: [string, string][] = [
   [`M-10 ${H} L-10 486 C60 462 120 456 180 474 C230 488 290 470 400 452 L400 ${H} Z`,

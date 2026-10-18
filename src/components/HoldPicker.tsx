@@ -14,9 +14,10 @@ export type PickerOption = { key: string; node: ReactNode; label?: string }
 //
 // `visible` shows only that many options at once. Holding the finger at the top
 // of the line keeps scrolling to higher options; at the bottom, back down.
-export default function HoldPicker({ options, visible, side = 'above', instant, onTap, onPick, onChange, maxStep, className, style, ariaLabel, children }: {
+export default function HoldPicker({ options, visible, start = 0, side = 'above', instant, onTap, onPick, onChange, maxStep, className, style, ariaLabel, children }: {
   options: PickerOption[]
   visible?: number
+  start?: number // option the line opens on (e.g. the weight already set), so long lists don't start from the bottom
   side?: 'above' | 'left' // 'left' for buttons near the top of the screen
   instant?: boolean // open as soon as the finger drags up, no hold
   onTap?: () => void // pressed and let go without opening
@@ -36,6 +37,7 @@ export default function HoldPicker({ options, visible, side = 'above', instant, 
   const [offset, setOffset] = useState(0)
   const [local, setLocal] = useState(0)
   const pos = useRef({ offset: 0, local: 0 })
+  const base = useRef(0)
   const total = options.length
   const shown = Math.min(visible ?? total, total)
 
@@ -65,10 +67,13 @@ export default function HoldPicker({ options, visible, side = 'above', instant, 
       const step = Math.max(10, Math.min(maxStep, (r.top - page.top - 16) / shown))
       setRuler({ left: r.left - page.left + r.width / 2 - 22, top: r.top - page.top - step * shown - 4, step })
     }
-    pos.current = { offset: 0, local: 0 }
-    setOffset(0)
-    setLocal(0)
-    if (!getPreview()) onChange?.(0)
+    const at = Math.max(0, Math.min(total - 1, start))
+    const o = Math.max(0, Math.min(total - shown, at - 3))
+    base.current = at - o
+    pos.current = { offset: o, local: at - o }
+    setOffset(o)
+    setLocal(at - o)
+    if (!getPreview()) onChange?.(at)
     sound.pop()
   }
 
@@ -100,7 +105,7 @@ export default function HoldPicker({ options, visible, side = 'above', instant, 
       if (timer.current && Math.abs(e.clientY - startY.current) > 12) cancel()
       return
     }
-    const raw = (startY.current - e.clientY) / ruler.step
+    const raw = base.current + (startY.current - e.clientY) / ruler.step
     const l = Math.max(0, Math.min(shown - 1, Math.round(raw)))
     if (l !== pos.current.local) update(pos.current.offset, l)
     // at either end of a scrolling line, keep going while the finger stays there

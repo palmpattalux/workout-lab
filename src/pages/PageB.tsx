@@ -11,6 +11,11 @@ import { t } from '../lib/i18n'
 import { usePlan, atLeast, MAX_SETS, FREE_SETS } from '../lib/plan'
 import { useSessions } from '../lib/store'
 
+// Weights as they come in a gym: small dumbbells, then 2.5 kg steps (1.25 kg plates a side)
+// up to 100 kg, then 5 kg; in pounds 2.5 lb steps to 15, then 5 lb steps (2.5 lb plates a side).
+const steps = (from: number, to: number, by: number) => Array.from({ length: Math.round((to - from) / by) + 1 }, (_, i) => from + i * by)
+const LOADS_KG = [1, 2, 2.5, 3, 4, 5, 6, 7, 7.5, 8, 9, ...steps(10, 100, 2.5), ...steps(105, 250, 5)]
+const LOADS_LB = [...steps(2.5, 15, 2.5), ...steps(20, 500, 5)]
 const repOptions = Array.from({ length: 25 }, (_, i) => ({ key: String(i + 1), node: i + 1 }))
 // timed holds: 5 s steps up to 3 minutes
 const secOptions = Array.from({ length: 36 }, (_, i) => ({ key: String((i + 1) * 5), node: (i + 1) * 5, label: t('{n} sec', { n: (i + 1) * 5 }) }))
@@ -53,7 +58,11 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
     inSession ? record(field, v) : setLoose((s) => ({ ...s, [field]: v }))
 
   const unit = workout?.unit ?? 'kg'
-  const loadOptions = Array.from({ length: 30 }, (_, i) => ({ key: String(i + 1), node: i + 1, label: `${i + 1} ${unit}` }))
+  const loads = unit === 'lbs' ? LOADS_LB : LOADS_KG
+  const loadOptions = loads.map((n) => ({ key: String(n), node: n, label: `${n} ${unit}` }))
+  // open on this set's weight, else the last set's (closest step), else the lightest
+  const near = weight ?? (inSession ? session.sets[id!]?.[String(set - 1)]?.weight ?? null : null)
+  const loadStart = near ? loads.reduce((b, n, i) => (Math.abs(n - near) < Math.abs(loads[b] - near) ? i : b), 0) : 0
   const isProgression = workout?.mode === 'progression'
   const timed = isProgression && workout?.count === 'sec'
   const countValue = (i: number) => (timed ? (i + 1) * 5 : i + 1)
@@ -164,10 +173,11 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
         <HoldPicker
           options={loadOptions}
           visible={15}
+          start={loadStart}
           maxStep={20}
           instant
-          onChange={(i) => put('weight', i + 1)}
-          onPick={(i) => put('weight', i + 1)}
+          onChange={(i) => put('weight', loads[i])}
+          onPick={(i) => put('weight', loads[i])}
           className="mid load"
           style={{ left: '35.1%', top: '64.1%' }}
           ariaLabel={`Load (B3)${weight ? `: ${weight} ${unit}` : ` in ${unit}`}, drag up to set`}
