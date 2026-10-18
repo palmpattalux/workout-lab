@@ -30,11 +30,16 @@ export async function omise(path, method = 'GET', body) {
   return json
 }
 
-// The signed-in account, from the Supabase access token the app sends.
+// The signed-in account, from the Supabase access token the app sends. Checked with the
+// public anon key (the same one the app uses), so a wrong service key can't log people out.
+const ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhZnhrdW9rdW5qZ3R2ZXhxYWFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4ODUzNjcsImV4cCI6MjEwNzQ2MTM2N30.H_GVEADyojPa8ih-C6YBfmvq68yptVsO968SLW5kxDI'
+let anon = null
 export async function userOf(req) {
   const token = (req.headers.authorization || '').replace(/^Bearer /, '')
   if (!token) return null
-  const { data } = await db().auth.getUser(token)
+  anon ??= createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false } })
+  const { data, error } = await anon.auth.getUser(token)
+  if (error) console.error('userOf', error.message)
   return data?.user ?? null
 }
 
