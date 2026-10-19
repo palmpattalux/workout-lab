@@ -66,6 +66,11 @@ export default function PlansPage({ userId }: { userId: string | null }) {
           {action(p.tier, p.tier === 'unlimited')}
         </section>
       ))}
+      {/* what a subscription means, in plain words (App Store, Google Play and card rules ask for this) */}
+      <p className="plan-legal">
+        {t('Plans paid by card renew every month at the price shown until you turn off renewing, which you can do here anytime. PromptPay and TrueMoney pay for one month and never renew.')}{' '}
+        <a href="#terms">{t('Terms')}</a> · <a href="#privacy">{t('Privacy')}</a> · <a href="#refunds">{t('Refunds')}</a>
+      </p>
     </main>
   )
 }

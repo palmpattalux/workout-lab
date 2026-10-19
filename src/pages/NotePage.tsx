@@ -44,7 +44,7 @@ export default function NotePage({ id, workouts }: { id: string; workouts: Worko
           {note.sessionId && <span className="muted">{s ? t('Session · {day}', { day: day(s.startedAt) }) : t('During a session')}</span>}
         </p>
       )}
-      <textarea className="note-text" autoFocus={!note.text} placeholder={t('Write a note…')} value={note.text}
+      <textarea className="note-text" autoFocus={!note.text} placeholder={t('Write a note… (please no medical details)')} value={note.text}
         onChange={(e) => updateNote(id, { text: e.target.value })} />
       {note.text.trim() && <button className="remove note-remove" onClick={() => setRemoving(true)}>{t('Remove note')}</button>}
       {removing && (

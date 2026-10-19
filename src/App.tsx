@@ -18,6 +18,8 @@ import NotePage from './pages/NotePage'
 import WeekPage from './pages/WeekPage'
 import LicensesPage from './pages/LicensesPage'
 import LandingPage from './pages/LandingPage'
+import LegalPage, { type LegalDoc } from './pages/LegalPage'
+import DeleteAccountPage from './pages/DeleteAccountPage'
 import { useWorkouts, setScope, type Workout } from './lib/store'
 import { supabase, useUser, useRecovering, arrivedFromEmailLink } from './lib/auth'
 import { switchTo } from './lib/session'
@@ -46,6 +48,13 @@ import { t } from './lib/i18n'
 //               presets = preset list, preset-<id> one preset's sessions, notes = all notes
 // The log-in page only opens when asked for (gear, the sign-up guide, or ending a guest's
 // session), never on its own when the app is opened.
+//   terms, privacy, refunds  the legal pages (also at dotset.app/terms, /privacy, /refunds)
+//   delete-account  delete the account (also at dotset.app/delete-account, for Google Play)
+// Those web addresses open the same page as their #hash.
+const PATHS: Record<string, string> = { '/terms': 'terms', '/privacy': 'privacy', '/refunds': 'refunds', '/delete-account': 'delete-account' }
+const path = PATHS[location.pathname.replace(/\/$/, '')]
+if (path) history.replaceState(null, '', '/' + location.search + '#' + path)
+const LEGAL_DOCS = ['terms', 'privacy', 'refunds']
 if (['login', 'signup', 'save'].includes(location.hash.slice(1))) history.replaceState(null, '', location.pathname + location.search)
 // back from a bank's or wallet's payment page (?pay=return): show how the payment went
 if (new URLSearchParams(location.search).get('pay') === 'return') history.replaceState(null, '', location.pathname + '#pay')
@@ -107,6 +116,7 @@ function Screen() {
   }, [])
 
   const [inApp, setInApp] = useState(startedInApp)
+  if (LEGAL_DOCS.includes(hash)) return <LegalPage doc={hash as LegalDoc} />
   if (desktop && !inApp && hash === '' && !arrivedFromEmailLink && !recovering) {
     return <LandingPage onOpenApp={() => { try { sessionStorage.setItem(IN_APP, '1') } catch { /* blocked */ } setInApp(true) }} />
   }
@@ -115,6 +125,7 @@ function Screen() {
     return <LoginPage key={hash} start={hash === 'login' ? 'login' : hash ? 'signup' : undefined} note={hash === 'save' ? t('Sign in to save your workout') : undefined} />
   }
   if (recovering) return <NewPasswordPage />
+  if (hash === 'delete-account') return <DeleteAccountPage user={user} />
   if (user && supabase && hash === 'password') return <NewPasswordPage change />
   const guest = !user
 

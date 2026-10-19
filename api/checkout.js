@@ -3,6 +3,9 @@
 // show a QR code, send the person to their bank/wallet to confirm, or that it's paid.
 import { PRICES, NAMES, THEME_PRICE, THEME_NAMES, db, omise, userOf, send, grant } from './_lib.js'
 
+// the Terms and Refund Policy version the buyer agreed to (kept on the Omise charge as proof)
+const TERMS_VERSION = '2026-10-19'
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return send(res, 405, { error: 'POST only' })
   try {
@@ -16,7 +19,7 @@ export default async function handler(req, res) {
       const { data: owned } = await db().from('owned_themes').select('theme').eq('user_id', user.id).eq('theme', theme).maybeSingle()
       if (owned) return send(res, 409, { error: 'You already own this theme' })
       amount = THEME_PRICE
-      metadata = { user_id: user.id, theme, method }
+      metadata = { user_id: user.id, theme, method, terms: TERMS_VERSION }
       description = `Dotset: ${THEME_NAMES[theme]}`
     } else {
       amount = PRICES[tier]
@@ -24,7 +27,7 @@ export default async function handler(req, res) {
       // a card plan that already renews itself can't be bought twice
       const { data: sub } = await db().from('subscriptions').select('tier, renews, paid_until').eq('user_id', user.id).maybeSingle()
       if (sub?.renews && sub.tier === tier && new Date(sub.paid_until) > new Date()) return send(res, 409, { error: 'You already have this plan' })
-      metadata = { user_id: user.id, tier, method }
+      metadata = { user_id: user.id, tier, method, terms: TERMS_VERSION }
       description = `Dotset ${NAMES[tier]}`
     }
 

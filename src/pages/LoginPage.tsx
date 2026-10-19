@@ -171,6 +171,9 @@ export default function LoginPage({ start, note }: { start?: 'login' | 'signup';
         <button className="primary" type="submit" disabled={busy}>
           {busy ? t('One moment…') : forgot ? t('Send reset link') : isLogin ? t('Log in') : t('Sign up')}
         </button>
+        {!isLogin && !forgot && (
+          <p className="legal-consent">{t('By signing up you agree to the')} <a href="#terms">{t('Terms')}</a> {t('and')} <a href="#privacy">{t('Privacy Policy')}</a>{t(', and confirm you are 13 or older (under 20s with a parent\'s permission).')}</p>
+        )}
 
         <div className="login-links">
           {forgot

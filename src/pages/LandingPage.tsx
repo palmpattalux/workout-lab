@@ -159,6 +159,9 @@ export default function LandingPage({ onOpenApp }: { onOpenApp: () => void }) {
         <select value={prefs.lang} onChange={(e) => setPrefs({ lang: e.target.value as typeof prefs.lang })} aria-label={t('Language')}>
           {LANGS.map((l) => <option key={l.key} value={l.key}>{l.name}</option>)}
         </select>
+        <a href="/terms" onClick={(e) => { e.preventDefault(); open('terms') }}>{t('Terms')}</a>
+        <a href="/privacy" onClick={(e) => { e.preventDefault(); open('privacy') }}>{t('Privacy')}</a>
+        <a href="/refunds" onClick={(e) => { e.preventDefault(); open('refunds') }}>{t('Refunds')}</a>
         <button className="ld-link" onClick={() => open('licenses')}>{t('Open-source licences')}</button>
       </footer>
     </div>

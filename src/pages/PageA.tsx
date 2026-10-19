@@ -614,6 +614,14 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
                 <span>{t('Change password')}</span>
                 <span className="chev"><Icon name="back" size="18px" /></span>
               </button>}
+              <button className="set-row themes-link" onClick={() => { setSettingsOpen(false); location.hash = 'terms' }}>
+                <span>{t('Terms and privacy')}</span>
+                <span className="chev"><Icon name="back" size="18px" /></span>
+              </button>
+              {!guest && canResetPassword && <button className="set-row themes-link danger-row" onClick={() => { setSettingsOpen(false); location.hash = 'delete-account' }}>
+                <span>{t('Delete account')}</span>
+                <span className="chev"><Icon name="back" size="18px" /></span>
+              </button>}
               <button className="set-row themes-link credits-link" onClick={() => { setSettingsOpen(false); location.hash = 'licenses' }}>
                 <span>{t('Open-source licences')}</span>
                 <span className="chev"><Icon name="back" size="18px" /></span>

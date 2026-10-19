@@ -22,6 +22,9 @@ export default function CheckoutPage({ tier = 'premium', theme: themeKey, guest 
   const [method, setMethod] = useState<Method>('promptpay')
   const [card, setCard] = useState({ name: '', number: '', exp: '', cvc: '' })
   const [busy, setBusy] = useState(false)
+  // a card plan renews by itself: card rules ask for a clear, unticked yes to that
+  const [agreed, setAgreed] = useState(false)
+  const renews = !theme && method === 'card'
   const [error, setError] = useState<string | null>(null)
   // the reason the bank, Omise or our server gave, in small print under the message
   const [reason, setReason] = useState<string | null>(null)
@@ -37,7 +40,7 @@ export default function CheckoutPage({ tier = 'premium', theme: themeKey, guest 
 
   async function pay(e: FormEvent) {
     e.preventDefault()
-    if (busy || (method === 'card' && !cardReady)) return
+    if (busy || (method === 'card' && !cardReady) || (renews && !agreed)) return
     setBusy(true); setError(null); setReason(null)
     try {
       let token: string | undefined
@@ -124,9 +127,16 @@ export default function CheckoutPage({ tier = 'premium', theme: themeKey, guest 
             <p className="co-note">{t('Your {plan} plan switches to {next} as soon as this payment goes through.', { plan: t(PLANS.find((p) => p.tier === sub.tier)?.name ?? ''), next: t(plan.name) })}</p>
           )}
 
-          <button type="submit" className={`co-pay${busy ? ' busy' : ''}`} disabled={busy || (method === 'card' && !cardReady)}>
+          {renews && (
+            <label className="co-agree">
+              <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} disabled={busy} />
+              <span>{t('I agree that {plan} renews every month at {price} on this card until I turn off renewing in Plan.', { plan: t(plan.name), price })}</span>
+            </label>
+          )}
+          <button type="submit" className={`co-pay${busy ? ' busy' : ''}`} disabled={busy || (method === 'card' && !cardReady) || (renews && !agreed)}>
             {busy ? <><i className="co-dot" />{t('Securing your payment…')}</> : t('Pay {price}', { price })}
           </button>
+          <p className="co-fine legal-consent">{t('Digital items work straight away. You can get a full refund within 7 days of a first plan payment, or of a theme or icon set bought by mistake.')} {t('By paying you agree to the')} <a href="#terms">{t('Terms')}</a> {t('and')} <a href="#refunds">{t('Refund Policy')}</a>.</p>
           <p className="co-trust"><Icon name="shield" size="16px" />{t('Secure payment by Opn Payments. Dotset never sees your card or bank details.')}</p>
           <p className="co-fine">{theme ? t('One payment of {price}. {theme} is yours to keep, on every device you log in to.', { price, theme: t(theme.name) }) : method === 'card' ? t('Charged {price} today, then every month. Turn off renewing anytime in Plan.', { price }) : t('One month of {plan}. Nothing renews by itself: pay again from Plan when it ends.', { plan: t(plan.name) })}</p>
         </form>

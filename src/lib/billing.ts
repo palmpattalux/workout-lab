@@ -80,3 +80,4 @@ export async function cardToken(card: { name: string; number: string; month: str
     name: card.name, number: card.number.replace(/\s/g, ''), expiration_month: card.month, expiration_year: card.year.length === 2 ? '20' + card.year : card.year, security_code: card.cvc,
   }, (status, r) => (status === 200 && r.id ? resolve(r.id) : reject(new Error(r.message || 'card')))))
 }
+export const deleteAccount = () => api<{ ok: true }>('/api/account', { action: 'delete' })

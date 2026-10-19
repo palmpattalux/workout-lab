@@ -1937,3 +1937,37 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
   .theme-card .tier-chip { top: auto; bottom: 10px; right: 50%; transform: translateX(50%); }
 }
 @container theme-card (max-width: 130px) { .theme-card .tier-chip { display: none; } }
+
+/* legal pages: Terms, Privacy, Refunds */
+.legal-tabs { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: var(--sunk); }
+.legal-tabs button { white-space: nowrap; border: 0; background: none; color: var(--muted); padding: 7px 13px; border-radius: 999px; font: 700 .82rem var(--font); cursor: pointer; }
+.legal-tabs button.on { background: var(--surface); color: var(--ink); box-shadow: var(--lift); }
+.legal-text { padding: 6px 7% 60px; color: var(--ink); font-size: .9rem; line-height: 1.6; }
+.legal-text .legal-title { font: 800 1.5rem var(--font); letter-spacing: -.03em; margin: 8px 0 4px; }
+.legal-text h2 { font: 800 1.05rem var(--font); margin: 26px 0 6px; letter-spacing: -.01em; }
+.legal-text h3 { font: 700 .95rem var(--font); margin: 16px 0 4px; }
+.legal-text p { margin: 0 0 10px; }
+.legal-text ul { margin: 0 0 10px; padding-left: 1.2em; }
+.legal-text li { margin: 0 0 5px; }
+.legal-text a, .legal-consent a, .plan-legal a { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+.legal-consent { margin: 4px 0 0; color: var(--muted); font-size: .76rem; line-height: 1.5; text-align: center; }
+.plan-legal { margin: 18px 5.7% 34px; color: var(--muted); font-size: .76rem; line-height: 1.55; text-align: center; }
+/* delete account */
+.del-body { padding: 4px 7% 40px; color: var(--ink); line-height: 1.55; }
+.del-body ul { padding-left: 1.2em; color: var(--muted); }
+.del-body li { margin-bottom: 6px; }
+.del-lead { font-weight: 700; }
+.del-btn { display: block; width: 100%; margin-top: 12px; border: 0; border-radius: 999px; padding: 14px; font: 800 1rem var(--font); cursor: pointer; }
+.del-btn.danger { background: #d0453a; color: #fff; }
+.del-btn.quiet { background: var(--surface); color: var(--ink); box-shadow: var(--lift); }
+.del-btn:disabled { opacity: .6; }
+.del-confirm p { margin: 18px 0 0; font-weight: 700; text-align: center; }
+.danger-row span:first-child { color: #d0453a; }
+.ld-foot a { color: var(--l-muted); text-decoration: none; }
+.ld-foot a:hover { color: var(--l-ink); }
+.co-agree { display: flex; align-items: flex-start; gap: 10px; margin: 6px 0 12px; color: var(--ink); font-size: .82rem; line-height: 1.45; text-align: left; cursor: pointer; }
+.co-agree input { flex: none; width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--active); }
+.confirm.safety { display: flex; flex-direction: column; gap: 14px; }
+.confirm.safety p { margin: 0; }
+.confirm.safety small { color: var(--muted); font-size: .86rem; line-height: 1.5; text-align: center; }
+.confirm.safety button { width: 100%; }

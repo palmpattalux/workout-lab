@@ -154,6 +154,9 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
   // the switch button's menu is open: the session bar steps aside
   const [switching, setSwitching] = useState(false)
   const [confirmEnd, setConfirmEnd] = useState(false)
+  // the first time anyone starts training: a short safety note, once (Terms section 2)
+  const [safety, setSafety] = useState(() => { try { return inSession && !localStorage.getItem('dotset:safety-ok') } catch { return false } })
+  const safetyOk = () => { try { localStorage.setItem('dotset:safety-ok', '1') } catch { /* blocked */ } setSafety(false) }
   const endHint = firstSession && inSession && set >= 2 && !confirmEnd
   const [adding, setAdding] = useState(false)
   const [move, setMove] = useState('')
@@ -189,6 +192,16 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
       <button className="icon-btn home-back" aria-label={t('Back to home')} onClick={onHome}>
         <Icon name="arrowLeft" size="24px" />
       </button>
+
+      {safety && (
+        <div className="scrim">
+          <div className="confirm safety" role="alertdialog" aria-label={t('Train safely')}>
+            <p>{t('Train safely')}</p>
+            <small>{t('Dotset is a workout log, not medical advice. Check with a doctor before starting or changing your training, and stop if you feel pain, dizziness or shortness of breath.')}</small>
+            <button className="yes" onClick={safetyOk}>{t('Got it')}</button>
+          </div>
+        </div>
+      )}
 
       {confirmEnd && (
         <div className="scrim" onClick={(e) => { if (e.target === e.currentTarget) setConfirmEnd(false) }}>
