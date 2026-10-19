@@ -1,10 +1,10 @@
 // Who runs Dotset, as shown in the Terms, Privacy Policy and Refund Policy ({{key}} in src/legal/*.md).
 // Fill in the owner's legal name and address before going live (Omise, Apple and Google ask for them).
-const phone = ''                        // contact phone, e.g. '+66 81 234 5678' (Omise wants one on the website)
+const phone = '+66 91 942 3963'                     // contact phone, e.g. '+66 81 234 5678' (Omise wants one on the website)
 
 export const LEGAL = {
-  owner: 'the owner of Dotset',          // legal name of the person (or company) running Dotset
-  ownerTh: 'เจ้าของ Dotset',
+  owner: 'Pattalux Taongam',              // legal name of the person (or company) running Dotset
+  ownerTh: 'Pattalux Taongam',
   address: 'Bangkok, Thailand',           // registered business address
   email: 'hello@dotset.app',              // support and privacy contact
   phone,
