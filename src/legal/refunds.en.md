@@ -1,8 +1,12 @@
-# Refund and Cancellation Policy
+# Refund, Cancellation and Delivery Policy
 
 Last updated: {{updated}}
 
-Dotset sells digital items: plans (subscriptions), themes and icon sets. There is nothing shipped. Everything you buy works in your account the moment your payment goes through, on every device where you log in.
+Dotset sells digital items: plans (subscriptions), themes and icon sets.
+
+## Delivery
+
+There is nothing shipped. Everything you buy works in your account the moment your payment goes through, on every device where you log in. If something you paid for hasn't appeared within 15 minutes, email {{email}} and we will add it or refund you.
 
 ## Cancelling a plan
 
@@ -34,4 +38,4 @@ Purchases made in the iPhone or Android app are billed by Apple or Google, so re
 
 ## Contact
 
-{{owner}}, {{address}}. Email: {{email}}
+{{owner}}, {{address}}. Email: {{email}}{{phoneLine}}

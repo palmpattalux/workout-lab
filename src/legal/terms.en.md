@@ -74,4 +74,4 @@ We may suspend or close an account that seriously or repeatedly breaks these rul
 
 ## 11. Contact
 
-{{owner}}, {{address}}. Email: {{email}}
+{{owner}}, {{address}}. Email: {{email}}{{phoneLine}}

@@ -80,4 +80,4 @@ Dotset สำหรับผู้มีอายุ 13 ปีขึ้นไป
 
 ## 11. ติดต่อเรา
 
-{{ownerTh}} {{address}} อีเมล: {{email}}
+{{ownerTh}} {{address}} อีเมล: {{email}}{{phoneLineTh}}

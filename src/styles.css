@@ -1965,6 +1965,8 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .danger-row span:first-child { color: #d0453a; }
 .ld-foot a { color: var(--l-muted); text-decoration: none; }
 .ld-foot a:hover { color: var(--l-ink); }
+.ld-contact { margin-top: -22px; margin-bottom: 0; padding-bottom: 36px; color: var(--l-muted); font: 500 .8rem var(--font); }
+.ld-contact a { color: inherit; }
 .co-agree { display: flex; align-items: flex-start; gap: 10px; margin: 6px 0 12px; color: var(--ink); font-size: .82rem; line-height: 1.45; text-align: left; cursor: pointer; }
 .co-agree input { flex: none; width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--active); }
 .confirm.safety { display: flex; flex-direction: column; gap: 14px; }

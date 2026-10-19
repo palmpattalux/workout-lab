@@ -6,6 +6,7 @@ import { THEMES, THEME_PRICE, type Theme, type Feature } from '../lib/theme'
 import { PLANS } from '../lib/plan'
 import { usePrefs, setPrefs } from '../lib/prefs'
 import { LANGS, t } from '../lib/i18n'
+import { LEGAL } from '../legal/info'
 
 // dotset.app on a computer: Dotset is a phone app, so the desktop site is a calm shop window.
 // Its job is the themes (and plans) at the best price; phones never see this page.
@@ -164,6 +165,10 @@ export default function LandingPage({ onOpenApp }: { onOpenApp: () => void }) {
         <a href="/refunds" onClick={(e) => { e.preventDefault(); open('refunds') }}>{t('Refunds')}</a>
         <button className="ld-link" onClick={() => open('licenses')}>{t('Open-source licences')}</button>
       </footer>
+      <p className="ld-contact">
+        {prefs.lang === 'th' ? LEGAL.ownerTh : LEGAL.owner} · {LEGAL.address} · <a href={`mailto:${LEGAL.email}`}>{LEGAL.email}</a>
+        {LEGAL.phone && <> · <a href={`tel:${LEGAL.phone.replace(/\s/g, '')}`}>{LEGAL.phone}</a></>}
+      </p>
     </div>
   )
 }

@@ -74,4 +74,4 @@
 
 ## 11. ติดต่อเรา
 
-{{ownerTh}} {{address}} อีเมล: {{email}}
+{{ownerTh}} {{address}} อีเมล: {{email}}{{phoneLineTh}}

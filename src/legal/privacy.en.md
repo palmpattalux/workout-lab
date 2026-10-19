@@ -80,4 +80,4 @@ If we change this policy in an important way, we will tell you in the app or by 
 
 ## 11. Contact
 
-{{owner}}, {{address}}. Email: {{email}}
+{{owner}}, {{address}}. Email: {{email}}{{phoneLine}}
