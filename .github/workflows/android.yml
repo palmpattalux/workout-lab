@@ -1,5 +1,7 @@
-# Builds the Android app on every push to main. Download "dotset-android" from the run's
-# Artifacts and install the .apk on an Android phone to try it.
+# Builds the Android app on every push to main. From the run's Artifacts:
+# - "dotset-android": an .apk to install straight on an Android phone
+# - "dotset-android-release": the signed .aab to upload to Google Play (only once the
+#   ANDROID_KEYSTORE_BASE64 and ANDROID_KEYSTORE_PASSWORD secrets are set)
 name: Android build
 on:
   push:
@@ -8,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      HAS_KEY: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -27,3 +31,18 @@ jobs:
         with:
           name: dotset-android
           path: android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Signed release bundle for Google Play
+        if: env.HAS_KEY == 'true'
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          VERSION_CODE: ${{ github.run_number }}
+        working-directory: android
+        run: |
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/upload.p12"
+          ANDROID_KEYSTORE_FILE="$RUNNER_TEMP/upload.p12" ./gradlew bundleRelease
+      - uses: actions/upload-artifact@v4
+        if: env.HAS_KEY == 'true'
+        with:
+          name: dotset-android-release
+          path: android/app/build/outputs/bundle/release/app-release.aab

@@ -5,9 +5,11 @@ import { setOwnedThemes } from './theme'
 
 // Paying for a plan on the website. Omise (Opn Payments) takes the payment; our server
 // (api/*.js on Vercel) checks it and records the plan in Supabase, which the app reads here.
-// Only on the public site, and only once the Omise public key is set.
+// Only on the public site, and only once the Omise public key is set. Never inside the store apps:
+// Apple and Google require their own in-app purchase for digital items there.
 const PUBLIC_KEY = import.meta.env.VITE_OMISE_PUBLIC_KEY as string | undefined
-export const canPay = !!supabase && !!PUBLIC_KEY
+const native = !!(window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.()
+export const canPay = !!supabase && !!PUBLIC_KEY && !native
 
 export type Method = 'card' | 'promptpay' | 'truemoney'
 export type Subscription = { tier: Tier; paid_until: string; method: Method; renews: boolean } | null

@@ -25,7 +25,7 @@ export default function PlansPage({ userId }: { userId: string | null }) {
         <span className="plan-state on">{t('Current plan')}</span>
         {mine && <small>{mine.renews ? t('Renews on {date}', { date: until }) : t('Active until {date}', { date: until })}</small>}
         {mine?.renews && <button className="plan-quiet" disabled={stopping} onClick={stopRenewing}>{t('Turn off renewing')}</button>}
-        {mine && !mine.renews && <button className="plan-quiet" onClick={() => { location.hash = 'checkout-' + tier }}>{t('Add another month')}</button>}
+        {canPay && mine && !mine.renews && <button className="plan-quiet" onClick={() => { location.hash = 'checkout-' + tier }}>{t('Add another month')}</button>}
       </div>
     )
     : atLeast(plan, tier) ? <span className="plan-state">{t('Included')}</span>
