@@ -166,7 +166,7 @@ export default function LandingPage({ onOpenApp }: { onOpenApp: () => void }) {
         <button className="ld-link" onClick={() => open('licenses')}>{t('Open-source licences')}</button>
       </footer>
       <p className="ld-contact">
-        {prefs.lang === 'th' ? LEGAL.ownerTh : LEGAL.owner} · {LEGAL.address} · <a href={`mailto:${LEGAL.email}`}>{LEGAL.email}</a>
+        {prefs.lang === 'th' ? LEGAL.ownerTh : LEGAL.owner} · {prefs.lang === 'th' ? LEGAL.addressTh : LEGAL.address} · <a href={`mailto:${LEGAL.email}`}>{LEGAL.email}</a>
         {LEGAL.phone && <> · <a href={`tel:${LEGAL.phone.replace(/\s/g, '')}`}>{LEGAL.phone}</a></>}
       </p>
     </div>

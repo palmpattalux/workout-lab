@@ -38,4 +38,4 @@ Dotset จำหน่ายสินค้าดิจิทัล ได้แ
 
 ## ติดต่อเรา
 
-{{ownerTh}} {{address}} อีเมล: {{email}}{{phoneLineTh}}
+{{ownerTh}} {{addressTh}} อีเมล: {{email}}{{phoneLineTh}}
