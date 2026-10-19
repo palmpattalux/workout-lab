@@ -34,6 +34,13 @@
     <script>
       // apply the saved light/dark choice before anything paints
       try { var t = JSON.parse(localStorage.getItem('workout-lab:prefs') || '{}').theme; if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-mode', t) } catch (e) {}
+      // iPhone/iPad Safari (not the store app, not added to the home screen): Safari's own bars float over
+      // the bottom of the page, so the app is lifted clear of them (see data-ios-web in styles.css)
+      try {
+        var ios = /iP(hone|od|ad)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+        var app = navigator.standalone || (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())
+        if (ios && !app) document.documentElement.setAttribute('data-ios-web', '')
+      } catch (e) {}
     </script>
     <title>Dotset</title>
   </head>
