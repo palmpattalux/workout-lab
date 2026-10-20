@@ -16,6 +16,8 @@ import { LangPicker } from '../components/Flag'
 import { usePlan, atLeast, tierName, FREE_WORKOUTS, showLocked } from '../lib/plan'
 import { useNewWeek } from '../lib/week'
 import RenewNotice from '../components/RenewNotice'
+import BookDrop from '../components/BookDrop'
+import HoloThumb from '../components/HoloThumb'
 
 // Exercise dot positions, as % of the screen: low and toward the right, in easy reach of a
 // right thumb. The first four are always shown; the rest fill in as more workouts exist.
@@ -82,13 +84,14 @@ function fan(slot: number, n: number) {
 const iconOptionsOf = (p: IconPack) => packIcons(p).map((i) => ({ key: i.key, label: t(i.name), node: <WorkoutIcon k={i.key} size="24px" strokeWidth={2} /> }))
 const letterOptionsOf = (p: IconPack) => packLetters(p).map((l) => ({ key: l.key, label: l.name, node: <b className="letter">{l.key}</b> }))
 
-export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdit, onOpenBook, onThemes, onPlans, onCreate }: {
+export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdit, onOpenBook, onOpenSession, onThemes, onPlans, onCreate }: {
   guest: boolean
   workouts: Workout[]
   onOpenDot: (id: string) => void
   onStartPreset: (id: string, preset: string) => void
   onEdit: (id: string) => void
   onOpenBook: () => void
+  onOpenSession: (id: string) => void // a session picked from the book button's drag-down list
   onThemes: () => void
   onPlans: () => void
   onCreate: (icon: string, letter: string) => void
@@ -298,6 +301,8 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
   }
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [slideHint, setSlideHint] = useState(0)
+  // an icon was just picked: the same slide shows again, now for the letter, straight away
+  const [letterHint, setLetterHint] = useState(0)
   // hold on an empty spot: a small pop with a way to the themes
   const [themePop, setThemePop] = useState<{ x: number; y: number } | null>(null)
   const blank = useRef<{ x: number; y: number; timer: number } | null>(null)
@@ -343,7 +348,7 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
 
   return (
     <main className={`page${picking ? ' picking' : ''}`} aria-label="Page A"
-      onPointerDownCapture={(e) => { if (pickedIcon && !(e.target as Element).closest('.add')) setPickedIcon(null) }}
+      onPointerDownCapture={(e) => { if (letterHint) setLetterHint(0); if (pickedIcon && !(e.target as Element).closest('.add')) setPickedIcon(null) }}
       onPointerDown={onBlankDown} onPointerMove={onBlankMove} onPointerUp={onBlankUp} onPointerCancel={onBlankUp}
       onClick={(e) => { if (e.target === e.currentTarget) { setChosen(null); setSettingsOpen(false); setRing(null); setPresetOpen(false); setArmedPreset(null) } }}>
       <ThemeScene skin={skin} />
@@ -357,10 +362,10 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
       {savedSign && (
         <span className="saved-sign" aria-live="polite"><Icon name="check" size="13px" strokeWidth={2.6} />{t('Saved in your book')}</span>
       )}
-      <button className={`btn pill${savedSign ? ' just-saved' : ''}`} id="a2" aria-label={t('Book')} onClick={onOpenBook}>
+      <BookDrop className={`btn pill${savedSign ? ' just-saved' : ''}`} onOpenBook={onOpenBook} onOpenSession={onOpenSession}>
         <Icon name="book" size="46%" />
         {newWeek && <span className="new-dot" aria-label={t('New summary')} />}
-      </button>
+      </BookDrop>
 
       {/* empty slots: the first four always, every one while dragging */}
       {SLOTS.map((s, i) => (bySlot.has(i) || (i >= 4 && !drag)) ? null : (
@@ -488,7 +493,7 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
           maxStep={40}
           instant
           onTap={() => setSlideHint((n) => n + 1)}
-          onPick={(i) => setPickedIcon(iconOptions[i].key)}
+          onPick={(i) => { setPickedIcon(iconOptions[i].key); setLetterHint((n) => n + 1) }}
           className={`dot add float${slideHint ? ' hint-hidden' : ''}`}
           style={{ left: '20%', top: '87%' }}
           ariaLabel="Add workout, drag up to pick an icon"
@@ -502,13 +507,18 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
           instant
           onTap={tapAdd}
           onPick={(i) => { const icon = pickedIcon; setPickedIcon(null); onCreate(icon, letterOptions[i].key) }}
-          className="dot add float in-progress"
+          className={`dot add float in-progress${letterHint ? ' hint-hidden' : ''}`}
           style={{ left: '20%', top: '87%' }}
           ariaLabel="Adding workout, drag up to pick a body part, double tap to cancel"
         >
           <WorkoutIcon k={pickedIcon} size="40%" />
           <span className="badge" aria-hidden="true">?</span>
         </HoldPicker>
+      )}
+      {letterHint > 0 && pickedIcon !== null && (
+        <div key={'l' + letterHint} className="add-hint twice" style={{ left: '20%', top: '87%' }} aria-hidden="true" onAnimationEnd={(e) => { if (e.target === e.currentTarget) setLetterHint(0) }}>
+          <span className="add-hint-knob"><b className="add-hint-letter">{letterOptions[0]?.key ?? 'A'}</b></span>
+        </div>
       )}
       {/* tapped + instead of sliding it: show the slide, like a tall switch */}
       {slideHint > 0 && pickedIcon === null && !atLimit && (
@@ -647,15 +657,7 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
           <span className="holo-track" />
           <span className="holo-pick one"><WorkoutIcon k="dumbbell" size="52%" strokeWidth={2} /></span>
           <span className="holo-pick two"><b>A</b></span>
-          {/* a right thumb, as if holding the phone in the right hand: a blueprint to trace */}
-          <span className="holo-thumb">
-            <svg viewBox="0 0 80 250" aria-hidden="true">
-              <path className="th-body" d="M40 2C58 2 70 16 70 38L72 150C72 178 78 208 82 250H-2C2 208 8 178 10 150L10 38C10 16 22 2 40 2Z" />
-              <path className="th-nail" d="M40 10C52 10 60 20 60 34V60C60 68 53 73 40 73S20 68 20 60V34C20 20 28 10 40 10Z" />
-              <path className="th-line" d="M17 118Q40 126 63 118M15 131Q40 139 65 131" />
-              <circle className="th-tip" cx="40" cy="6" r="5" />
-            </svg>
-          </span>
+          <HoloThumb />
           <span className="holo-label">{t('Slide up to make an exercise')}</span>
         </div>
       )}

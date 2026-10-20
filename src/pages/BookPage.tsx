@@ -15,12 +15,13 @@ import { t, locale } from '../lib/i18n'
 // per preset, tap for only the sessions done from it. Notes: every note, newest first.
 // "This week" (Exclusive) opens the weekly summary.
 type View = 'exercises' | 'sessions' | 'presets' | 'notes'
-export default function BookPage({ workouts, kept = 0, view, openId, presetId, onOpen, onOpenPreset, onView }: {
+export default function BookPage({ workouts, kept = 0, view, openId, sessionId, presetId, onOpen, onOpenPreset, onView }: {
   workouts: Workout[]
   // exercises saved but not shown on Free (they come back with a plan)
   kept?: number
   view: View
   openId: string | null
+  sessionId?: string | null // Sessions tab with this session open
   presetId: string | null
   onOpen: (id: string) => void
   onOpenPreset: (id: string) => void
@@ -60,7 +61,7 @@ export default function BookPage({ workouts, kept = 0, view, openId, presetId, o
         <button className="logout" onClick={() => { signOut(); location.replace('#') }}>{t('Log out')}</button>
       )}
 
-      {open ? <Detail w={open} /> : preset ? <PresetDetail p={preset} workouts={workouts} /> : view === 'sessions' ? <SessionsList workouts={workouts} />
+      {open ? <Detail w={open} /> : preset ? <PresetDetail p={preset} workouts={workouts} /> : view === 'sessions' ? <SessionsList workouts={workouts} startOpen={sessionId} />
         : view === 'notes' ? <NotesList workouts={workouts} />
         : view === 'presets' && canPreset ? (presets.length === 0
           ? <p className="empty-note">{t('No presets yet. Tap the list button on the first page to make one.')}</p>
