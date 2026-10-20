@@ -7,6 +7,7 @@ import { Icon, WorkoutMark } from '../components/icons'
 import HoldPicker from '../components/HoldPicker'
 import HoldMenu from '../components/HoldMenu'
 import NumberPrompt from '../components/NumberPrompt'
+import HoloThumb from '../components/HoloThumb'
 import { updateWorkout, usePresets, addNote, type Workout } from '../lib/store'
 import { useSession, switchTo, goToSet, setSided, setKey, keyNum, keySide, record, recordAt, recordMove, endSession, discardSession, removeFromSession } from '../lib/session'
 import { useTimer, startTimer, stopTimer, timerState } from '../lib/timer'
@@ -33,7 +34,7 @@ const repOptions = Array.from({ length: 25 }, (_, i) => ({ key: String(i + 1), n
 // The line is tight, so only every fifth second is numbered.
 const secOptions = Array.from({ length: 60 }, (_, i) => ({ key: String(i + 1), node: (i + 1) % 5 === 0 || i === 0 ? i + 1 : <i className="tick" />, label: t('{n} sec', { n: i + 1 }) }))
 
-export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded }: {
+export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
   guest?: boolean
   workout: Workout | null
   workouts: Workout[]
@@ -58,9 +59,9 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
   const skin = useSkin()
   // a session started from a preset: the switcher only offers that preset, in its order
   const presets = usePresets()
-  // a guest's first session: from set 2 on, a hologram shows that Active ends it
+  // anyone's first session: from set 2 on, a hologram shows that Active ends it
   const doneSessions = useSessions()
-  const firstSession = !!guest && doneSessions.length === 0
+  const firstSession = doneSessions.length === 0
   const preset = session?.preset ? presets.find((p) => p.id === session.preset) : undefined
   // Trying a theme on: the set arrows still move (nothing is saved), so the theme's
   // page B animation can be seen. Sets loop, as if moving on to the next exercise.
@@ -160,6 +161,18 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
   const endHint = firstSession && inSession && set >= 2 && !confirmEnd
   const [adding, setAdding] = useState(false)
   const [move, setMove] = useState('')
+  // The first time a session is on page B, holograms show the three buttons at once: slide up
+  // for weight (or tap to name a progression), slide up for reps, tap the arrow for the next set.
+  // Once per device (progression exercises get their own once); any touch ends it.
+  const hintKey = isProgression ? 'dotset:hint-b-prog' : 'dotset:hint-b'
+  const [bHint, setBHint] = useState(() => { try { return inSession && !localStorage.getItem(hintKey) } catch { return false } })
+  const showBHint = bHint && inSession && !safety && !confirmEnd && !adding
+  useEffect(() => {
+    if (!showBHint) return
+    try { localStorage.setItem(hintKey, '1') } catch { /* blocked */ }
+    const tm = setTimeout(() => setBHint(false), 6600)
+    return () => clearTimeout(tm)
+  }, [showBHint])
 
   function addMove() {
     const text = move.trim()
@@ -169,12 +182,12 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
   }
 
   return (
-    <main className="page" aria-label="Page B">
+    <main className="page" aria-label="Page B" onPointerDownCapture={() => { if (bHint) setBHint(false) }}>
       {skin === 'manga' && (inSession || trying) && <MangaBattle set={trying ? demo + 1 : set} />}
       {/* To the Top: every set moved on, across the whole session, is a step up the mountain */}
       {skin === 'summit' && (inSession || trying) && <SummitClimb steps={trying ? demo : Object.values(session!.setOf).reduce((a, n) => a + Math.max(0, n - 1), 0)} />}
       <div className="tabs">
-        <button className={`btn pill${session ? ' live' : ''}${endHint ? ' holo-target' : ''}`} id="b1" aria-label={session ? t('Active session: tap to end') : t('Active')} onClick={() => session && setConfirmEnd(true)}>
+        <button className={`btn pill${session ? ' live' : ''}${endHint ? ' holo-target' : ''}${startPulse && !endHint ? ' start-pulse' : ''}`} id="b1" aria-label={session ? t('Active session: tap to end') : t('Active')} onClick={() => session && setConfirmEnd(true)}>
           <span className="led" />{t('Active')}
         </button>
         <button className="btn pill" id="b2" aria-label={t('Notes')}
@@ -339,6 +352,36 @@ export default function PageB({ guest, workout, workouts, onGo, onHome, onEnded 
             : <span className="val"><Icon name="stopwatch" size="14px" />{ts.held}<small>{t('sec')}</small></span>
           : reps ? <span className="val">{reps}{timed && <small>{t('sec')}</small>}</span> : timed ? <span className="unit-label">{t('sec')}</span> : <Icon name="numbers" />}
       </HoldPicker>
+      {showBHint && (
+        <>
+          {isProgression ? (
+            <div className="holo holo-move" style={{ left: '35.1%', top: '64.1%' }} aria-hidden="true">
+              <span className="holo-ring" />
+              <span className="holo-hand"><Icon name="hand" size="100%" strokeWidth={1.6} /></span>
+              <span className="holo-input"><span>{t('Knee push-up')}</span></span>
+              <span className="holo-label">{t('Tap: new move')}</span>
+            </div>
+          ) : (
+            <div className="holo holo-slide" style={{ left: '35.1%', top: '64.1%' }} aria-hidden="true">
+              <span className="holo-track" />
+              <span className="holo-nums"><i>{unit === 'lbs' ? 45 : 20}</i><i>{unit === 'lbs' ? 95 : 40}</i><i>{unit === 'lbs' ? 135 : 60}</i></span>
+              <HoloThumb />
+              <span className="holo-label">{t('Slide up: weight')}</span>
+            </div>
+          )}
+          <div className="holo holo-slide" style={{ left: '69%', top: '64.1%' }} aria-hidden="true">
+            <span className="holo-track" />
+            <span className="holo-nums"><i>{timed ? 10 : 6}</i><i>{timed ? 20 : 8}</i><i>{timed ? 30 : 10}</i></span>
+            <HoloThumb />
+            <span className="holo-label">{timed ? t('Slide up: seconds') : t('Slide up: reps')}</span>
+          </div>
+          <div className="holo holo-tap holo-next" style={{ left: '85.1%', top: '43.2%' }} aria-hidden="true">
+            <span className="holo-ring" />
+            <span className="holo-hand"><Icon name="hand" size="100%" strokeWidth={1.6} /></span>
+            <span className="holo-label">{t('Next set')}</span>
+          </div>
+        </>
+      )}
       {typing && (
         <NumberPrompt
           title={typing === 'weight' ? t('Weight') : t('Seconds')}

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { WorkoutMark } from '../components/icons'
 import { useSessions, deleteSession, updateSession, useNotes, type Workout, type Session, type SetEntry } from '../lib/store'
 import { Icon } from '../components/icons'
@@ -18,13 +18,15 @@ function Change({ d, unit, label }: { d: number | null; unit?: string; label: st
 }
 
 // Every session as a row, newest at the top. Tap a row to see its exercises and sets.
-export default function SessionsList({ workouts, only }: { workouts: Workout[]; only?: string }) {
+export default function SessionsList({ workouts, only, startOpen }: { workouts: Workout[]; only?: string; startOpen?: string | null }) {
   const done = useSessions()
   const live = useSession()
   const allNotes = useNotes().filter((n) => n.text.trim() && n.sessionId)
-  const [open, setOpen] = useState<string | null>(null)
+  const [open, setOpen] = useState<string | null>(startOpen ?? null)
   const [removing, setRemoving] = useState<(Session & { live?: boolean }) | null>(null)
   const [editing, setEditing] = useState<string | null>(null)
+  // opened from the book button's drag-down list: bring that session into view
+  useEffect(() => { if (startOpen) document.getElementById('s-' + startOpen)?.scrollIntoView({ block: 'center' }) }, [startOpen])
   // `only`: a preset's id, to list just the sessions done from it
   const rows: (Session & { live?: boolean })[] = [...(live ? [{ ...live, live: true }] : []), ...[...done].reverse()].filter((s) => !only || s.preset === only)
 
@@ -57,7 +59,7 @@ export default function SessionsList({ workouts, only }: { workouts: Workout[]; 
         const gains = s.order.filter((id) => changes[id].up).length
         const notes = allNotes.filter((n) => n.sessionId === s.id)
         return (
-          <li key={s.id} className={s.live ? 'live' : undefined}>
+          <li key={s.id} className={s.live ? 'live' : undefined} id={'s-' + s.id}>
             <button className="session-row" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : s.id)}>
               {/* what was trained first, when it was on the right */}
               <span className="marks">

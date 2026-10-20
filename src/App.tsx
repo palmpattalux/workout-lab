@@ -44,7 +44,8 @@ import { t } from './lib/i18n'
 //   note-<id>   one note (page B Notes, Book > Notes)
 //   licenses    open-source credits (gear)
 //   week        weekly summary (Book > This week, Exclusive)
-//   book        book list, book-<id> one workout, sessions = all sessions,
+//   book        book list, book-<id> one workout, sessions = all sessions, session-<id> = with that one open
+//               (picked from the book button's drag-down list),
 //               presets = preset list, preset-<id> one preset's sessions, notes = all notes
 // The log-in page only opens when asked for (gear, the sign-up guide, or ending a guest's
 // session), never on its own when the app is opened.
@@ -167,13 +168,14 @@ function AppScreen({ hash, user, recovering }: { hash: string; user: ReturnType<
     const w = workouts.find((x) => x.id === hash.slice(5))
     if (w) return <CreatePage key={w.id} editing={w} icon={w.icon} letter={w.letter} onClose={() => history.back()} />
   }
-  if (hash === 'book' || hash === 'sessions' || hash === 'presets' || hash === 'notes' || hash.startsWith('book-') || hash.startsWith('preset-')) {
+  if (hash === 'book' || hash === 'sessions' || hash.startsWith('session-') || hash === 'presets' || hash === 'notes' || hash.startsWith('book-') || hash.startsWith('preset-')) {
     return (
       <BookPage
         workouts={workouts}
         kept={kept}
-        view={hash === 'sessions' ? 'sessions' : hash === 'notes' ? 'notes' : hash === 'presets' || hash.startsWith('preset-') ? 'presets' : 'exercises'}
+        view={hash === 'sessions' || hash.startsWith('session-') ? 'sessions' : hash === 'notes' ? 'notes' : hash === 'presets' || hash.startsWith('preset-') ? 'presets' : 'exercises'}
         openId={hash.startsWith('book-') ? hash.slice(5) : null}
+        sessionId={hash.startsWith('session-') ? hash.slice(8) : null}
         presetId={hash.startsWith('preset-') ? hash.slice(7) : null}
         onOpen={(id) => go('book-' + id)}
         onOpenPreset={(id) => go('preset-' + id)}
@@ -189,6 +191,7 @@ function AppScreen({ hash, user, recovering }: { hash: string; user: ReturnType<
       onStartPreset={(id, preset) => { if (!getPreview()) switchTo(id, preset); go('b-' + id) }}
       onEdit={(id) => go('edit-' + id)}
       onOpenBook={() => go('book')}
+      onOpenSession={(id) => go('session-' + id)}
       onThemes={() => go('themes')}
       onPlans={() => go('plans')}
       onCreate={(icon, letter) => { setDraft({ icon, letter }); go('new') }}
