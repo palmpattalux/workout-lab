@@ -187,7 +187,7 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
       {/* To the Top: every set moved on, across the whole session, is a step up the mountain */}
       {skin === 'summit' && (inSession || trying) && <SummitClimb steps={trying ? demo : Object.values(session!.setOf).reduce((a, n) => a + Math.max(0, n - 1), 0)} />}
       <div className="tabs">
-        <button className={`btn pill${session ? ' live' : ''}${endHint ? ' holo-target' : ''}`} id="b1" aria-label={session ? t('Active session: tap to end') : t('Active')} onClick={() => session && setConfirmEnd(true)}>
+        <button className={`btn pill${session ? ' live' : ''}${endHint ? ' holo-target' : ''}${startPulse && !endHint ? ' start-pulse' : ''}`} id="b1" aria-label={session ? t('Active session: tap to end') : t('Active')} onClick={() => session && setConfirmEnd(true)}>
           <span className="led" />{t('Active')}
         </button>
         <button className="btn pill" id="b2" aria-label={t('Notes')}

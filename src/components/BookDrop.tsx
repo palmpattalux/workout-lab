@@ -64,7 +64,7 @@ export default function BookDrop({ className, onOpenBook, onOpenSession, childre
 
   return (
     <>
-      <button ref={btn} className={className} id="a2" aria-label={t('Book. Drag down for recent sessions')}
+      <button ref={btn} className={className + (recent.length && !open && !className.includes('just-saved') ? ' nudge' : '')} id="a2" aria-label={t('Book. Drag down for recent sessions')}
         onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onClick={click}>
         {children}
       </button>

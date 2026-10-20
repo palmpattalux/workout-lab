@@ -20,6 +20,8 @@ export default function CreatePage({ icon: icon0, letter: letter0, editing, onCl
   const [count, setCount] = useState<'reps' | 'sec'>(editing?.count ?? 'reps')
   const [focus, setFocus] = useState(editing?.focus ?? '')
   const [notes, setNotes] = useState(editing?.notes ?? '')
+  // a new exercise starts with just the name, weight type and equipment; focus and notes come once it's named
+  const [named, setNamed] = useState(!!editing)
 
   function save() {
     const fields = { icon, letter, color: color || undefined, exercise: exercise.trim(), equipment: equipment.trim(), mode, unit, count, focus: focus.trim(), notes: notes.trim() }
@@ -70,7 +72,20 @@ export default function CreatePage({ icon: icon0, letter: letter0, editing, onCl
       )}
 
       <div className="form">
-        <input id="exercise" className="field" placeholder={t('Exercise')} value={exercise} onChange={(e) => setExercise(e.target.value)} />
+        <input id="exercise" className="field" placeholder={t('Exercise')} value={exercise} enterKeyHint="next" onChange={(e) => setExercise(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter' && exercise.trim()) { setNamed(true); document.getElementById('equipment')?.focus() } }}
+          onBlur={() => { if (exercise.trim()) setNamed(true) }} />
+
+        {/* weight type first, then the equipment it's for */}
+        {isEquipment ? (
+          <button className="unit" onClick={() => setUnit(unit === 'kg' ? 'lbs' : 'kg')} aria-label={`Unit: ${unit}, tap to switch`}>
+            <span className={unit === 'kg' ? 'on' : ''}>kg</span> / <span className={unit === 'lbs' ? 'on' : ''}>lbs</span>
+          </button>
+        ) : (
+          <button className="unit" onClick={() => setCount(count === 'reps' ? 'sec' : 'reps')} aria-label={`Counting ${count}, tap to switch`}>
+            <span className={count === 'reps' ? 'on' : ''}>{t('reps')}</span> / <span className={count === 'sec' ? 'on' : ''}>{t('sec')}</span>
+          </button>
+        )}
 
         <div className="field-row">
           <input
@@ -90,25 +105,17 @@ export default function CreatePage({ icon: icon0, letter: letter0, editing, onCl
             <span className="knob" />
           </button>
         </div>
+        {!isEquipment && <p className="hint later">{t('add later as you progress')}</p>}
 
-        {isEquipment ? (
-          <button className="unit" onClick={() => setUnit(unit === 'kg' ? 'lbs' : 'kg')} aria-label={`Unit: ${unit}, tap to switch`}>
-            <span className={unit === 'kg' ? 'on' : ''}>kg</span> / <span className={unit === 'lbs' ? 'on' : ''}>lbs</span>
-          </button>
-        ) : (
+        {named && (
           <>
-            <button className="unit" onClick={() => setCount(count === 'reps' ? 'sec' : 'reps')} aria-label={`Counting ${count}, tap to switch`}>
-              <span className={count === 'reps' ? 'on' : ''}>{t('reps')}</span> / <span className={count === 'sec' ? 'on' : ''}>{t('sec')}</span>
-            </button>
-            <p className="hint later">{t('add later as you progress')}</p>
+            <textarea id="focus" className="field area reveal" placeholder={t('Specific focus')} value={focus} onChange={(e) => setFocus(e.target.value)} />
+            <p className="hint reveal">{t('Reminder in your next session')}</p>
+
+            <textarea id="notes" className="field area quiet reveal" placeholder={t('General notes')} value={notes} onChange={(e) => setNotes(e.target.value)} />
+            <p className="hint quiet reveal">{t('Control your variables')}</p>
           </>
         )}
-
-        <textarea id="focus" className="field area" placeholder={t('Specific focus')} value={focus} onChange={(e) => setFocus(e.target.value)} />
-        <p className="hint">{t('Reminder in your next session')}</p>
-
-        <textarea id="notes" className="field area quiet" placeholder={t('General notes')} value={notes} onChange={(e) => setNotes(e.target.value)} />
-        <p className="hint quiet">{t('Control your variables')}</p>
 
         {editing && <button className="remove" onClick={() => setConfirmRemove(true)}>{t('Remove exercise')}</button>}
       </div>

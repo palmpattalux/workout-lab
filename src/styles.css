@@ -2193,3 +2193,12 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .holo-input span { display: inline-block; overflow: hidden; vertical-align: bottom; border-right: 1.5px solid var(--active); animation: holo-type 3.2s steps(12) infinite; }
 @keyframes holo-type { 0%, 15% { max-width: 0; } 65%, 100% { max-width: 9em; } }
 .holo-next .holo-label { left: auto; right: -12px; top: -82px; transform: none; }
+
+/* Book on page A: every so often it dips a little with a deeper shadow, hinting "drag me down" (2026-10-20) */
+#a2.nudge { animation: book-nudge 14s var(--ease) 3s infinite; }
+@keyframes book-nudge {
+  0%, 6%, 100% { translate: 0 0; box-shadow: var(--lift); }
+  3% { translate: 0 7px; box-shadow: var(--lift), 0 12px 18px -8px rgb(0 0 0 / .32); }
+}
+@media (prefers-reduced-motion: reduce) { #a2.nudge { animation: none; } }
+.create .reveal { animation: rise .35s var(--ease) both; }
