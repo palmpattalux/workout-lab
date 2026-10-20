@@ -141,7 +141,7 @@ export default function LandingPage({ user }: { user: AppUser | null | undefined
         <div className="ld-copy">
           <span className="ld-badge"><i />{t('Coming soon to the App Store and Google Play.')}</span>
           <h1>{t('Simple logging.')}<br /><em>{t('Zero friction.')}</em></h1>
-          <p>{t('Most workout trackers cram in every feature and end up messy and tiring to use. Dotset does the opposite: few buttons, clean screens, everything where your thumb already rests. It is not a notebook you write in. It sorts every set for you, so your tired brain gets a break after a long day and your whole journey is measured more accurately.')}</p>
+          <p>{t("Most workout apps try to do everything, and logging a set ends up harder than lifting it. Dotset keeps only what matters: a few buttons, right where your thumb rests. Every set is sorted for you, so you can focus on training and see your progress clearly.")}</p>
           <div className="ld-cta">
             <button className="ld-btn" onClick={() => toSection('ld-how')}>{t('See how it works')}</button>
             <button className="ld-link ld-try" onClick={() => toSection('ld-try')}>{t('Create your first exercise')}</button>
