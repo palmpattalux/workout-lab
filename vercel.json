@@ -3,6 +3,7 @@
     { "source": "/terms", "destination": "/index.html" },
     { "source": "/privacy", "destination": "/index.html" },
     { "source": "/refunds", "destination": "/index.html" },
-    { "source": "/delete-account", "destination": "/index.html" }
+    { "source": "/delete-account", "destination": "/index.html" },
+    { "source": "/affiliate", "destination": "/affiliate/index.html" }
   ]
 }
