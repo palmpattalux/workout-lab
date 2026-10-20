@@ -17,7 +17,7 @@ import { refreshSubscription } from './lib/billing'
 import NotePage from './pages/NotePage'
 import WeekPage from './pages/WeekPage'
 import LicensesPage from './pages/LicensesPage'
-import LandingPage from './pages/LandingPage'
+import LandingPage, { DesktopFrame, DesktopView } from './pages/LandingPage'
 import LegalPage, { type LegalDoc } from './pages/LegalPage'
 import DeleteAccountPage from './pages/DeleteAccountPage'
 import { useWorkouts, setScope, type Workout } from './lib/store'
@@ -59,12 +59,14 @@ if (['login', 'signup', 'save'].includes(location.hash.slice(1))) history.replac
 // back from a bank's or wallet's payment page (?pay=return): show how the payment went
 if (new URLSearchParams(location.search).get('pay') === 'return') history.replaceState(null, '', location.pathname + '#pay')
 
-// dotset.app on a computer opens on a landing page (themes and the best price); phones and the
-// store apps go straight into the app. "Open Dotset" there switches to the app for this visit.
+// dotset.app on a computer is its own site (LandingPage.tsx): it never shows the phone app.
+// There, only these app screens open (in a card, under the desktop top bar); any other address
+// goes to the landing page. "view" is the desktop progress page. Phones and the store apps are
+// unchanged.
 const native = !!(window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.()
 const desktop = !native && matchMedia('(min-width: 1000px) and (hover: hover) and (pointer: fine)').matches
-const IN_APP = 'dotset:in-app'
-const startedInApp = () => { try { return !!sessionStorage.getItem(IN_APP) } catch { return false } }
+const DESKTOP_SCREENS = ['login', 'signup', 'save', 'password', 'pay', 'licenses', 'delete-account', 'checkout-premium', 'checkout-exclusive']
+const onDesktop = (hash: string) => DESKTOP_SCREENS.includes(hash) || hash.startsWith('checkout-theme-') || LEGAL_DOCS.includes(hash)
 
 function go(hash: string) {
   location.hash = hash
@@ -89,9 +91,6 @@ function useVisibleWorkouts(): Workout[] {
 
 function Screen() {
   const [hash, setHash] = useState(() => location.hash.slice(1))
-  const [draft, setDraft] = useState<{ icon: string; letter: string } | null>(null)
-  const workouts = useVisibleWorkouts()
-  const kept = useWorkouts().length - workouts.length
   const user = useUser()
   const recovering = useRecovering()
 
@@ -115,11 +114,21 @@ function Screen() {
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
 
-  const [inApp, setInApp] = useState(startedInApp)
-  if (LEGAL_DOCS.includes(hash)) return <LegalPage doc={hash as LegalDoc} />
-  if (desktop && !inApp && hash === '' && !arrivedFromEmailLink && !recovering) {
-    return <LandingPage onOpenApp={() => { try { sessionStorage.setItem(IN_APP, '1') } catch { /* blocked */ } setInApp(true) }} />
+  // an email link (verify, reset password) opens its screen until it has signed the person in
+  const linkScreen = recovering || (arrivedFromEmailLink && !user)
+  if (desktop && !linkScreen) {
+    if (hash === 'view') return <DesktopView user={user} />
+    if (!onDesktop(hash) || (user && ['login', 'signup', 'save'].includes(hash))) return <LandingPage user={user} />
   }
+  if (desktop) return <DesktopFrame user={user} card><AppScreen hash={hash} user={user} recovering={recovering} /></DesktopFrame>
+  return <AppScreen hash={hash} user={user} recovering={recovering} />
+}
+
+function AppScreen({ hash, user, recovering }: { hash: string; user: ReturnType<typeof useUser>; recovering: boolean }) {
+  const [draft, setDraft] = useState<{ icon: string; letter: string } | null>(null)
+  const workouts = useVisibleWorkouts()
+  const kept = useWorkouts().length - workouts.length
+  if (LEGAL_DOCS.includes(hash)) return <LegalPage doc={hash as LegalDoc} />
   if (user === undefined) return <main className="page" aria-busy="true" />
   if (!user && (hash === 'login' || hash === 'signup' || hash === 'save' || arrivedFromEmailLink)) {
     return <LoginPage key={hash} start={hash === 'login' ? 'login' : hash ? 'signup' : undefined} note={hash === 'save' ? t('Sign in to save your workout') : undefined} />
