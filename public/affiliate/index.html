@@ -47,7 +47,7 @@
     .cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
     .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 0 24px; border-radius: 14px; font-weight: 800; text-decoration: none; border: 1px solid var(--hair); background: var(--surface); }
     .btn.main { background: var(--sun); border-color: var(--sun); color: #1b201d; }
-    .btn[aria-disabled="true"] { opacity: .55; pointer-events: none; }
+    .btn[aria-disabled="true"], .store[aria-disabled="true"] { opacity: .55; pointer-events: none; }
 
     /* each benefit: big, generous headline first, small fine print under it */
     .give { padding: 44px 0; border-bottom: 1px solid var(--hair); }
@@ -70,6 +70,52 @@
     .r3 i { background: color-mix(in srgb, var(--sun) 50%, transparent); }
     .r4 i { background: color-mix(in srgb, var(--sun) 75%, transparent); }
     .r5 i { background: var(--sun); box-shadow: 0 0 8px var(--sun); }
+
+    /* tiers: one row per rank, a coloured icon each; rows on desktop, stacked cards on phones */
+    .ranks { list-style: none; padding: 0; margin: 4px 0 14px; max-width: 640px; display: grid; gap: 8px; }
+    .ranks li { display: grid; grid-template-columns: 1.3fr 1.4fr 1fr; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--hair); border-radius: 14px; padding: 10px 14px; }
+    .ranks li.hd { background: none; border: 0; padding: 0 14px; font-size: .74rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+    .ranks .nm { display: flex; align-items: center; gap: 10px; font-weight: 800; }
+    .ranks .cap { font-weight: 800; text-align: right; }
+    .ranks .who { color: var(--muted); font-size: .9rem; }
+    .tier { width: 30px; height: 30px; flex: none; display: grid; place-items: center; border-radius: 10px; }
+    .tier svg { width: 18px; height: 18px; }
+    .t-starter { background: rgba(63,174,106,.16); color: #3fae6a; }
+    .t-silver { background: rgba(150,160,170,.2); color: #8d97a1; }
+    .t-gold { background: rgba(242,182,50,.2); color: #d99a12; }
+    .t-platinum { background: rgba(84,170,220,.18); color: #3f9fd6; }
+    .t-diamond { background: rgba(139,108,255,.18); color: #8b6cff; }
+    /* the 3 things: icon + text */
+    .steps3 .ic { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 12px; background: var(--sun-soft); color: var(--sun-ink); margin-bottom: 8px; }
+    .steps3 .ic svg { width: 20px; height: 20px; }
+    /* store badges (desktop) */
+    .store { display: inline-flex; align-items: center; gap: 10px; min-height: 50px; padding: 0 18px; border-radius: 14px; background: var(--ink); color: var(--bg); text-decoration: none; font-weight: 800; line-height: 1.1; }
+    .store svg { width: 22px; height: 22px; }
+    .store small { display: block; font-size: .66rem; font-weight: 600; opacity: .75; }
+    .soon { font-size: .78rem; color: var(--muted); align-self: center; }
+    .only-phone { display: none !important; }
+    /* phones: app-like layout, thumb-sized targets, a sticky join bar at the bottom */
+    @media (max-width: 719px) {
+      .only-phone { display: inherit !important; }
+      .only-desk { display: none !important; }
+      body { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
+      header .bar { height: 54px; }
+      section, .give { padding: 34px 0; }
+      .wrap { padding: 0 16px; }
+      .cta .btn { flex: 1; }
+      .give .head { margin-top: 4px; }
+      .ranks li:not(.hd) { grid-template-columns: 1fr auto; grid-template-areas: "nm cap" "who cap"; row-gap: 0; padding: 12px 14px; }
+      .ranks li.hd { display: none; }
+      .ranks .nm { grid-area: nm; }
+      .ranks .who { grid-area: who; padding-left: 40px; font-size: .82rem; }
+      .ranks .cap { grid-area: cap; font-size: 1.1rem; }
+      .steps3 div { display: flex; align-items: center; gap: 12px; padding: 12px; }
+      .steps3 .ic { margin: 0; flex: none; }
+      .dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(12px); border-top: 1px solid var(--hair); transition: transform .25s ease; }
+      .dock .btn { width: 100%; }
+      .dock.away { transform: translateY(110%); }
+    }
+    @media (min-width: 720px) { .dock { display: none; } }
 
     /* the ending: how to accept */
     .accept { text-align: center; }
@@ -104,7 +150,10 @@
         </p>
         <div class="cta">
           <a class="btn main" href="#accept"><span lang="th">เข้าร่วม</span><span lang="en">Join</span></a>
-          <a class="btn" href="/"><span lang="th">ลองใช้แอป</span><span lang="en">Try the app</span></a>
+          <a class="btn only-phone" href="/"><span lang="th">ลองใช้แอป</span><span lang="en">Try the app</span></a>
+          <a class="store only-desk" data-link="appstore" href="#"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9s-1.8-.9-3-.8c-1.5 0-3 .9-3.8 2.3-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.4 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3 .7c1.3 0 2.1-1.1 2.8-2.3.9-1.3 1.3-2.6 1.3-2.6s-2.5-1-2.5-3.8zM14.2 5.8c.6-.8 1.1-1.8 1-2.8-.9 0-2 .6-2.7 1.4-.6.7-1.1 1.7-1 2.7 1 .1 2-.5 2.7-1.3z"/></svg><span><small>Download on the</small>App Store</span></a>
+          <a class="store only-desk" data-link="play" href="#"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 3.2v17.6c0 .5.5.8.9.6l15.3-8.8c.4-.3.4-.9 0-1.2L4.9 2.6c-.4-.2-.9.1-.9.6z"/></svg><span><small>Get it on</small>Google Play</span></a>
+          <span class="soon only-desk" data-soon hidden><span lang="th">เร็ว ๆ นี้</span><span lang="en">Coming soon</span></span>
         </div>
       </div>
     </section>
@@ -124,16 +173,14 @@
         <div class="kicker"><span lang="th">ค่าวิว</span><span lang="en">View pay</span></div>
         <div class="head">฿1 <small lang="th">ทุก 100 วิว</small><small lang="en">for every 100 views</small></div>
         <p class="warm"><span lang="th">ทุกคลิปที่มี Dotset ได้ค่าวิว ยิ่งมีคนสมัครรายเดือนผ่านโค้ดคุณมาก เพดานค่าวิวยิ่งสูง</span><span lang="en">Every clip featuring Dotset earns view pay. The more people subscribe monthly with your code, the higher your view-pay cap.</span></p>
-        <table class="table">
-          <thead><tr><th><span lang="th">แรงค์</span><span lang="en">Rank</span></th><th><span lang="th">คนสมัครรายเดือนผ่านโค้ด / เดือน</span><span lang="en">Monthly sign-ups with your code / month</span></th><th><span lang="th">ค่าวิวสูงสุด / เดือน</span><span lang="en">Max view pay / month</span></th></tr></thead>
-          <tbody>
-            <tr><td><span class="rank"><i></i>Starter</span></td><td>3–9</td><td>฿200</td></tr>
-            <tr><td><span class="rank r2"><i></i>Silver</span></td><td>10–29</td><td>฿500</td></tr>
-            <tr><td><span class="rank r3"><i></i>Gold</span></td><td>30–79</td><td>฿1,500</td></tr>
-            <tr><td><span class="rank r4"><i></i>Platinum</span></td><td>80–199</td><td>฿4,000</td></tr>
-            <tr><td><span class="rank r5"><i></i>Diamond</span></td><td>200+</td><td>฿10,000</td></tr>
-          </tbody>
-        </table>
+        <ul class="ranks">
+          <li class="hd"><span><span lang="th">แรงค์</span><span lang="en">Rank</span></span><span><span lang="th">คนสมัครรายเดือนผ่านโค้ด / เดือน</span><span lang="en">Monthly sign-ups with your code / month</span></span><span class="cap"><span lang="th">ค่าวิวสูงสุด / เดือน</span><span lang="en">Max view pay / month</span></span></li>
+          <li><span class="nm"><span class="tier t-starter"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21v-8M12 13c0-4 3-6 7-6 0 4-3 6-7 6zM12 15c0-3-2-5-6-5 0 3 2 5 6 5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Starter</span><span class="who">3–9 <span lang="th">คน</span><span lang="en">sign-ups</span></span><span class="cap">฿200</span></li>
+          <li><span class="nm"><span class="tier t-silver"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="14" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 3l4 5 4-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></span>Silver</span><span class="who">10–29 <span lang="th">คน</span><span lang="en">sign-ups</span></span><span class="cap">฿500</span></li>
+          <li><span class="nm"><span class="tier t-gold"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="14" r="6" fill="currentColor"/><path d="M8 3l4 5 4-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></span>Gold</span><span class="who">30–79 <span lang="th">คน</span><span lang="en">sign-ups</span></span><span class="cap">฿1,500</span></li>
+          <li><span class="nm"><span class="tier t-platinum"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z" fill="currentColor"/></svg></span>Platinum</span><span class="who">80–199 <span lang="th">คน</span><span lang="en">sign-ups</span></span><span class="cap">฿4,000</span></li>
+          <li><span class="nm"><span class="tier t-diamond"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l4 5-9 11L3 9z" fill="currentColor"/><path d="M3 9h18M9 4l3 16M15 4l-3 16" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.2"/></svg></span>Diamond</span><span class="who">200+ <span lang="th">คน</span><span lang="en">sign-ups</span></span><span class="cap">฿10,000</span></li>
+        </ul>
         <ul class="small" lang="th"><li>นับวิว 30 วันแรกของแต่ละคลิป ทีมงานบันทึกยอดวิวเองเมื่อครบ 30 วัน ยอดที่บันทึกถือเป็นที่สุด</li><li>วิวจากการโปรโมตแบบเสียเงินไม่นับ</li></ul>
         <ul class="small" lang="en"><li>Each clip's first 30 days of views count. We record the views ourselves at day 30, and that number is final.</li><li>Paid-promotion views don't count.</li></ul>
       </div>
@@ -144,9 +191,9 @@
         <div class="kicker"><span lang="th">คลิปที่นับ</span><span lang="en">Clips that count</span></div>
         <div class="head"><span lang="th">แค่ 3 อย่าง</span><span lang="en">Just 3 things</span></div>
         <div class="steps3">
-          <div><b>1</b><span lang="th">โชว์แอป Dotset 5 วินาทีขึ้นไป</span><span lang="en">Show Dotset for 5+ seconds</span></div>
-          <div><b>2</b><span lang="th">บอกโค้ดของคุณ</span><span lang="en">Mention your code</span></div>
-          <div><b>3</b><span lang="th">ใส่ #โฆษณา หรือป้ายพาร์ทเนอร์</span><span lang="en">Add #ad or the partner label</span></div>
+          <div><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M11 18.5h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span lang="th">โชว์แอป Dotset 5 วินาทีขึ้นไป</span><span lang="en">Show Dotset for 5+ seconds</span></div>
+          <div><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 9.5l4 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span lang="th">บอกโค้ดของคุณ</span><span lang="en">Mention your code</span></div>
+          <div><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10v4h3l7 4V6L6 10zM16.5 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></span><span lang="th">ใส่ #โฆษณา หรือป้ายพาร์ทเนอร์</span><span lang="en">Add #ad or the partner label</span></div>
         </div>
         <p class="warm"><span lang="th">โพสต์แล้วส่งลิงก์ในฟอร์ม "ส่งงาน" ใน LINE ครั้งเดียวจบ</span><span lang="en">After posting, send the link once through the "Submit clip" form in LINE. That's it.</span></p>
         <ul class="small" lang="th"><li>TikTok หรือ Instagram จากบัญชีของคุณ เปิดสาธารณะ ส่งลิงก์ภายใน 7 วันหลังโพสต์</li><li>ขอไม่ให้: อ้างผลด้านสุขภาพ ให้ข้อมูลผิด อ้างเป็นบัญชีทางการของ Dotset ปั่นวิว พาดพิงแอปอื่น หรือทำเนื้อหาสำหรับเด็ก ถ้าเราขอให้แก้คลิป รบกวนแก้ภายใน 48 ชม.</li></ul>
@@ -209,6 +256,8 @@
     </section>
   </main>
 
+  <div class="dock" id="dock"><a class="btn main" href="#accept"><span lang="th">เข้าร่วม Dotset Creators</span><span lang="en">Join Dotset Creators</span></a></div>
+
   <footer>
     <div class="wrap">
       <p class="fine"><a href="/affiliate/terms/"><span lang="th">ข้อตกลงฉบับเต็ม</span><span lang="en">Full agreement</span></a> · <a href="/privacy">Privacy</a> · <a href="mailto:hello@dotset.app">hello@dotset.app</a> · © Dotset</p>
@@ -218,13 +267,22 @@
   <script>
     // Fill in when it exists: the LINE Official Account add-friend link.
     var LINKS = {
-      line: '', // e.g. 'https://lin.ee/xxxxxxx'
+      line: '',     // e.g. 'https://lin.ee/xxxxxxx'
+      appstore: '', // App Store page (desktop badges)
+      play: '',     // Google Play page (desktop badges)
     }
     document.querySelectorAll('[data-link]').forEach(function (a) {
       var url = LINKS[a.getAttribute('data-link')]
       if (url) { a.href = url; a.target = '_blank'; a.rel = 'noopener' }
       else a.setAttribute('aria-disabled', 'true')
     })
+    if (!LINKS.appstore || !LINKS.play) document.querySelector('[data-soon]').hidden = false
+
+    // phones: the join bar steps aside once the joining section is on screen
+    var dock = document.getElementById('dock')
+    try {
+      new IntersectionObserver(function (e) { dock.classList.toggle('away', e[0].isIntersecting) }).observe(document.getElementById('accept'))
+    } catch (e) {}
 
     // language: Thai first, remembered per device
     function setLang(l) {
