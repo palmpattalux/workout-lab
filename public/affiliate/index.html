@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
-    /* Dotset Creators (dotset.app/affiliate). Big type for the offer, small but readable type for the rules.
+    /* Dotset Creators (dotset.app/affiliate). Big, giving headlines; small but readable fine print.
        The rules here match the Dotset Creators Agreement at /affiliate/terms: change both together. */
     :root {
       --bg: #f3f4f2; --surface: #ffffff; --ink: #1b201d; --muted: #646c67; --hair: rgba(27,32,29,.1);
@@ -49,27 +49,19 @@
     .btn.main { background: var(--sun); border-color: var(--sun); color: #1b201d; }
     .btn[aria-disabled="true"] { opacity: .55; pointer-events: none; }
 
-    /* the four benefits: the big, simple part */
-    .perks { display: grid; gap: 12px; grid-template-columns: 1fr; margin-top: 22px; counter-reset: p; }
-    @media (min-width: 680px) { .perks { grid-template-columns: 1fr 1fr; } }
-    .perk { position: relative; background: var(--surface); border: 1px solid var(--hair); border-radius: 20px; padding: 22px 20px 18px; counter-increment: p; }
-    .perk::before { content: counter(p); position: absolute; top: 18px; right: 18px; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: var(--sun-soft); color: var(--sun-ink); font-weight: 800; font-size: .85rem; }
-    .perk .big { font-size: clamp(1.9rem, 6vw, 2.4rem); font-weight: 800; letter-spacing: -.03em; line-height: 1.1; margin-bottom: 6px; padding-right: 36px; }
-    .perk .big small { font-size: 1rem; font-weight: 700; letter-spacing: 0; }
-    .perk h3 { margin-bottom: 4px; }
-    .perk p { color: var(--muted); font-size: .95rem; margin: 0; }
-    .perk a.more { display: inline-block; margin-top: 10px; font-size: .85rem; font-weight: 700; color: var(--sun-ink); text-decoration: none; }
-
-    /* rules: smaller, but labelled clearly as rules */
-    .rules-head .tag, .rule .tag { display: inline-block; padding: 3px 10px; border-radius: 999px; background: var(--ink); color: var(--bg); font-size: .72rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
-    .rules-head p { font-size: .95rem; }
-    .rule { background: var(--surface); border: 1px solid var(--hair); border-radius: 18px; padding: 18px 20px; margin-top: 12px; scroll-margin-top: 76px; }
-    .rule h3 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 8px 0 8px; }
-    .rule ol, .rule ul { margin: 0; padding-left: 1.25em; font-size: .88rem; line-height: 1.6; color: var(--ink); }
-    .rule li { margin: 3px 0; }
-    .rule li b { font-weight: 700; }
-    .rule .note { font-size: .82rem; color: var(--muted); margin-top: 8px; }
-    .table { width: 100%; border-collapse: collapse; margin: 10px 0 4px; font-size: .88rem; }
+    /* each benefit: big, generous headline first, small fine print under it */
+    .give { padding: 44px 0; border-bottom: 1px solid var(--hair); }
+    .give .kicker { font-size: .82rem; font-weight: 800; color: var(--sun-ink); letter-spacing: .02em; }
+    .give .head { font-size: clamp(2rem, 7.5vw, 3rem); font-weight: 800; letter-spacing: -.03em; line-height: 1.12; margin: 6px 0 10px; }
+    .give .head small { font-size: .45em; font-weight: 700; letter-spacing: 0; color: var(--muted); }
+    .give .warm { font-size: 1.08rem; color: var(--ink); max-width: 600px; margin-bottom: 14px; }
+    .steps3 { display: grid; gap: 8px; grid-template-columns: 1fr; margin: 4px 0 14px; }
+    @media (min-width: 640px) { .steps3 { grid-template-columns: repeat(3, 1fr); } }
+    .steps3 div { background: var(--surface); border: 1px solid var(--hair); border-radius: 14px; padding: 12px 14px; font-weight: 700; }
+    .steps3 b { display: block; color: var(--sun-ink); font-size: .8rem; }
+    .small { font-size: .8rem; color: var(--muted); line-height: 1.55; margin: 0; padding-left: 1.1em; max-width: 640px; }
+    .small li { margin: 2px 0; }
+    .table { width: 100%; max-width: 640px; border-collapse: collapse; margin: 4px 0 14px; font-size: .9rem; background: var(--surface); border: 1px solid var(--hair); border-radius: 14px; overflow: hidden; }
     .table th, .table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--hair); }
     .table th { font-size: .74rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
     .rank { display: inline-flex; align-items: center; gap: 7px; font-weight: 700; }
@@ -78,15 +70,6 @@
     .r3 i { background: color-mix(in srgb, var(--sun) 50%, transparent); }
     .r4 i { background: color-mix(in srgb, var(--sun) 75%, transparent); }
     .r5 i { background: var(--sun); box-shadow: 0 0 8px var(--sun); }
-
-    /* calculator */
-    .calc { display: grid; gap: 12px; margin-top: 16px; }
-    @media (min-width: 680px) { .calc { grid-template-columns: 1fr 1fr; } }
-    .card { background: var(--surface); border: 1px solid var(--hair); border-radius: 18px; padding: 18px; }
-    .calc label { display: block; font-weight: 600; font-size: .9rem; margin-bottom: 6px; }
-    .calc input { width: 100%; height: 46px; border-radius: 12px; border: 1px solid var(--hair); background: var(--bg); color: var(--ink); font: 700 1rem var(--font); padding: 0 12px; margin-bottom: 12px; }
-    .out .line { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--hair); }
-    .out .total { font-size: 1.5rem; font-weight: 800; border: 0; padding-top: 12px; }
 
     /* the ending: how to accept */
     .accept { text-align: center; }
@@ -109,243 +92,109 @@
   </header>
 
   <main>
-    <!-- 1. the offer -->
     <section>
       <div class="wrap">
         <h1>
-          <span lang="th">ทำคลิปออกกำลังกาย<br />แล้วได้เงินจริงกับ Dotset</span>
-          <span lang="en">Make training clips.<br />Get paid by Dotset.</span>
+          <span lang="th">โพสต์เหมือนเดิม<br />ได้เงินจาก Dotset</span>
+          <span lang="en">Post like normal.<br />Get paid by Dotset.</span>
         </h1>
         <p class="lead">
-          <span lang="th">ทำคลิปแบบที่คุณทำอยู่แล้ว ใส่ Dotset เข้าไปในคลิป แล้วรับค่าวิวและค่าคอมทุกเดือน ไม่มีค่าสมัคร ไม่มีขั้นต่ำผู้ติดตาม</span>
-          <span lang="en">Keep making the clips you already make, put Dotset in them, and earn view pay and commission every month. No fees and no follower minimum.</span>
+          <span lang="th">ทำคลิปออกกำลังกายแบบที่คุณทำอยู่แล้ว แค่มี Dotset อยู่ในคลิป ไม่มีค่าสมัคร ไม่มีขั้นต่ำผู้ติดตาม</span>
+          <span lang="en">Make the training clips you already make, with Dotset in them. No fees and no follower minimum.</span>
         </p>
         <div class="cta">
-          <a class="btn main" href="#accept"><span lang="th">วิธีเข้าร่วม</span><span lang="en">How to join</span></a>
+          <a class="btn main" href="#accept"><span lang="th">เข้าร่วม</span><span lang="en">Join</span></a>
           <a class="btn" href="/"><span lang="th">ลองใช้แอป</span><span lang="en">Try the app</span></a>
         </div>
       </div>
     </section>
 
-    <!-- 2. the four benefits -->
+    <div class="give">
+      <div class="wrap">
+        <div class="kicker"><span lang="th">ของขวัญสำหรับคุณ</span><span lang="en">Our gift to you</span></div>
+        <div class="head"><span lang="th">Premium ฟรีตลอดไป</span><span lang="en">Premium, free for good</span></div>
+        <p class="warm"><span lang="th">โพสต์คลิปแรกกับเรา แล้ว Premium เป็นของคุณ โพสต์ต่อเนื่องเดือนละคลิปครบ 6 เดือน เราอัปให้เป็น <b>Exclusive ฟรีตลอดไป</b></span><span lang="en">Post your first clip with us and Premium is yours. Keep posting one clip a month for 6 months and we'll upgrade you to <b>Exclusive, free for good</b>.</span></p>
+        <ul class="small" lang="th"><li>ใช้กับบัญชี Dotset ของคุณ 1 บัญชี โอนหรือแลกเป็นเงินไม่ได้</li><li>"ตลอดไป" คือตลอดที่คุณยังเป็น Dotset Creator และแพ็กเกจนั้นยังเปิดให้บริการ</li><li>6 เดือนนับเป็นเดือนปฏิทินติดกัน แต่ละเดือนมีคลิปที่นับได้อย่างน้อย 1 คลิป</li></ul>
+        <ul class="small" lang="en"><li>For one Dotset account of yours. It can't be transferred or exchanged for cash.</li><li>"For good" means while you're a Dotset Creator and that plan exists.</li><li>The 6 months are calendar months in a row, each with at least 1 clip that counts.</li></ul>
+      </div>
+    </div>
+
+    <div class="give" id="views">
+      <div class="wrap">
+        <div class="kicker"><span lang="th">ค่าวิว</span><span lang="en">View pay</span></div>
+        <div class="head">฿1 <small lang="th">ทุก 100 วิว</small><small lang="en">for every 100 views</small></div>
+        <p class="warm"><span lang="th">ทุกคลิปที่มี Dotset ได้ค่าวิว ยิ่งมีคนสมัครรายเดือนผ่านโค้ดคุณมาก เพดานค่าวิวยิ่งสูง</span><span lang="en">Every clip featuring Dotset earns view pay. The more people subscribe monthly with your code, the higher your view-pay cap.</span></p>
+        <table class="table">
+          <thead><tr><th><span lang="th">แรงค์</span><span lang="en">Rank</span></th><th><span lang="th">คนสมัครรายเดือนผ่านโค้ด / เดือน</span><span lang="en">Monthly sign-ups with your code / month</span></th><th><span lang="th">ค่าวิวสูงสุด / เดือน</span><span lang="en">Max view pay / month</span></th></tr></thead>
+          <tbody>
+            <tr><td><span class="rank"><i></i>Starter</span></td><td>0–9</td><td>฿200</td></tr>
+            <tr><td><span class="rank r2"><i></i>Silver</span></td><td>10–29</td><td>฿500</td></tr>
+            <tr><td><span class="rank r3"><i></i>Gold</span></td><td>30–79</td><td>฿1,500</td></tr>
+            <tr><td><span class="rank r4"><i></i>Platinum</span></td><td>80–199</td><td>฿4,000</td></tr>
+            <tr><td><span class="rank r5"><i></i>Diamond</span></td><td>200+</td><td>฿10,000</td></tr>
+          </tbody>
+        </table>
+        <ul class="small" lang="th"><li>นับวิว 30 วันแรกของแต่ละคลิป ทีมงานบันทึกยอดวิวเองเมื่อครบ 30 วัน ยอดที่บันทึกถือเป็นที่สุด</li><li>วิวจากการโปรโมตแบบเสียเงินไม่นับ ค่าวิวของครีเอเตอร์ทุกคนรวมกันมีงบเดือนละ ฿30,000</li></ul>
+        <ul class="small" lang="en"><li>Each clip's first 30 days of views count. We record the views ourselves at day 30, and that number is final.</li><li>Paid-promotion views don't count. View pay across all creators has a ฿30,000 monthly budget.</li></ul>
+      </div>
+    </div>
+
+    <div class="give" id="clip">
+      <div class="wrap">
+        <div class="kicker"><span lang="th">คลิปที่นับ</span><span lang="en">Clips that count</span></div>
+        <div class="head"><span lang="th">แค่ 3 อย่าง</span><span lang="en">Just 3 things</span></div>
+        <div class="steps3">
+          <div><b>1</b><span lang="th">โชว์แอป Dotset 5 วินาทีขึ้นไป</span><span lang="en">Show Dotset for 5+ seconds</span></div>
+          <div><b>2</b><span lang="th">บอกโค้ดของคุณ</span><span lang="en">Mention your code</span></div>
+          <div><b>3</b><span lang="th">ใส่ #โฆษณา หรือป้ายพาร์ทเนอร์</span><span lang="en">Add #ad or the partner label</span></div>
+        </div>
+        <p class="warm"><span lang="th">โพสต์แล้วส่งลิงก์ในฟอร์ม "ส่งงาน" ใน LINE ครั้งเดียวจบ</span><span lang="en">After posting, send the link once through the "Submit clip" form in LINE. That's it.</span></p>
+        <ul class="small" lang="th"><li>TikTok หรือ Instagram จากบัญชีของคุณ เปิดสาธารณะ ส่งลิงก์ภายใน 7 วันหลังโพสต์</li><li>ขอไม่ให้: อ้างผลด้านสุขภาพ ให้ข้อมูลผิด อ้างเป็นบัญชีทางการของ Dotset ปั่นวิว พาดพิงแอปอื่น หรือทำเนื้อหาสำหรับเด็ก ถ้าเราขอให้แก้คลิป รบกวนแก้ภายใน 48 ชม.</li></ul>
+        <ul class="small" lang="en"><li>On TikTok or Instagram, from your own public account. Send the link within 7 days of posting.</li><li>Please don't: make health claims, share wrong info, pose as an official Dotset account, fake views, mention other apps, or make content for children. If we ask for a fix, please make it within 48 hours.</li></ul>
+      </div>
+    </div>
+
+    <div class="give">
+      <div class="wrap">
+        <div class="kicker"><span lang="th">ค่าคอม</span><span lang="en">Commission</span></div>
+        <div class="head">฿150 <small lang="th">ทุกคนที่สมัครรายปี</small><small lang="en">for every yearly sign-up</small></div>
+        <p class="warm"><span lang="th">ทุกคนที่สมัครแพ็กเกจรายปีด้วยโค้ดของคุณ เราจ่ายให้คุณ ฿150 ไม่จำกัดจำนวน</span><span lang="en">Everyone who buys a yearly plan with your code earns you ฿150, with no limit.</span></p>
+        <ul class="small" lang="th"><li>นับผู้ใช้ใหม่ที่ซื้อบนเว็บ dotset.app หลังพ้น 7 วันที่ขอคืนเงินได้ ไม่นับการซื้อในแอปสโตร์ หรือบัญชีของคุณเอง</li><li>ถ้ามีการคืนเงินภายหลัง (ภายใน 120 วัน) จะหักจากยอดเดือนถัดไป</li></ul>
+        <ul class="small" lang="en"><li>It counts new users who buy on dotset.app, once the 7-day refund window has passed. App store purchases and your own accounts don't count.</li><li>If a payment is refunded later (within 120 days), it comes off your next payout.</li></ul>
+      </div>
+    </div>
+
+    <div class="give">
+      <div class="wrap">
+        <div class="kicker"><span lang="th">สำหรับผู้ติดตามของคุณ</span><span lang="en">For your followers</span></div>
+        <div class="head"><span lang="th">ส่วนลดจากโค้ดคุณ</span><span lang="en">A discount from your code</span></div>
+        <p class="warm"><span lang="th"><b>ลด ฿20</b> เดือนแรกสำหรับรายเดือน และ <b>ลด ฿100</b> สำหรับรายปี คนสมัครรายเดือนช่วยดันแรงค์และเพดานค่าวิวของคุณ</span><span lang="en"><b>฿20 off</b> the first month of a monthly plan and <b>฿100 off</b> a yearly plan. Monthly sign-ups raise your rank and your view-pay cap.</span></p>
+        <ul class="small" lang="th"><li>สำหรับคนที่ไม่เคยจ่ายให้ Dotset ใช้ได้คนละครั้ง บนเว็บ dotset.app เท่านั้น คนสมัครรายเดือนนับแรงค์ แต่ไม่มีค่าคอม</li><li>แชร์โค้ดบนโซเชียลของคุณได้เต็มที่ ขอไม่ให้ลงเว็บคูปอง สแปม หรือใช้กับโฆษณาแบบเสียเงิน</li></ul>
+        <ul class="small" lang="en"><li>For people who have never paid Dotset, one use each, on dotset.app only. Monthly sign-ups count toward rank but earn no commission.</li><li>Share your code freely on your own socials. Please don't post it on coupon sites, spam it, or use it in paid ads.</li></ul>
+      </div>
+    </div>
+
+    <div class="give">
+      <div class="wrap">
+        <div class="kicker"><span lang="th">รับเงิน</span><span lang="en">Getting paid</span></div>
+        <div class="head"><span lang="th">โอนทุกวันที่ 10</span><span lang="en">Paid on the 10th</span></div>
+        <p class="warm"><span lang="th">สรุปยอดส่งให้ใน LINE ทุกต้นเดือน แล้วโอนเข้าบัญชีของคุณภายในวันที่ 10</span><span lang="en">We send your statement on LINE early each month and pay into your account by the 10th.</span></p>
+        <ul class="small" lang="th"><li>ขั้นต่ำ ฿100 (ยอดน้อยกว่านั้นสะสมไปเดือนหน้า) โอนเข้าบัญชีชื่อของคุณเอง ก่อนรับครั้งแรกกรอกฟอร์มรับเงิน (บัตรประชาชนและบัญชี)</li><li>หักภาษี ณ ที่จ่ายเมื่อกฎหมายกำหนด สงสัยยอดแจ้งได้ภายใน 14 วัน</li></ul>
+        <ul class="small" lang="en"><li>Minimum ฿100 (smaller amounts carry over), paid to an account in your own name. Before your first payout, fill in the payout form (ID and bank details).</li><li>Tax is withheld where the law requires it. Questions about a statement within 14 days, please.</li></ul>
+      </div>
+    </div>
+
     <section>
       <div class="wrap">
-        <h2><span lang="th">สิทธิประโยชน์ของครีเอเตอร์</span><span lang="en">What creators get</span></h2>
-        <div class="perks">
-          <div class="perk">
-            <div class="big"><span lang="th">Premium ฟรีตลอดไป</span><span lang="en">Free Premium, for good</span></div>
-            <p><span lang="th">เปิดให้หลังคลิปแรกของคุณ โพสต์อย่างน้อยเดือนละ 1 คลิปครบ 6 เดือน อัปเป็น Exclusive ฟรี</span><span lang="en">Turned on after your first clip. Post at least 1 clip a month for 6 months and it upgrades to free Exclusive.</span></p>
-            <a class="more" href="#r1"><span lang="th">ดูกติกา →</span><span lang="en">See the rules →</span></a>
-          </div>
-          <div class="perk">
-            <div class="big">฿1 <small lang="th">ทุก 100 วิว</small><small lang="en">per 100 views</small></div>
-            <p><span lang="th">ค่าวิวจากคลิปที่มี Dotset ยิ่งมีผู้ใช้รายเดือนผ่านโค้ดมาก เพดานค่าวิวยิ่งสูง</span><span lang="en">View pay for clips featuring Dotset. The more monthly subscribers your code brings, the higher your view-pay cap.</span></p>
-            <a class="more" href="#r2"><span lang="th">ดูกติกา →</span><span lang="en">See the rules →</span></a>
-          </div>
-          <div class="perk">
-            <div class="big">฿150 <small lang="th">ต่อคนสมัครรายปี</small><small lang="en">per yearly subscriber</small></div>
-            <p><span lang="th">ทุกคนที่สมัครแพ็กเกจรายปีด้วยโค้ดของคุณ</span><span lang="en">For everyone who buys a yearly plan with your code.</span></p>
-            <a class="more" href="#r3"><span lang="th">ดูกติกา →</span><span lang="en">See the rules →</span></a>
-          </div>
-          <div class="perk">
-            <div class="big"><span lang="th">ส่วนลดให้ผู้ติดตาม</span><span lang="en">A discount for your followers</span></div>
-            <p><span lang="th">ลด ฿20 เดือนแรกสำหรับรายเดือน และลด ฿100 สำหรับรายปี ผู้ใช้รายเดือนไม่มีค่าคอม แต่นับเพื่อเลื่อนแรงค์ของคุณ</span><span lang="en">฿20 off the first month of a monthly plan, ฿100 off a yearly plan. Monthly subscribers earn no commission, but they count toward your rank.</span></p>
-            <a class="more" href="#r4"><span lang="th">ดูกติกา →</span><span lang="en">See the rules →</span></a>
-          </div>
-        </div>
+        <h3 style="font-size:.95rem"><span lang="th">ข้อตกลงสั้น ๆ</span><span lang="en">The short version of the agreement</span></h3>
+        <ul class="small" lang="th"><li>อายุ 18 ปีขึ้นไป คุณเป็นครีเอเตอร์อิสระ ไม่ใช่พนักงานของ Dotset และให้คำมั่นแทน Dotset ไม่ได้</li><li>สิ่งที่ไม่ได้เขียนไว้ว่าจ่าย ถือว่าไม่จ่าย ยอดนับตามระบบของ Dotset</li><li>เราเปลี่ยนอัตราได้โดยแจ้งใน LINE ล่วงหน้า 14 วัน เงินที่ได้แล้วไม่ถูกลด คุณออกได้ทุกเมื่อ เรายุติได้โดยแจ้ง 14 วัน หรือทันทีหากทุจริต</li><li>ใช้กฎหมายไทย รายละเอียดทั้งหมดอยู่ใน <a href="/affiliate/terms/">ข้อตกลงฉบับเต็ม</a></li></ul>
+        <ul class="small" lang="en"><li>18 or older. You're an independent creator, not a Dotset employee, and you can't make promises for Dotset.</li><li>If it isn't written as payable, it isn't paid. Amounts follow Dotset's records.</li><li>We can change rates with 14 days' notice on LINE, and money already earned is never reduced. You can leave any time. We can end things with 14 days' notice, or immediately for fraud.</li><li>Thai law applies. Everything is in the <a href="/affiliate/terms/">full agreement</a>.</li></ul>
       </div>
     </section>
 
-    <!-- 3. the rules, one block per benefit, then the general rules -->
-    <section>
-      <div class="wrap">
-        <div class="rules-head">
-          <span class="tag"><span lang="th">กติกา</span><span lang="en">Rules</span></span>
-          <h2 style="margin-top:10px"><span lang="th">รายละเอียดและกติกาของแต่ละสิทธิ</span><span lang="en">How each benefit works</span></h2>
-          <p class="muted"><span lang="th">ส่วนนี้คือกติกาที่ใช้จริง กรุณาอ่านให้ครบก่อนพิมพ์ "ยอมรับ"</span><span lang="en">These are the rules that apply. Please read them all before you type "ยอมรับ" (accept).</span></p>
-        </div>
-
-        <div class="rule" id="r1">
-          <span class="tag"><span lang="th">กติกา 1</span><span lang="en">Rule 1</span></span>
-          <h3><span lang="th">Premium และ Exclusive ฟรี</span><span lang="en">Free Premium and Exclusive</span></h3>
-          <ol lang="th">
-            <li>Premium ฟรีเปิดให้บัญชี Dotset ของคุณ 1 บัญชี หลังจากคลิปแรกของคุณผ่านเงื่อนไข (กติกา 5)</li>
-            <li><b>"ตลอดไป"</b> หมายถึง ตลอดที่คุณยังเป็น Dotset Creator และ Dotset ยังเปิดให้บริการ Premium ไม่ต้องโพสต์ทุกเดือนเพื่อเก็บ Premium</li>
-            <li>Exclusive ฟรี: เมื่อคุณมีคลิปที่ผ่านเงื่อนไขอย่างน้อย 1 คลิป ทุกเดือนปฏิทิน ติดต่อกัน 6 เดือน จะอัปเป็น Exclusive ในเดือนถัดไป</li>
-            <li>Exclusive อยู่ต่อตราบที่คุณยังโพสต์อย่างน้อยเดือนละ 1 คลิป ถ้าเดือนไหนไม่มีคลิป จะกลับเป็น Premium และเริ่มนับ 6 เดือนใหม่</li>
-            <li>สิทธินี้เป็นของคุณคนเดียว โอนให้คนอื่นไม่ได้ และแลกเป็นเงินไม่ได้</li>
-          </ol>
-          <ol lang="en">
-            <li>Free Premium is turned on for one Dotset account of yours once your first clip qualifies (Rule 5).</li>
-            <li><b>"For good"</b> means for as long as you're a Dotset Creator and Dotset offers Premium. You don't have to post every month to keep Premium.</li>
-            <li>Free Exclusive: once you've had at least 1 qualifying clip in each of 6 calendar months in a row, you're upgraded the following month.</li>
-            <li>Exclusive stays while you keep posting at least 1 qualifying clip a month. A month with none takes you back to Premium, and the 6-month count starts again.</li>
-            <li>It's for you only. It can't be transferred or exchanged for cash.</li>
-          </ol>
-        </div>
-
-        <div class="rule" id="r2">
-          <span class="tag"><span lang="th">กติกา 2</span><span lang="en">Rule 2</span></span>
-          <h3><span lang="th">ค่าวิว และแรงค์</span><span lang="en">View pay and ranks</span></h3>
-          <ol lang="th">
-            <li>฿1 ต่อทุก 100 วิว (ปัดเศษลง) ของคลิปที่ผ่านเงื่อนไข</li>
-            <li><b>นับเฉพาะวิวใน 30 วันแรกหลังโพสต์</b> วิวหลังจากนั้นไม่ได้ค่าวิว</li>
-            <li>ส่งภาพหน้าจอสถิติที่เห็นยอดวิวเมื่อครบ 30 วัน ทาง LINE ในวันที่ 31–37 ถ้าไม่ส่ง คลิปนั้นไม่ได้ค่าวิว</li>
-            <li>วิวจากการโปรโมตแบบเสียเงิน (เช่น TikTok Promote, Spark Ads, Boost) ไม่นับ</li>
-            <li><b>ค่าวิวแต่ละเดือนมีเพดานตามแรงค์</b> แรงค์นับจากจำนวนผู้ใช้ใหม่ที่สมัครรายเดือนด้วยโค้ดของคุณในเดือนนั้น (ผู้ใช้รายปีไม่นับแรงค์)</li>
-            <li>ค่าวิวของครีเอเตอร์ทุกคนรวมกันมีงบเดือนละ ฿30,000 ถ้าเกิน จะลดค่าวิวของทุกคนในสัดส่วนเท่ากัน</li>
-          </ol>
-          <ol lang="en">
-            <li>฿1 for every full 100 views (rounded down) on a qualifying clip.</li>
-            <li><b>Only views in the first 30 days after posting count.</b> Later views earn nothing.</li>
-            <li>Send a screenshot of the clip's stats showing its views at 30 days, on LINE between day 31 and day 37. Without it, that clip earns no view pay.</li>
-            <li>Views from paid promotion (such as TikTok Promote, Spark Ads or boosts) don't count.</li>
-            <li><b>Monthly view pay is capped by rank.</b> Your rank is the number of new people who buy a monthly plan with your code that month. Yearly subscribers don't count toward rank.</li>
-            <li>View pay for all creators together has a ฿30,000 monthly budget. If it's exceeded, everyone's view pay is reduced by the same percentage.</li>
-          </ol>
-          <table class="table">
-            <thead><tr><th><span lang="th">แรงค์</span><span lang="en">Rank</span></th><th><span lang="th">ผู้ใช้รายเดือนใหม่ / เดือน</span><span lang="en">New monthly subscribers / month</span></th><th><span lang="th">เพดานค่าวิว / เดือน</span><span lang="en">View-pay cap / month</span></th></tr></thead>
-            <tbody>
-              <tr><td><span class="rank"><i></i>Starter</span></td><td>0–9</td><td>฿200</td></tr>
-              <tr><td><span class="rank r2"><i></i>Silver</span></td><td>10–29</td><td>฿500</td></tr>
-              <tr><td><span class="rank r3"><i></i>Gold</span></td><td>30–79</td><td>฿1,500</td></tr>
-              <tr><td><span class="rank r4"><i></i>Platinum</span></td><td>80–199</td><td>฿4,000</td></tr>
-              <tr><td><span class="rank r5"><i></i>Diamond</span></td><td>200+</td><td>฿10,000</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="rule" id="r3">
-          <span class="tag"><span lang="th">กติกา 3</span><span lang="en">Rule 3</span></span>
-          <h3><span lang="th">฿150 ต่อผู้สมัครรายปี</span><span lang="en">฿150 per yearly subscriber</span></h3>
-          <ol lang="th">
-            <li>นับเมื่อผู้ใช้ <b>ที่ไม่เคยจ่ายค่าแพ็กเกจ Dotset มาก่อน</b> ซื้อแพ็กเกจรายปีบน <b>เว็บไซต์ dotset.app</b> ด้วยโค้ดของคุณ</li>
-            <li>นับหลังพ้น 7 วันที่ผู้ใช้ขอคืนเงินได้ และต้องไม่ได้รับเงินคืน</li>
-            <li>การซื้อใน App Store หรือ Google Play การต่ออายุ และการซื้อธีม ไม่นับ</li>
-            <li>ใช้โค้ดตัวเอง หรือบัญชีของคุณเอง ไม่นับ</li>
-            <li>ถ้าภายหลังมีการคืนเงินหรือปฏิเสธการชำระเงินภายใน 120 วัน จะหักออกจากยอดเดือนถัดไปของคุณ</li>
-          </ol>
-          <ol lang="en">
-            <li>It counts when someone <b>who has never paid for a Dotset plan</b> buys a yearly plan on <b>the dotset.app website</b> with your code.</li>
-            <li>It's counted once their 7-day refund window has passed, if they weren't refunded.</li>
-            <li>App Store or Google Play purchases, renewals and theme purchases don't count.</li>
-            <li>Your own code use, or your own accounts, don't count.</li>
-            <li>If the payment is refunded or charged back within 120 days, it comes off your next payout.</li>
-          </ol>
-        </div>
-
-        <div class="rule" id="r4">
-          <span class="tag"><span lang="th">กติกา 4</span><span lang="en">Rule 4</span></span>
-          <h3><span lang="th">โค้ดและส่วนลด</span><span lang="en">Your code and the discount</span></h3>
-          <ol lang="th">
-            <li>ครีเอเตอร์หนึ่งคนมีโค้ดเดียว Dotset เป็นผู้อนุมัติชื่อโค้ด</li>
-            <li>ส่วนลด: <b>รายเดือน ลด ฿20 เฉพาะเดือนแรก</b> และ <b>รายปี ลด ฿100</b> สำหรับผู้ที่ไม่เคยจ่ายค่าแพ็กเกจ Dotset มาก่อน ใช้ได้คนละครั้ง บนเว็บไซต์ dotset.app เท่านั้น</li>
-            <li>ผู้ใช้รายเดือนที่ใช้โค้ด <b>ไม่มีค่าคอม</b> แต่นับเพื่อเลื่อนแรงค์ (กติกา 2)</li>
-            <li>แชร์โค้ดได้บนโซเชียลของคุณเอง (คลิป แคปชัน ไบโอ คอมเมนต์ใต้คลิปตัวเอง) และกลุ่มที่คุณดูแล</li>
-            <li><b>ห้ามโพสต์โค้ดบนเว็บคูปองหรือเว็บแคชแบ็ก ห้ามสแปม ห้ามใช้กับโฆษณาแบบเสียเงิน</b></li>
-          </ol>
-          <ol lang="en">
-            <li>One code per creator. Dotset approves the code name.</li>
-            <li>Discount: <b>฿20 off the first month of a monthly plan</b> and <b>฿100 off a yearly plan</b>, for people who have never paid for a Dotset plan. One use per person, on the dotset.app website only.</li>
-            <li>Monthly subscribers using your code <b>earn no commission</b>, but they count toward your rank (Rule 2).</li>
-            <li>Share the code on your own social accounts (clips, captions, bio, comments under your own posts) and in groups you run.</li>
-            <li><b>Never post it on coupon or cashback sites, spam it, or use it in paid ads.</b></li>
-          </ol>
-        </div>
-
-        <div class="rule" id="r5">
-          <span class="tag"><span lang="th">กติกา 5</span><span lang="en">Rule 5</span></span>
-          <h3><span lang="th">คลิปที่ผ่านเงื่อนไข</span><span lang="en">What makes a clip qualify</span></h3>
-          <ol lang="th">
-            <li>โพสต์บน TikTok หรือ Instagram จากบัญชีของคุณ และเปิดสาธารณะ</li>
-            <li>โชว์แอป Dotset ที่ใช้งานจริงอย่างน้อย 5 วินาที และบอกโค้ดของคุณ</li>
-            <li>ใส่ <b>#โฆษณา</b> หรือ <b>#ad</b> ในบรรทัดแรกของแคปชัน หรือเปิดป้ายพาร์ทเนอร์ของแพลตฟอร์ม</li>
-            <li>ส่งลิงก์คลิปใน LINE ภายใน 7 วันหลังโพสต์</li>
-            <li><b>ห้าม:</b> อ้างผลด้านสุขภาพหรือรับประกันผล (เช่น "ลด 5 กิโลใน 2 สัปดาห์") ให้ข้อมูลราคาหรือฟีเจอร์ผิด อ้างว่าเป็นทีมงานหรือบัญชีทางการของ Dotset ปั่นวิว ใช้บอท พาดพิงแอปอื่น โปรโมตแอปบันทึกการออกกำลังกายตัวอื่นในคลิปเดียวกัน หรือเนื้อหาสำหรับเด็กต่ำกว่า 13 ปี</li>
-            <li>ถ้าเราขอให้แก้หรือลบคลิป ต้องทำภายใน 48 ชั่วโมง</li>
-          </ol>
-          <ol lang="en">
-            <li>Posted on TikTok or Instagram from your own account, and public.</li>
-            <li>Shows the Dotset app in real use for at least 5 seconds, and mentions your code.</li>
-            <li>Has <b>#โฆษณา</b> or <b>#ad</b> in the first line of the caption, or the platform's partnership label turned on.</li>
-            <li>The clip link is sent on LINE within 7 days of posting.</li>
-            <li><b>Not allowed:</b> health claims or promised results (like "lose 5 kg in 2 weeks"), wrong prices or features, claiming to be Dotset staff or an official account, fake views or bots, mentioning other apps, promoting another workout-tracking app in the same clip, or content aimed at children under 13.</li>
-            <li>If we ask you to edit or remove a clip, do it within 48 hours.</li>
-          </ol>
-        </div>
-
-        <div class="rule" id="r6">
-          <span class="tag"><span lang="th">กติกา 6</span><span lang="en">Rule 6</span></span>
-          <h3><span lang="th">การจ่ายเงิน</span><span lang="en">Getting paid</span></h3>
-          <ol lang="th">
-            <li>ตัดยอดสิ้นเดือน ส่งสรุปยอดใน LINE ภายในวันที่ 7 <b>โอนภายในวันที่ 10</b> ของเดือนถัดไป</li>
-            <li>ขั้นต่ำ ฿100 ยอดที่น้อยกว่าสะสมไปเดือนถัดไป</li>
-            <li>โอนเข้าบัญชีธนาคารหรือพร้อมเพย์ <b>ที่เป็นชื่อของคุณเองเท่านั้น</b></li>
-            <li>ก่อนรับเงินครั้งแรก กรอกฟอร์มรับเงิน (สำเนาบัตรประชาชนและบัญชี) พร้อมประกาศความเป็นส่วนตัว อายุ 18–19 ปี ต้องมีหนังสือยินยอมผู้ปกครอง</li>
-            <li>หักภาษี ณ ที่จ่ายเมื่อกฎหมายกำหนด คุณรับผิดชอบภาษีเงินได้ของคุณเอง</li>
-            <li>สงสัยยอดแจ้งได้ภายใน 14 วันหลังได้รับสรุปยอด ยอดนับตามระบบของ Dotset</li>
-          </ol>
-          <ol lang="en">
-            <li>The month closes on its last day. You get a statement on LINE by the 7th, and <b>payment by the 10th</b> of the next month.</li>
-            <li>The minimum payout is ฿100. Smaller amounts carry over to the next month.</li>
-            <li>We pay to a bank account or PromptPay <b>in your own name only</b>.</li>
-            <li>Before your first payout, fill in the payout form (ID card copy and bank details), which includes our privacy notice. If you're 18–19, a parent's or guardian's consent is needed.</li>
-            <li>Tax is withheld where the law requires it. You're responsible for your own income tax.</li>
-            <li>Question a statement within 14 days of receiving it. Amounts follow Dotset's records.</li>
-          </ol>
-        </div>
-
-        <div class="rule" id="r7">
-          <span class="tag"><span lang="th">กติกา 7</span><span lang="en">Rule 7</span></span>
-          <h3><span lang="th">ข้อตกลงทั่วไป</span><span lang="en">General terms</span></h3>
-          <ol lang="th">
-            <li>ต้องอายุ 18 ปีขึ้นไป หนึ่งคนหนึ่งบัญชีครีเอเตอร์</li>
-            <li>คุณเป็นผู้รับจ้างอิสระ ไม่ใช่พนักงานหรือตัวแทนของ Dotset และให้คำมั่นแทน Dotset ไม่ได้</li>
-            <li><b>สิ่งที่ไม่ได้เขียนว่าจ่าย ถือว่าไม่จ่าย</b> แชท DM หรือคำพูดไม่ใช่ข้อตกลง</li>
-            <li>Dotset เปลี่ยนอัตราหรือกติกาได้โดยแจ้งใน LINE ล่วงหน้า 14 วัน เงินที่ได้ไปแล้วไม่ถูกลด</li>
-            <li>คุณออกได้ทุกเมื่อ Dotset ยุติได้โดยแจ้งล่วงหน้า 14 วัน หรือทันทีถ้ามีการทุจริตหรือผิดกติการ้ายแรง เงินที่ได้จากการทุจริตจะไม่จ่ายและต้องคืน</li>
-            <li>ใช้กฎหมายไทย รายละเอียดทั้งหมดอยู่ใน <a href="/affiliate/terms/">ข้อตกลง Dotset Creators ฉบับเต็ม</a> ซึ่งมีผลเหนือหน้านี้หากมีข้อความต่างกัน</li>
-          </ol>
-          <ol lang="en">
-            <li>You must be 18 or older. One creator account per person.</li>
-            <li>You're an independent creator, not Dotset's employee or agent, and you can't make promises for Dotset.</li>
-            <li><b>If it isn't written as payable, it isn't paid.</b> Chats, DMs and things said aloud aren't part of the agreement.</li>
-            <li>Dotset can change rates or rules with 14 days' notice on LINE. Money you've already earned is never reduced.</li>
-            <li>You can leave at any time. Dotset can end the agreement with 14 days' notice, or immediately for fraud or a serious breach. Money from fraud isn't paid and must be returned.</li>
-            <li>Thai law applies. Everything is in the <a href="/affiliate/terms/">full Dotset Creators Agreement</a>, which prevails over this page if they differ.</li>
-          </ol>
-        </div>
-      </div>
-    </section>
-
-    <!-- 4. calculator -->
-    <section>
-      <div class="wrap">
-        <h2><span lang="th">ลองคำนวณรายได้</span><span lang="en">Estimate your earnings</span></h2>
-        <p class="fine"><span lang="th">ประมาณการเท่านั้น ยอดจริงตามระบบของ Dotset และงบรวมของโปรแกรม</span><span lang="en">An estimate only. Actual amounts follow Dotset's records and the program budget.</span></p>
-        <div class="calc">
-          <div class="card">
-            <label for="c-m"><span lang="th">ผู้ใช้รายเดือนใหม่ผ่านโค้ด (นับแรงค์)</span><span lang="en">New monthly subscribers with your code (rank)</span></label>
-            <input id="c-m" type="number" min="0" step="1" value="12" inputmode="numeric" />
-            <label for="c-y"><span lang="th">ผู้ใช้รายปีใหม่ผ่านโค้ด</span><span lang="en">New yearly subscribers with your code</span></label>
-            <input id="c-y" type="number" min="0" step="1" value="3" inputmode="numeric" />
-            <label for="c-v"><span lang="th">ยอดวิวรวม (30 วันแรกของแต่ละคลิป)</span><span lang="en">Total views (each clip's first 30 days)</span></label>
-            <input id="c-v" type="number" min="0" step="1000" value="60000" inputmode="numeric" />
-          </div>
-          <div class="card out" aria-live="polite">
-            <div class="line"><span lang="th">แรงค์</span><span lang="en">Rank</span><b id="o-rank"></b></div>
-            <div class="line"><span lang="th">ค่าวิว</span><span lang="en">View pay</span><b id="o-view"></b></div>
-            <div class="line"><span lang="th">ค่าคอมรายปี</span><span lang="en">Yearly commission</span><b id="o-com"></b></div>
-            <div class="line total"><span lang="th">รวมเดือนนี้</span><span lang="en">Total this month</span><b id="o-total"></b></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 5. how to accept -->
     <section id="accept" class="accept">
       <div class="wrap">
-        <h2><span lang="th">โอเคกับกติกาทั้งหมด?</span><span lang="en">Happy with all of this?</span></h2>
+        <h2><span lang="th">โอเคกับทั้งหมดนี้?</span><span lang="en">Happy with all of this?</span></h2>
         <p class="lead" style="margin:0 auto 8px"><span lang="th">แอด LINE Dotset Creators แล้วพิมพ์</span><span lang="en">Add Dotset Creators on LINE and type</span></p>
         <div class="yom">ยอมรับ</div>
         <p class="muted"><span lang="th">จากนั้นทำตามขั้นตอนง่าย ๆ ใน LINE เพื่อรับโค้ดของคุณ</span><span lang="en">Then follow the simple steps on LINE to get your code.</span></p>
@@ -353,8 +202,8 @@
           <a class="btn main" data-link="line" href="#"><span lang="th">แอด LINE Dotset Creators</span><span lang="en">Add Dotset Creators on LINE</span></a>
         </div>
         <p class="fine">
-          <span lang="th">การพิมพ์ "ยอมรับ" หมายความว่าคุณอายุ 18 ปีขึ้นไป ได้อ่านกติกาในหน้านี้และ <a href="/affiliate/terms/">ข้อตกลง Dotset Creators ฉบับ 1.0</a> แล้ว และยอมรับทั้งหมด ข้อตกลงเริ่มมีผลเมื่อเราส่งโค้ดให้คุณใน LINE</span>
-          <span lang="en">Typing "ยอมรับ" means you're 18 or older, you've read the rules on this page and the <a href="/affiliate/terms/">Dotset Creators Agreement v1.0</a>, and you accept all of them. The agreement starts when we send you your code on LINE.</span>
+          <span lang="th">การพิมพ์ "ยอมรับ" หมายความว่าคุณอายุ 18 ปีขึ้นไป ได้อ่านหน้านี้และ <a href="/affiliate/terms/">ข้อตกลง Dotset Creators ฉบับ 1.0</a> แล้ว และยอมรับทั้งหมด ข้อตกลงเริ่มเมื่อเราส่งโค้ดให้คุณใน LINE</span>
+          <span lang="en">Typing "ยอมรับ" means you're 18 or older, you've read this page and the <a href="/affiliate/terms/">Dotset Creators Agreement v1.0</a>, and you accept all of it. The agreement starts when we send you your code on LINE.</span>
         </p>
       </div>
     </section>
@@ -385,29 +234,6 @@
       try { localStorage.setItem('dotset:aff-lang', l) } catch (e) {}
     }
     document.querySelectorAll('.langs button').forEach(function (b) { b.addEventListener('click', function () { setLang(b.getAttribute('data-set')) }) })
-
-    // calculator: same numbers as Rule 2 and 3 (and Schedule A of the agreement)
-    var RANKS = [
-      { name: 'Starter', min: 0, cap: 200 },
-      { name: 'Silver', min: 10, cap: 500 },
-      { name: 'Gold', min: 30, cap: 1500 },
-      { name: 'Platinum', min: 80, cap: 4000 },
-      { name: 'Diamond', min: 200, cap: 10000 },
-    ]
-    function num(id) { var v = Math.floor(Number(document.getElementById(id).value)); return v > 0 ? v : 0 }
-    function baht(n) { return '฿' + n.toLocaleString('en-US') }
-    function calc() {
-      var monthly = num('c-m'), yearly = num('c-y'), views = num('c-v'), rank = RANKS[0]
-      RANKS.forEach(function (r) { if (monthly >= r.min) rank = r })
-      var view = Math.min(Math.floor(views / 100), rank.cap), com = yearly * 150
-      document.getElementById('o-rank').textContent = rank.name
-      document.getElementById('o-view').textContent = baht(view)
-      document.getElementById('o-com').textContent = baht(com)
-      document.getElementById('o-total').textContent = baht(view + com)
-    }
-    ;['c-m', 'c-y', 'c-v'].forEach(function (id) { document.getElementById(id).addEventListener('input', calc) })
-    calc()
-
     var saved = 'th'
     try { saved = localStorage.getItem('dotset:aff-lang') || 'th' } catch (e) {}
     setLang(saved === 'en' ? 'en' : 'th')
