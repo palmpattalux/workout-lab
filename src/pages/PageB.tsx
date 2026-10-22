@@ -366,14 +366,14 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
               <span className="holo-track" />
               <span className="holo-nums"><i>{unit === 'lbs' ? 45 : 20}</i><i>{unit === 'lbs' ? 95 : 40}</i><i>{unit === 'lbs' ? 135 : 60}</i></span>
               <HoloThumb />
-              <span className="holo-label">{t('Slide up: weight')}</span>
+              <span className="holo-label">{t('Load')}</span>
             </div>
           )}
           <div className="holo holo-slide" style={{ left: '69%', top: '64.1%' }} aria-hidden="true">
             <span className="holo-track" />
             <span className="holo-nums"><i>{timed ? 10 : 6}</i><i>{timed ? 20 : 8}</i><i>{timed ? 30 : 10}</i></span>
             <HoloThumb />
-            <span className="holo-label">{timed ? t('Slide up: seconds') : t('Slide up: reps')}</span>
+            <span className="holo-label">{timed ? t('Seconds') : t('Reps')}</span>
           </div>
           <div className="holo holo-tap holo-next" style={{ left: '85.1%', top: '43.2%' }} aria-hidden="true">
             <span className="holo-ring" />
