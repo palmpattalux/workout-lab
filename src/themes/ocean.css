@@ -111,10 +111,10 @@
 .oc-band.b1 path { fill: var(--oc-sea1); }
 .oc-band.b2 path { fill: var(--oc-sea2); }
 @keyframes oc-roll { from { transform: translateX(0); } to { transform: translateX(-50cqw); } }
-.oc-shimmer { position: absolute; left: 50.8%; top: 0; bottom: 0; width: 0; opacity: var(--oc-shimmer-o); }
+.oc-shimmer { position: absolute; left: 52.3%; top: 0; bottom: 0; width: 0; opacity: var(--oc-shimmer-o); }
 .oc-shimmer i {
   position: absolute; left: 0; display: block; height: 2px; border-radius: 2px; transform: translateX(-50%);
-  background: linear-gradient(90deg, transparent, rgba(244, 239, 220, .55), transparent);
+  background: linear-gradient(90deg, transparent, rgba(244, 239, 220, .34), transparent);
   animation: oc-glint 8s ease-in-out infinite;
 }
 @keyframes oc-glint { 50% { opacity: .3; transform: translateX(-50%) scaleX(.7); } }

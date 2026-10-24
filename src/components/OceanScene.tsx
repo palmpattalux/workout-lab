@@ -54,8 +54,8 @@ export default function OceanScene() {
           {STARS.map(([x, y, r], i) => <circle key={i} cx={x} cy={y} r={r} className={i % 3 === 0 ? 'tw' : undefined} style={i % 3 === 0 ? { animationDelay: `${-i * 1.3}s` } : undefined} />)}
         </g>
         <g className="oc-moon">
-          <circle cx="198" cy="128" r="26" fill={g('moonhalo')} />
-          <circle cx="198" cy="128" r="9.5" className="oc-moon-disc" />
+          <circle cx="204" cy="100" r="26" fill={g('moonhalo')} />
+          <circle cx="204" cy="100" r="9.5" className="oc-moon-disc" />
         </g>
         <path className="oc-beam" d={`M${LAMP[0]} ${LAMP[1]} L70 ${LAMP[1] - 46} L70 ${LAMP[1] + 6} Z`} fill={g('beam')} />
         <g className="oc-gulls">
