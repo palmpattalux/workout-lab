@@ -1,0 +1,65 @@
+/* ---------- Desert theme, page B during a session (DesertSession in DesertScene.tsx) ----------
+   Two low dunes along the bottom edge, a footprint trail on the front crest (one print per
+   set), a soft gust with a ribbon of sand on each set. Everything sits behind the controls. */
+:root[data-skin="desert"], .theme-art[data-skin="desert"] {
+  --ds-b-back: #efd3aa; --ds-b-back-o: .55; --ds-b-front: #e8c18f; --ds-b-front-o: .6;
+  --ds-b-print: rgba(140, 78, 36, .42); --ds-b-ribbon: rgba(255, 250, 240, .95); --ds-b-ribbon2: rgba(196, 120, 62, .45);
+  --ds-b-grain: rgba(170, 98, 46, .75); --ds-b-wisp: rgba(255, 252, 245, .9); --ds-b-puff: rgba(176, 110, 60, .5);
+}
+:root[data-skin="desert"][data-mode="dark"], :root[data-mode="dark"] .theme-art[data-skin="desert"] {
+  --ds-b-back: #2a2347; --ds-b-back-o: .8; --ds-b-front: #35284a; --ds-b-front-o: .85;
+  --ds-b-print: rgba(4, 3, 14, .62); --ds-b-ribbon: rgba(246, 206, 170, .5); --ds-b-ribbon2: rgba(243, 149, 80, .4);
+  --ds-b-grain: rgba(250, 196, 150, .6); --ds-b-wisp: rgba(200, 190, 240, .35); --ds-b-puff: rgba(246, 206, 170, .5);
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="desert"]:not([data-mode="light"]), :root:not([data-mode="light"]) .theme-art[data-skin="desert"] {
+    --ds-b-back: #2a2347; --ds-b-back-o: .8; --ds-b-front: #35284a; --ds-b-front-o: .85;
+    --ds-b-print: rgba(4, 3, 14, .62); --ds-b-ribbon: rgba(246, 206, 170, .5); --ds-b-ribbon2: rgba(243, 149, 80, .4);
+    --ds-b-grain: rgba(250, 196, 150, .6); --ds-b-wisp: rgba(200, 190, 240, .35); --ds-b-puff: rgba(246, 206, 170, .5);
+  }
+}
+
+.desert-scene.ds-trek .ds-dunes { position: absolute; left: 0; bottom: 0; width: 100%; height: auto; aspect-ratio: 390 / 110; overflow: visible; }
+.ds-trek .ds-dune-back { fill: var(--ds-b-back); opacity: var(--ds-b-back-o); }
+.ds-trek .ds-dune-front { fill: var(--ds-b-front); opacity: var(--ds-b-front-o); }
+
+/* the trail: each print glides along as the oldest fades off the left edge */
+.ds-trek .ds-print { transition: transform 1s cubic-bezier(.4, 0, .2, 1), opacity 1s ease; }
+.ds-trek .ds-print.gone { opacity: 0; }
+.ds-trek .ds-print ellipse { fill: var(--ds-b-print); }
+.ds-trek .ds-print-in { transform-box: fill-box; transform-origin: center; animation: ds-print-in .8s ease-out .35s both; }
+@keyframes ds-print-in { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: scale(1); } }
+
+/* a gust: a thin ribbon of sand riding across the dunes, a few grains lifting off it */
+.ds-trek .ds-gust { animation: ds-gust 2.4s cubic-bezier(.45, .05, .4, 1) both; }
+@keyframes ds-gust {
+  0% { transform: translate(-230px, 58px); opacity: 0; }
+  18% { opacity: 1; }
+  50% { transform: translate(80px, 72px); }
+  82% { opacity: .9; }
+  100% { transform: translate(400px, 54px); opacity: 0; }
+}
+.desert-scene.ds-trek .ds-ribbon { fill: none; stroke: var(--ds-b-ribbon); stroke-width: 1.6; stroke-linecap: round; }
+.desert-scene.ds-trek .ds-ribbon.thin { stroke: var(--ds-b-ribbon2); stroke-width: 1; }
+.ds-trek .ds-grain { fill: var(--ds-b-grain); animation: ds-grain 1.8s ease-out both; }
+@keyframes ds-grain { 0% { opacity: 0; transform: translate(0, 0); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(40px, var(--gy)); } }
+
+/* a far breeze over the back dune now and then */
+.desert-scene.ds-trek .ds-wisp-far { fill: none; stroke: var(--ds-b-wisp); stroke-width: 1.1; stroke-linecap: round; animation: ds-wisp-far 5.5s ease-in-out both; }
+@keyframes ds-wisp-far {
+  0% { transform: translate(-170px, 40px); opacity: 0; }
+  25% { opacity: .7; }
+  50% { transform: translate(120px, 22px); }
+  80% { opacity: .5; }
+  100% { transform: translate(400px, 40px); opacity: 0; }
+}
+
+/* a tap on the empty page: a tiny puff of sand */
+.ds-trek .ds-puff { position: absolute; width: 0; height: 0; }
+.ds-trek .ds-puff i { position: absolute; left: -1.5px; top: -1.5px; width: 3px; height: 3px; border-radius: 50%; background: var(--ds-b-puff); opacity: 0; animation: ds-puff 1.1s ease-out both; }
+@keyframes ds-puff { 0% { opacity: 0; transform: translate(0, 0) scale(.6); } 20% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--px), var(--py)) scale(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-trek .ds-print, .ds-trek .ds-print-in { transition: none; animation: none; }
+  .ds-trek .ds-gust, .ds-trek .ds-wisp-far, .ds-trek .ds-puff { display: none; }
+}

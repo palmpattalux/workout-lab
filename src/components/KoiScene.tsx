@@ -1,5 +1,7 @@
 import '../themes/koi.css'
-import { useEffect, useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
+import { livePage } from '../lib/sound'
+import { koiSound } from '../themes/koi-sound'
 
 // Koi Pond theme backdrop: a calm pond seen from above. Lily pads with a pink lotus are the
 // anchor top-right; three flat koi glide slow loops across the water, each trailed by a soft
@@ -160,7 +162,64 @@ export default function KoiScene() {
 }
 
 // Page B during a session: answers each set moved on (see ThemeSession in ThemeScene.tsx).
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// Each set: a ripple opens from the lower edge, a koi glides once along the bottom of the
+// page (alternating direction), and a lily pad drifts in at the edge, so the pond fills as the
+// workout goes on. A soft water plop per set, and a faint trickle every 20-40 s.
+const SLOTS = [
+  { x: 1, y: 21, r: 26, a: 20 }, { x: 99, y: 15, r: 22, a: 160 }, { x: 22, y: 100, r: 24, a: -90 },
+  { x: 1.5, y: 48, r: 18, a: -10, lotus: true }, { x: 98.5, y: 60, r: 20, a: 200 }, { x: 0, y: 74, r: 30, a: 30 },
+  { x: 100, y: 83, r: 27, a: 150, lotus: true }, { x: 66, y: 1, r: 20, a: 90 },
+]
+
 export function KoiSession({ steps }: { steps: number }) {
-  return null
+  const ref = useRef<HTMLDivElement>(null)
+  const last = useRef(steps)
+  const gid = 'kos' + useId().replace(/:/g, '')
+  const pads = Math.min(steps, SLOTS.length)
+  const rtl = steps % 2 === 0
+
+  useEffect(() => {
+    if (steps > last.current && livePage(ref.current)) koiSound.set()
+    last.current = steps
+  }, [steps])
+
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>
+    const loop = () => {
+      if (livePage(ref.current)) koiSound.ambient()
+      t = setTimeout(loop, 20000 + Math.random() * 20000)
+    }
+    t = setTimeout(loop, 14000 + Math.random() * 10000)
+    return () => clearTimeout(t)
+  }, [])
+
+  return (
+    <div className="koi-session" ref={ref} aria-hidden="true">
+      <svg width="0" height="0" style={{ position: 'absolute' }}><defs><clipPath id={gid}><path d={BODY} /></clipPath></defs></svg>
+      {SLOTS.slice(0, pads).map((p, i) => (
+        <div key={i} className={`ko-s-pad${i === pads - 1 && steps > 0 ? ' new' : ''}`} style={{ left: `${p.x}%`, top: `${p.y}%`, width: p.r * 2 + 8, height: p.r * 2 + 8 }}>
+          <svg viewBox={`${-p.r - 4} ${-p.r - 4} ${p.r * 2 + 8} ${p.r * 2 + 8}`} style={{ animationDuration: `${13 + (i % 4) * 2.5}s`, animationDelay: `${-i * 3}s` }}>
+            <path className="ko-pad-shadow" d={pad(p.r, p.a)} transform="translate(2 3)" />
+            <path className={`ko-pad${i % 3 === 1 ? ' b' : i % 3 === 2 ? ' c' : ''}`} d={pad(p.r, p.a)} />
+            <path className="ko-vein" d={`M0 0 L${(p.r * -0.6).toFixed(1)} ${(p.r * -0.5).toFixed(1)} M0 0 L${(p.r * 0.7).toFixed(1)} ${(p.r * -0.3).toFixed(1)} M0 0 L${(p.r * 0.1).toFixed(1)} ${(p.r * 0.8).toFixed(1)}`} />
+            {p.lotus && <g transform={`translate(${(p.r * 0.25).toFixed(1)} ${(p.r * 0.15).toFixed(1)}) scale(.55)`}>
+              {[0, 60, 120, 180, 240, 300].map((a) => <ellipse key={a} className="ko-petal o" cx="0" cy="-8" rx="4.6" ry="8.5" transform={`rotate(${a + 30})`} />)}
+              {[0, 90, 180, 270].map((a) => <ellipse key={a} className="ko-petal" cx="0" cy="-5" rx="3.4" ry="6" transform={`rotate(${a})`} />)}
+              <circle className="ko-heart" r="2.6" />
+            </g>}
+          </svg>
+        </div>
+      ))}
+      {steps > 0 && (
+        <div key={steps} className={`ko-s-wake${rtl ? ' rtl' : ''}`}>
+          <i className="ko-s-ring" /><i className="ko-s-ring two" />
+          <div className="ko-s-glide">
+            <svg className="ko-s-koi" viewBox="-38 -14 66 28">
+              <Koi kind={['kohaku', 'orange', 'utsuri'][steps % 3]} clip={gid} />
+            </svg>
+          </div>
+        </div>
+      )}
+    </div>
+  )
 }

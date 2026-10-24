@@ -73,3 +73,38 @@
   .ob-mx { transform: translateX(calc(var(--ob-rx) * -.8)); }
   .ob-my { transform: translateY(calc(var(--ob-ry) * .6)); }
 }
+
+/* ---------- page B during a session: a small planetary system that grows a moon per set ---------- */
+.orbit-scene.ob-session { background: none; }
+.ob-sys { position: absolute; left: 0; bottom: 0; width: 100cqw; height: 100cqw; overflow: visible; }
+.ob-echo { position: absolute; right: 0; top: 0; width: 52cqw; height: 52cqw; overflow: visible; }
+.orbit-scene .ob-sys-ring { fill: none; stroke: var(--ob-path); stroke-width: .9; }
+.orbit-scene .ob-sys-ring.r1 { stroke-dasharray: 2 5; }
+.orbit-scene .ob-sys-ring.r2 { opacity: .7; }
+.ob-sys-glow { opacity: .45; }
+.ob-sys-planet { opacity: .7; }
+.orbit-scene .ob-sys-halo { fill: none; stroke: var(--ob-ring); stroke-width: 1; opacity: .5; }
+.ob-sys-moon { fill: color-mix(in srgb, var(--ob-m2), var(--ink) 22%); opacity: .9; }
+.ob-sys-moon.sat { fill: var(--sun); opacity: .75; }
+.ob-sys-moonglow { opacity: .8; }
+.ob-echo-sun { fill: var(--sun); opacity: .35; }
+.ob-sw { animation: ob-sw 30s ease-in-out infinite alternate; }
+@keyframes ob-sw { from { transform: rotate(var(--a0)); } to { transform: rotate(var(--a1)); } }
+.ob-join { animation: ob-join 1.4s cubic-bezier(.2, .8, .3, 1) both; }
+@keyframes ob-join { 0% { transform: scale(0); opacity: 0; } 35% { opacity: 1; } 55% { transform: scale(1.5); } 100% { transform: scale(1); opacity: 1; } }
+
+.ob-shoot { position: absolute; width: 36cqw; height: 2px; transform-origin: 0 50%; }
+.ob-shoot i { position: absolute; inset: 0; border-radius: 2px; opacity: 0;
+  background: linear-gradient(90deg, transparent, var(--ob-star) 85%, var(--ob-m1));
+  box-shadow: 0 0 6px var(--ob-glow); animation: ob-shoot 1.5s cubic-bezier(.3, .6, .4, 1) both; }
+@keyframes ob-shoot {
+  0% { transform: translateX(-10cqw) scaleX(.3); opacity: 0; }
+  25% { opacity: .55; }
+  100% { transform: translateX(40cqw) scaleX(.6); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ob-sw, .ob-join { animation: none; }
+  .ob-sw { transform: rotate(var(--a0)); }
+  .ob-shoot { display: none; }
+}

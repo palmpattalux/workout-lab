@@ -1,5 +1,7 @@
 import '../themes/orbit.css'
-import { useId } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
+import { livePage } from '../lib/sound'
+import { orbitSound } from '../themes/orbit-sound'
 
 // Orbit theme backdrop: a ringed planet partly off the top-right corner (echoing the logo's
 // dot-in-a-ring), one small moon circling it on a faint tilted ellipse, sparse slow stars and
@@ -104,8 +106,93 @@ function Moon({ fill }: { fill: string }) {
   )
 }
 
-// Page B during a session: answers each set moved on (see ThemeSession in ThemeScene.tsx).
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// Page B during a session: faint orbit rings round a small planet in the bottom-left corner
+// (and a faint echo top-right). Every set moved on sends a soft shooting star across the top
+// and adds a moon that joins one of the orbits, so the little system grows through the session.
+const SYS_RINGS = [112, 178, 252]
+const MAX_MOONS = 12
+const moonOf = (i: number) => {
+  const ring = i % 3
+  const R = SYS_RINGS[ring]
+  // each moon swings slowly to and fro along the visible quarter of its ring
+  const a0 = -(14 + rand(i + 5) * 22), a1 = -(52 + rand(i + 11) * 24)
+  const dur = [24, 34, 46][ring] + rand(i + 17) * 8
+  return { R, a0, a1, dur, delay: -(rand(i + 23) * dur * 2), r: 2.6 + rand(i + 29) * 2.2, sat: i % 4 === 3 }
+}
+
 export function OrbitSession({ steps }: { steps: number }) {
-  return null
+  const gid = useId().replace(/:/g, '')
+  const ref = useRef<HTMLDivElement>(null)
+  const first = useRef(steps)
+  const last = useRef(steps)
+  const [shot, setShot] = useState<{ n: number; top: number; left: number; a: number } | null>(null)
+
+  useEffect(() => {
+    if (steps > last.current) {
+      setShot({ n: steps, top: 12 + Math.random() * 5, left: 6 + Math.random() * 18, a: 8 + Math.random() * 10 })
+      if (livePage(ref.current)) orbitSound.set()
+    }
+    last.current = steps
+    const t = setTimeout(() => setShot(null), 1800)
+    return () => clearTimeout(t)
+  }, [steps])
+
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>
+    const loop = () => {
+      if (livePage(ref.current)) orbitSound.ambient()
+      t = setTimeout(loop, 28000 + Math.random() * 26000)
+    }
+    t = setTimeout(loop, 9000 + Math.random() * 8000)
+    return () => clearTimeout(t)
+  }, [])
+
+  const count = Math.min(steps, MAX_MOONS)
+  return (
+    <div className="orbit-scene ob-session" ref={ref} aria-hidden="true">
+      <svg className="ob-sys" viewBox="0 0 390 390">
+        <defs>
+          <radialGradient id={gid + 'sg'}>
+            <stop offset=".2" style={{ stopColor: 'var(--ob-glow)', stopOpacity: 'var(--ob-glow-o)' }} />
+            <stop offset="1" style={{ stopColor: 'var(--ob-glow)', stopOpacity: 0 }} />
+          </radialGradient>
+          <radialGradient id={gid + 'sp'} cx=".7" cy=".3" r=".8">
+            <stop offset="0" style={{ stopColor: 'var(--ob-p1)' }} />
+            <stop offset="1" style={{ stopColor: 'var(--ob-p3)' }} />
+          </radialGradient>
+        </defs>
+        <g transform="translate(0 390)">
+          <circle r="170" fill={`url(#${gid}sg)`} className="ob-sys-glow" />
+          {SYS_RINGS.map((R, i) => <circle key={i} r={R} className={`ob-sys-ring r${i}`} />)}
+          <circle r="40" fill={`url(#${gid}sp)`} className="ob-sys-planet" />
+          <circle r="58" className="ob-sys-halo" />
+          {Array.from({ length: count }, (_, i) => {
+            const m = moonOf(i)
+            return (
+              <g key={i} className="ob-sw" style={{ ['--a0' as string]: `${m.a0.toFixed(1)}deg`, ['--a1' as string]: `${m.a1.toFixed(1)}deg`, animationDuration: `${m.dur.toFixed(1)}s`, animationDelay: `${m.delay.toFixed(1)}s` }}>
+                <g transform={`translate(${m.R} 0)`}>
+                  <g className={i >= first.current ? 'ob-join' : undefined}>
+                    <circle r={m.r * 3} fill={`url(#${gid}sg)`} className="ob-sys-moonglow" />
+                    <circle r={m.r.toFixed(2)} className={m.sat ? 'ob-sys-moon sat' : 'ob-sys-moon'} />
+                  </g>
+                </g>
+              </g>
+            )
+          })}
+        </g>
+      </svg>
+      <svg className="ob-echo" viewBox="0 0 200 200">
+        <g transform="translate(200 0)">
+          <circle r="74" className="ob-sys-ring r0" />
+          <circle r="136" className="ob-sys-ring r2" />
+          <circle r="5" className="ob-echo-sun" />
+        </g>
+      </svg>
+      {shot && (
+        <div key={shot.n} className="ob-shoot" style={{ top: `${shot.top.toFixed(1)}%`, left: `${shot.left.toFixed(1)}%`, transform: `rotate(${shot.a.toFixed(1)}deg)` }}>
+          <i />
+        </div>
+      )}
+    </div>
+  )
 }

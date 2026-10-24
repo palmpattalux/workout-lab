@@ -1,3 +1,8 @@
+import { useEffect, useRef, useState } from 'react'
+import '../themes/nightcity-session.css'
+import { livePage } from '../lib/sound'
+import { nightcitySound } from '../themes/nightcity-sound'
+
 // Night City: a gothic noir skyline in three depths. Far towers fade into fog, a
 // searchlight sweeps the clouds, lightning now and then lights the sky behind the
 // spires, rain falls in two depths and lamp light smears across the wet street.
@@ -105,7 +110,44 @@ export default function NightCityScene() {
 }
 
 // Page B during a session: answers each set moved on (see ThemeSession in ThemeScene.tsx).
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// Each set: a muted bass note and one window lighting up faintly at the edge of the screen.
+// Now and then the city is heard far off (a low hum, a distant siren).
+type Lit = { id: number; x: number; y: number }
 export function NightCitySession({ steps }: { steps: number }) {
-  return null
+  const ref = useRef<HTMLDivElement>(null)
+  const last = useRef(steps)
+  const [lit, setLit] = useState<Lit[]>([])
+
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>
+    const loop = () => {
+      if (livePage(ref.current)) nightcitySound.ambient()
+      t = setTimeout(loop, 15000 + Math.random() * 15000)
+    }
+    t = setTimeout(loop, 9000 + Math.random() * 8000)
+    return () => clearTimeout(t)
+  }, [])
+
+  useEffect(() => {
+    if (steps > last.current) {
+      if (livePage(ref.current)) nightcitySound.set(steps)
+      const left = steps % 2 === 1
+      const x = left ? 2 + Math.random() * 4 : 92 + Math.random() * 4
+      const y = 58 + Math.random() * 28
+      setLit((l) => [...l.slice(-3), { id: steps, x, y }])
+    }
+    last.current = steps
+  }, [steps])
+
+  useEffect(() => {
+    if (!lit.length) return
+    const t = setTimeout(() => setLit((l) => l.slice(1)), 5000)
+    return () => clearTimeout(t)
+  }, [lit])
+
+  return (
+    <div className="nc-session" ref={ref} aria-hidden="true">
+      {lit.map((w) => <i key={w.id} className="nc-lit" style={{ left: `${w.x}%`, top: `${w.y}%` }} />)}
+    </div>
+  )
 }

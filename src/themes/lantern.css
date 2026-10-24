@@ -91,3 +91,36 @@
   .ln-stars circle.tw, .ln-refl g, .ln-hang, .ln-rise { animation: none; }
   .ln-rise { opacity: .7; transform: translate(0, 40cqh) scale(.85); }
 }
+
+/* ---------- page B session: one sky lantern let go for every set moved on ---------- */
+.lantern-scene.ln-session { container-type: size; --ln-s-halo: .6; --ln-s-o: .85; --ln-s-hz: .6; }
+:root[data-mode="dark"] .ln-session { --ln-s-halo: 1; --ln-s-o: .9; --ln-s-hz: .8; }
+@media (prefers-color-scheme: dark) { :root:not([data-mode="light"]) .ln-session { --ln-s-halo: 1; --ln-s-o: .9; --ln-s-hz: .8; } }
+/* a faint warm glow along the bottom edge, where the lanterns are let go */
+.ln-s-horizon { position: absolute; left: -10%; right: -10%; bottom: -60px; height: 160px; opacity: var(--ln-s-hz);
+  background: radial-gradient(50% 60% at 50% 100%, color-mix(in srgb, var(--ln-glow) 30%, transparent), transparent 75%);
+  animation: ln-s-hz 9s ease-in-out infinite alternate; }
+@keyframes ln-s-hz { to { opacity: calc(var(--ln-s-hz) * .6); } }
+.ln-s-up { position: absolute; top: 0; display: block; margin-left: -10px; opacity: 0;
+  animation: ln-s-up 150s linear both; will-change: transform, opacity; }
+.ln-s-up::before { content: ""; position: absolute; left: 50%; top: 60%; width: 360%; aspect-ratio: 1; transform: translate(-50%, -50%);
+  border-radius: 50%; opacity: var(--ln-s-halo);
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--ln-glow) 38%, transparent), color-mix(in srgb, var(--ln-glow) 9%, transparent) 50%, transparent); }
+.ln-s-sway { display: block; position: relative; animation: ln-s-sway 7s ease-in-out infinite alternate; }
+.ln-s-sway svg { display: block; width: 100%; height: auto; }
+.ln-s-flame { transform-box: fill-box; transform-origin: center; animation: ln-s-flick 2.4s ease-in-out infinite alternate; }
+@keyframes ln-s-sway { from { transform: translateX(calc(var(--ln-sway) * -1)) rotate(-3deg); } to { transform: translateX(var(--ln-sway)) rotate(3deg); } }
+@keyframes ln-s-flick { to { opacity: .55; transform: scale(.85); } }
+/* lifts gently off the bottom edge, rests a little, then drifts slowly up and away, fading */
+@keyframes ln-s-up {
+  0% { transform: translateY(calc(100cqh + 20px)) scale(1.05); opacity: 0; animation-timing-function: cubic-bezier(.25, .6, .35, 1); }
+  1.2% { opacity: var(--ln-s-o); }
+  7% { transform: translateY(66cqh) scale(.95); opacity: var(--ln-s-o); animation-timing-function: linear; }
+  45% { opacity: calc(var(--ln-s-o) * .45); }
+  85% { opacity: calc(var(--ln-s-o) * .3); }
+  100% { transform: translateY(-40px) scale(.55); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ln-s-horizon, .ln-s-up, .ln-s-sway, .ln-s-flame { animation: none; }
+  .ln-s-up { opacity: calc(var(--ln-s-o) * .6); transform: translateY(var(--ln-rm)) scale(.85); }
+}

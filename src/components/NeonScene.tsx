@@ -1,3 +1,8 @@
+import { useEffect, useRef, useState } from 'react'
+import { livePage } from '../lib/sound'
+import { neonSound } from '../themes/neon-sound'
+import '../themes/neon-session.css'
+
 // Neon: a cyber city at night, kept minimal. Two flat skyline layers with a few
 // rooftops traced in neon, a perspective grid rolling toward you, light trails
 // gliding between the towers and the odd sign flickering, a crescent moon as the
@@ -96,7 +101,34 @@ export default function NeonScene() {
 }
 
 // Page B during a session: answers each set moved on (see ThemeSession in ThemeScene.tsx).
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// A thin neon line along the bottom edge charges up on each set, with a soft synth blip;
+// now and then the line flickers with a faint neon-sign buzz.
 export function NeonSession({ steps }: { steps: number }) {
-  return null
+  const ref = useRef<HTMLDivElement>(null)
+  const last = useRef(steps)
+  const [pulse, setPulse] = useState(0)
+  const [flick, setFlick] = useState(false)
+
+  useEffect(() => {
+    if (steps > last.current) { setPulse((p) => p + 1); if (livePage(ref.current)) neonSound.set() }
+    last.current = steps
+  }, [steps])
+
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>
+    const loop = () => {
+      setFlick(true)
+      if (livePage(ref.current)) neonSound.ambient()
+      t = setTimeout(() => { setFlick(false); t = setTimeout(loop, 15000 + Math.random() * 15000) }, 600)
+    }
+    t = setTimeout(loop, 15000 + Math.random() * 15000)
+    return () => clearTimeout(t)
+  }, [])
+
+  return (
+    <div className={`ne-session${flick ? ' flick' : ''}`} ref={ref} aria-hidden="true">
+      <i className="ne-base" />
+      {pulse > 0 && <i key={pulse} className="ne-pulse" />}
+    </div>
+  )
 }

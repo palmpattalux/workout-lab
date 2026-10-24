@@ -1,5 +1,7 @@
 import '../themes/lantern.css'
-import { useId } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
+import { livePage } from '../lib/sound'
+import { lanternSound } from '../themes/lantern-sound'
 
 // Lanterns theme. Day: a dusk sky from lilac to peach, a string of round paper lanterns
 // across the top-right corner, a few sky lanterns drifting up, hills over calm water.
@@ -105,8 +107,59 @@ export default function LanternScene() {
   )
 }
 
-// Page B during a session: answers each set moved on (see ThemeSession in ThemeScene.tsx).
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// Page B during a session: every set moved on lets one small sky lantern go. It lifts from
+// the bottom edge, then drifts slowly up and off the top; the earlier ones stay faintly
+// visible higher up. Now and then a very quiet breath of air (and sometimes a far bell).
+const LANES = [14, 84, 26, 72, 90, 9, 36, 64]
+const LIFE = 150 // seconds from release to gone off the top
+const KEEP = 7
+type Sky = { id: number; x: number; delay: number; size: number; sway: number }
+const sky = (n: number, delay: number): Sky => ({
+  id: n, x: LANES[n % LANES.length], delay, size: 18 + (n * 7) % 7, sway: (n % 2 ? 1 : -1) * (5 + (n % 3) * 2),
+})
+
 export function LanternSession({ steps }: { steps: number }) {
-  return null
+  const ref = useRef<HTMLDivElement>(null)
+  const last = useRef(steps)
+  // coming back to page B mid-session: the lanterns already let go are up in the sky
+  const [list, setList] = useState<Sky[]>(() =>
+    Array.from({ length: Math.min(steps, KEEP) }, (_, k) => sky(steps - k, -(14 + k * 22))).reverse())
+
+  useEffect(() => {
+    if (steps > last.current) {
+      setList((l) => [...l, sky(steps, 0)].slice(-KEEP))
+      if (livePage(ref.current)) lanternSound.set()
+    }
+    last.current = steps
+  }, [steps])
+
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>
+    const loop = () => {
+      if (livePage(ref.current)) lanternSound.ambient()
+      t = setTimeout(loop, 16000 + Math.random() * 14000)
+    }
+    t = setTimeout(loop, 9000)
+    return () => clearTimeout(t)
+  }, [])
+
+  return (
+    <div className="lantern-scene ln-session" ref={ref} aria-hidden="true">
+      <div className="ln-s-horizon" />
+      {list.map((s, i) => (
+        <span key={s.id} className="ln-s-up" style={{
+          left: `${s.x}%`, width: `${s.size}px`, animationDelay: `${s.delay}s`, animationDuration: `${LIFE}s`,
+          ['--ln-rm' as string]: `${62 - (list.length - 1 - i) * 9}cqh`,
+        }}>
+          <span className="ln-s-sway" style={{ ['--ln-sway' as string]: `${s.sway}px`, animationDelay: `${-s.id * 1.7}s` }}>
+            <svg viewBox="0 0 20 26">
+              <path className="ln-sky-body" d="M3 2.5 Q10 -0.5 17 2.5 L15 20 Q10 21.6 5 20 Z" />
+              <path className="ln-sky-seam" d="M10 1 L10 20.8" />
+              <ellipse className="ln-sky-flame ln-s-flame" cx="10" cy="22.6" rx="2" ry="1.6" />
+            </svg>
+          </span>
+        </span>
+      ))}
+    </div>
+  )
 }
