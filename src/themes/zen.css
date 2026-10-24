@@ -1,1 +1,71 @@
-/* ---------- Zen Garden theme ---------- */
+/* ---------- Zen Garden theme: raked sand, a still stone, bamboo in the corner ----------
+   Day = warm stone-beige sand. Night = moonlit grey-blue sand with a small moon behind the bamboo. */
+:root[data-skin="zen"], .theme-art[data-skin="zen"] {
+  --stage: #f1ebdf; --bg: #e5dccb; --surface: #fcfaf5; --sunk: #ebe4d6;
+  --ink: #2a2a23; --muted: #7a7564; --hair: rgba(60, 50, 30, .08); --line: rgba(60, 50, 30, .14);
+  --sun: #6e8a46; --active: #5c7a38; --active-soft: #e3e9d2;
+  --zn-sand1: #f3eee3; --zn-sand2: #eee6d7; --zn-sand3: #e7ddca;
+  --zn-rake: rgba(150, 128, 92, .26); --zn-ring: rgba(140, 118, 84, .34);
+  --zn-stone: #8f887c; --zn-stone-hi: #bdb6a8; --zn-shadow: rgba(90, 70, 40, .2); --zn-moss: rgba(110, 138, 70, .45);
+  --zn-stalk: #a9b48a; --zn-node: rgba(90, 104, 60, .45); --zn-leaf: #93a96a; --zn-leaf-b: #7f9858; --zn-twig: rgba(100, 112, 70, .6);
+  --zn-moon: #f4f1e6; --zn-moon-o: 0; --zn-bamboo-o: .85;
+}
+:root[data-skin="zen"][data-mode="dark"], :root[data-mode="dark"] .theme-art[data-skin="zen"] {
+  --stage: #1a2029; --bg: #11151c; --surface: #252c37; --sunk: #161b23;
+  --ink: #e7ebee; --muted: #98a2ad; --hair: rgba(255, 255, 255, .07); --line: rgba(255, 255, 255, .11);
+  --sun: #a3c27a; --active: #a3c27a; --active-soft: #2b3627;
+  --zn-sand1: #1a2029; --zn-sand2: #1d242e; --zn-sand3: #222a35;
+  --zn-rake: rgba(190, 208, 228, .1); --zn-ring: rgba(200, 216, 234, .16);
+  --zn-stone: #343b46; --zn-stone-hi: #5a6370; --zn-shadow: rgba(0, 0, 0, .35); --zn-moss: rgba(120, 150, 90, .32);
+  --zn-stalk: #3c4a44; --zn-node: rgba(10, 16, 14, .45); --zn-leaf: #4a5e4c; --zn-leaf-b: #3f5242; --zn-twig: rgba(80, 100, 86, .7);
+  --zn-moon: #e9edf0; --zn-moon-o: 1; --zn-bamboo-o: 1;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="zen"]:not([data-mode="light"]), :root:not([data-mode="light"]) .theme-art[data-skin="zen"] {
+    --stage: #1a2029; --bg: #11151c; --surface: #252c37; --sunk: #161b23;
+    --ink: #e7ebee; --muted: #98a2ad; --hair: rgba(255, 255, 255, .07); --line: rgba(255, 255, 255, .11);
+    --sun: #a3c27a; --active: #a3c27a; --active-soft: #2b3627;
+    --zn-sand1: #1a2029; --zn-sand2: #1d242e; --zn-sand3: #222a35;
+    --zn-rake: rgba(190, 208, 228, .1); --zn-ring: rgba(200, 216, 234, .16);
+    --zn-stone: #343b46; --zn-stone-hi: #5a6370; --zn-shadow: rgba(0, 0, 0, .35); --zn-moss: rgba(120, 150, 90, .32);
+    --zn-stalk: #3c4a44; --zn-node: rgba(10, 16, 14, .45); --zn-leaf: #4a5e4c; --zn-leaf-b: #3f5242; --zn-twig: rgba(80, 100, 86, .7);
+    --zn-moon: #e9edf0; --zn-moon-o: 1; --zn-bamboo-o: 1;
+    color-scheme: dark;
+  }
+}
+.theme-art[data-skin="zen"] { color: var(--ink); }
+.zen-scene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.zen-scene .zn-art { position: absolute; inset: 0; width: 100%; height: 100%; }
+.zen-scene svg * { stroke: none; }
+.zen-scene .zn-moonset { opacity: var(--zn-moon-o); }
+.zen-scene .zn-moon { fill: var(--zn-moon); opacity: .82; }
+.zen-scene .zn-rake path { fill: none; stroke: var(--zn-rake); stroke-width: 1; }
+.zen-scene .zn-rings ellipse {
+  fill: none; stroke: var(--zn-ring); stroke-width: 1.1;
+  transform-box: fill-box; transform-origin: center; animation: zn-breathe 12s ease-in-out infinite;
+}
+@keyframes zn-breathe { 0%, 100% { transform: scale(1); opacity: .75; } 50% { transform: scale(1.045); opacity: 1; } }
+.zen-scene .zn-moss { fill: var(--zn-moss); }
+.zen-scene .zn-shadow { fill: var(--zn-shadow); }
+.zen-scene .zn-bamboo { opacity: var(--zn-bamboo-o); }
+.zen-scene .zn-stalk { fill: var(--zn-stalk); }
+.zen-scene .zn-node { fill: var(--zn-node); }
+.zen-scene .zn-leaf { fill: var(--zn-leaf); }
+.zen-scene .zn-leaf.b { fill: var(--zn-leaf-b); }
+.zen-scene .zn-twig { fill: none; stroke: var(--zn-twig); stroke-width: 1.2; }
+.zen-scene .zn-sprig { transform-origin: 0 0; animation: zn-sway 10s ease-in-out infinite; }
+@keyframes zn-sway { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(3deg); } }
+.zn-drift {
+  position: absolute; top: 26cqh; left: 78cqw; width: 14px; height: 3.4px; border-radius: 100% 0 100% 0;
+  background: var(--zn-leaf); opacity: 0; animation: zn-drift 18s linear infinite; animation-delay: -5s;
+}
+@keyframes zn-drift {
+  0% { transform: translate(0, 0) rotate(-20deg); opacity: 0; }
+  8% { opacity: .75; }
+  35% { transform: translate(-10cqw, 10cqh) rotate(25deg); }
+  65% { transform: translate(-4cqw, 22cqh) rotate(-15deg); opacity: .6; }
+  85% { transform: translate(-14cqw, 30cqh) rotate(10deg); opacity: 0; }
+  100% { transform: translate(-14cqw, 30cqh); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .zen-scene .zn-rings ellipse, .zen-scene .zn-sprig, .zn-drift { animation: none; } }
