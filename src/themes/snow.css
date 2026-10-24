@@ -1,1 +1,73 @@
-/* ---------- Snowfall theme ---------- */
+/* ---------- Snowfall theme: a winter day, and the same mountains at night with a glowing cabin ----------
+   Sun (moon by night) is the anchor top-right; ridges and the cabin sit low, away from the controls. */
+:root[data-skin="snow"], .theme-art[data-skin="snow"] {
+  --stage: #f5f9fc; --bg: #e4edf5; --surface: #ffffff; --sunk: #edf3f8;
+  --ink: #1d2a38; --muted: #6a7b8e; --hair: rgba(60, 100, 140, .14); --line: rgba(60, 100, 140, .22);
+  --sun: #4a8cc2; --active: #3f82ba; --active-soft: #dcebf7;
+  --sn-sky1: #d6e7f4; --sn-sky2: #eaf2f9; --sn-sky3: #f6f9fc;
+  --sn-sun: #fffbea; --sn-sun-o: .95; --sn-bite-o: 0; --sn-stars-o: 0; --sn-night: 0;
+  --sn-hill0: #dbe7f1; --sn-hill0b: #e8f0f7; --sn-hill1: #e6eff7; --sn-hill1b: #f0f5fa;
+  --sn-hill2: #f1f6fa; --sn-hill2b: #fbfdfe; --sn-cap: #ffffff;
+  --sn-pine: rgba(96, 132, 150, .42); --sn-wall: #c9b6a4; --sn-roof: #a99486; --sn-roof-snow: #ffffff;
+  --sn-win: #e3edf5; --sn-door: #ae9887; --sn-flake: #a9c6de;
+}
+:root[data-skin="snow"][data-mode="dark"], :root[data-mode="dark"] .theme-art[data-skin="snow"] {
+  --stage: #121a36; --bg: #0b1127; --surface: #1d2749; --sunk: #151d3c;
+  --ink: #edf2fb; --muted: #9ba8c8; --hair: rgba(180, 200, 240, .12); --line: rgba(180, 200, 240, .2);
+  --sun: #8ec5ef; --active: #8ec5ef; --active-soft: #233a5e;
+  --sn-sky1: #0c1230; --sn-sky2: #19224a; --sn-sky3: #26305a;
+  --sn-sun: #eef3fb; --sn-sun-o: .9; --sn-halo-o: .45; --sn-bite-o: 1; --sn-stars-o: 1; --sn-night: 1;
+  --sn-hill0: #2c3767; --sn-hill0b: #242e58; --sn-hill1: #222b52; --sn-hill1b: #1c2448;
+  --sn-hill2: #1a2244; --sn-hill2b: #141b38; --sn-cap: #4a5788;
+  --sn-pine: rgba(10, 14, 34, .55); --sn-wall: #33294a; --sn-roof: #261f3a; --sn-roof-snow: #55628f;
+  --sn-win: #ffc66e; --sn-door: #221b34; --sn-flake: #c9d6f2;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="snow"]:not([data-mode="light"]), :root:not([data-mode="light"]) .theme-art[data-skin="snow"] {
+    --stage: #121a36; --bg: #0b1127; --surface: #1d2749; --sunk: #151d3c;
+    --ink: #edf2fb; --muted: #9ba8c8; --hair: rgba(180, 200, 240, .12); --line: rgba(180, 200, 240, .2);
+    --sun: #8ec5ef; --active: #8ec5ef; --active-soft: #233a5e;
+    --sn-sky1: #0c1230; --sn-sky2: #19224a; --sn-sky3: #26305a;
+    --sn-sun: #eef3fb; --sn-sun-o: .9; --sn-halo-o: .45; --sn-bite-o: 1; --sn-stars-o: 1; --sn-night: 1;
+    --sn-hill0: #2c3767; --sn-hill0b: #242e58; --sn-hill1: #222b52; --sn-hill1b: #1c2448;
+    --sn-hill2: #1a2244; --sn-hill2b: #141b38; --sn-cap: #4a5788;
+    --sn-pine: rgba(10, 14, 34, .55); --sn-wall: #33294a; --sn-roof: #261f3a; --sn-roof-snow: #55628f;
+    --sn-win: #ffc66e; --sn-door: #221b34; --sn-flake: #c9d6f2;
+    color-scheme: dark;
+  }
+}
+.theme-art[data-skin="snow"] { color: var(--ink); }
+.snow-scene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.snow-scene .sn-art { position: absolute; inset: 0; width: 100%; height: 100%; }
+.snow-scene svg * { stroke: none; }
+.sn-sun { fill: var(--sn-sun); opacity: var(--sn-sun-o); }
+.snow-scene .sn-bite { fill: #000; fill-opacity: var(--sn-bite-o); }
+.sn-halo { opacity: var(--sn-halo-o, 1); transform-box: fill-box; transform-origin: center; animation: sn-halo 12s ease-in-out infinite alternate; }
+@keyframes sn-halo { to { transform: scale(1.08); opacity: calc(var(--sn-halo-o, 1) * .75); } }
+.sn-stars circle { fill: #fff; opacity: calc(var(--sn-stars-o) * .6); }
+.sn-stars circle.tw { animation: sn-tw 9s ease-in-out infinite; }
+@keyframes sn-tw { 50% { opacity: calc(var(--sn-stars-o) * .12); } }
+.sn-cap { fill: var(--sn-cap); opacity: .85; }
+.sn-pines path { fill: var(--sn-pine); }
+.sn-wall { fill: var(--sn-wall); }
+.sn-chim { fill: var(--sn-roof); }
+.sn-roof { fill: var(--sn-roof); }
+.sn-roof-snow { fill: var(--sn-roof-snow); }
+.sn-door { fill: var(--sn-door); }
+.sn-win { fill: var(--sn-win); }
+.sn-glow { opacity: var(--sn-night); mix-blend-mode: screen; transform-box: fill-box; transform-origin: center; animation: sn-glow 8s ease-in-out infinite alternate; }
+@keyframes sn-glow { to { transform: scale(1.06); opacity: calc(var(--sn-night) * .8); } }
+.sn-flake {
+  position: absolute; top: 0; display: block; border-radius: 50%; background: var(--sn-flake);
+  opacity: 0; animation: sn-fall linear infinite;
+}
+@keyframes sn-fall {
+  0% { transform: translate(0, -3cqh); opacity: 0; }
+  8% { opacity: var(--sn-o); }
+  35% { transform: translate(var(--sn-sway), 34cqh); }
+  65% { transform: translate(calc(var(--sn-sway) * -.6), 64cqh); }
+  88% { opacity: var(--sn-o); }
+  100% { transform: translate(calc(var(--sn-sway) * .4), 96cqh); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .sn-flake, .sn-halo, .sn-glow, .sn-stars circle.tw { animation: none; } }
