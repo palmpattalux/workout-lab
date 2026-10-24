@@ -89,7 +89,7 @@ const ROWS: [string, string, string, string][] = [
   ['Renew {plan}', 'ต่ออายุ {plan}', '{plan} を更新', '续订 {plan}'],
   ['Skip', 'ข้าม', 'スキップ', '跳过'],
   ['{n} more saved. They come back when you renew.', 'เก็บไว้อีก {n} ท่า จะกลับมาเมื่อคุณต่ออายุ', 'ほかに {n} 件保存されています。更新すると戻ります。', '另有 {n} 个已保存，续订后恢复。'],
-  ['Custom sounds', 'เสียงเฉพาะธีม', 'オリジナルサウンド', '专属音效'],
+  ['Sound', 'เสียง', 'サウンド', '音效'],
   ['Interactive', 'ตอบสนองการใช้งาน', 'インタラクティブ', '互动'],
   ['Icon set · yours to keep', 'ชุดไอคอน · เป็นของคุณตลอดไป', 'アイコンセット · ずっとあなたのもの', '图标套装 · 永久拥有'],
   ['Free with {plan}', 'ฟรีกับ {plan}', '{plan} なら無料', '{plan} 免费'],
@@ -598,7 +598,6 @@ const ROWS: [string, string, string, string][] = [
   ["A planet in the corner and one small moon circling it among slow stars.", "ดาวเคราะห์ที่มุมจอ กับดวงจันทร์ดวงเล็กที่โคจรรอบท่ามกลางดวงดาว", "隅に惑星、そのまわりを小さな月がゆっくりと回り、星がまたたく。", "角落里一颗行星，一颗小卫星在缓慢的星光中绕它运行。"],
   ["Soft rain on glass, drops sliding down. A grey day, or city lights blurred at night.", "สายฝนบนกระจก หยดน้ำไหลลงช้าๆ วันฟ้าครึ้ม หรือแสงไฟเมืองพร่ามัวยามค่ำคืน", "ガラスに降る優しい雨、滑り落ちるしずく。曇りの日、または夜ににじむ街の灯り。", "轻雨落在玻璃上，水珠缓缓滑落。阴天，或夜晚朦胧的城市灯光。"],
   ["Koi gliding under lily pads. Their shadows pass slowly across the water.", "ปลาคาร์ปว่ายใต้ใบบัว เงาของพวกมันเคลื่อนผ่านผิวน้ำช้าๆ", "蓮の葉の下を泳ぐ鯉。その影が水面をゆっくりと横切る。", "锦鲤在睡莲叶下游弋，影子缓缓掠过水面。"],
-  ["Bold circles, arcs and lines in primary colours, gently shifting.", "วงกลม เส้นโค้ง และเส้นตรงในสีหลัก ขยับเคลื่อนอย่างนุ่มนวล", "原色の大胆な円、弧、線が、ゆっくりと動く。", "原色的圆、弧与线条，轻轻移动变化。"],
 ]
 for (const [en, th, ja, zh] of ROWS) { D.th[en] = th; D.ja[en] = ja; D.zh[en] = zh }
 

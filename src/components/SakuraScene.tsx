@@ -47,3 +47,9 @@ export default function SakuraScene() {
     </div>
   )
 }
+
+// Page B during a session: answers each set moved on (see ThemeSession in ThemeScene.tsx).
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function SakuraSession({ steps }: { steps: number }) {
+  return null
+}
