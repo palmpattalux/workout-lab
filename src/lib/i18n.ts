@@ -588,6 +588,17 @@ const ROWS: [string, string, string, string][] = [
   ["Keep dragging for more", "ลากต่อเพื่อดูเพิ่ม", "さらにドラッグでもっと表示", "继续拖动查看更多"],
   ["Knee push-up", "วิดพื้นแบบคุกเข่า", "膝つき腕立て", "跪姿俯卧撑"],
   ["Tap: new move", "แตะ: ท่าใหม่", "タップ：新しい動き", "点按：新动作"],
+  // new themes (2026-10-24)
+  ["Rolling waves and a lighthouse. Gulls by day, a sweeping beam over a moonlit sea by night.", "คลื่นซัดเบาๆ กับประภาคาร นกนางนวลยามกลางวัน แสงไฟกวาดผ่านทะเลใต้แสงจันทร์ยามค่ำคืน", "寄せる波と灯台。昼はカモメ、夜は月明かりの海を照らす光。", "起伏的海浪与灯塔。白天海鸥飞翔，夜晚光束扫过月下的海面。"],
+  ["Layers of pine in morning mist. Fireflies drift between the trees at night.", "แนวต้นสนในหมอกยามเช้า หิ่งห้อยลอยไปมาระหว่างต้นไม้ยามค่ำคืน", "朝霧に重なる松の木々。夜は木々の間をホタルが舞う。", "晨雾中层层松林。夜晚萤火虫在林间飘舞。"],
+  ["Quiet mountains under soft falling snow. A cabin window glows at night.", "ภูเขาเงียบสงบใต้หิมะที่โปรยปราย หน้าต่างกระท่อมเรืองแสงยามค่ำคืน", "静かな山に降る柔らかな雪。夜は山小屋の窓が灯る。", "轻雪飘落下的静谧群山。夜晚小屋的窗户亮起灯光。"],
+  ["A maple branch in the corner, red leaves floating down and settling on the ground.", "กิ่งเมเปิลที่มุมจอ ใบไม้สีแดงร่วงลอยลงมาทับถมบนพื้น", "隅に紅葉の枝。赤い葉がひらひらと舞い落ちて地面に積もる。", "角落里一枝枫叶，红叶飘落，铺满地面。"],
+  ["Raked sand, a still stone and bamboo leaves. Slow ripples circle the stone.", "ทรายที่คราดเป็นลาย หินนิ่งสงบ และใบไผ่ ระลอกช้าๆ วนรอบก้อนหิน", "砂紋、静かな石、竹の葉。石の周りをゆっくりと波紋が巡る。", "耙过的细沙、静石与竹叶。缓慢的涟漪环绕着石头。"],
+  ["Paper lanterns rising into the sky, glowing warm against the night.", "โคมกระดาษลอยขึ้นสู่ท้องฟ้า เปล่งแสงอบอุ่นท่ามกลางยามค่ำคืน", "空へ昇る紙のランタン。夜空に温かく灯る。", "纸灯笼缓缓升空，在夜色中散发温暖光芒。"],
+  ["A planet in the corner and one small moon circling it among slow stars.", "ดาวเคราะห์ที่มุมจอ กับดวงจันทร์ดวงเล็กที่โคจรรอบท่ามกลางดวงดาว", "隅に惑星、そのまわりを小さな月がゆっくりと回り、星がまたたく。", "角落里一颗行星，一颗小卫星在缓慢的星光中绕它运行。"],
+  ["Soft rain on glass, drops sliding down. A grey day, or city lights blurred at night.", "สายฝนบนกระจก หยดน้ำไหลลงช้าๆ วันฟ้าครึ้ม หรือแสงไฟเมืองพร่ามัวยามค่ำคืน", "ガラスに降る優しい雨、滑り落ちるしずく。曇りの日、または夜ににじむ街の灯り。", "轻雨落在玻璃上，水珠缓缓滑落。阴天，或夜晚朦胧的城市灯光。"],
+  ["Koi gliding under lily pads. Their shadows pass slowly across the water.", "ปลาคาร์ปว่ายใต้ใบบัว เงาของพวกมันเคลื่อนผ่านผิวน้ำช้าๆ", "蓮の葉の下を泳ぐ鯉。その影が水面をゆっくりと横切る。", "锦鲤在睡莲叶下游弋，影子缓缓掠过水面。"],
+  ["Bold circles, arcs and lines in primary colours, gently shifting.", "วงกลม เส้นโค้ง และเส้นตรงในสีหลัก ขยับเคลื่อนอย่างนุ่มนวล", "原色の大胆な円、弧、線が、ゆっくりと動く。", "原色的圆、弧与线条，轻轻移动变化。"],
 ]
 for (const [en, th, ja, zh] of ROWS) { D.th[en] = th; D.ja[en] = ja; D.zh[en] = zh }
 
