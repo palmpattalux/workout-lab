@@ -1,0 +1,9 @@
+/* Night City, page B during a session: a window somewhere at the edge of the city
+   lights up for each set moved on, then slowly goes dark again. */
+.nc-session { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.nc-session .nc-lit { position: absolute; width: 7px; height: 10px; border-radius: 1px; opacity: 0;
+  background: var(--sun); box-shadow: 0 0 10px 2px color-mix(in srgb, var(--sun) 45%, transparent);
+  animation: nc-lit 4.8s ease-in-out forwards; }
+@keyframes nc-lit { 0% { opacity: 0; transform: scaleY(.6); } 12% { opacity: .5; transform: none; } 20% { opacity: .32; } 70% { opacity: .3; } 100% { opacity: 0; } }
+:root[data-mode="light"] .nc-session .nc-lit { box-shadow: 0 0 8px 1px color-mix(in srgb, var(--sun) 35%, transparent); }
+@media (prefers-reduced-motion: reduce) { .nc-session .nc-lit { animation: none; opacity: .25; } }

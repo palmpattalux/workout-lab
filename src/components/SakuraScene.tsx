@@ -1,3 +1,8 @@
+import '../themes/sakura-session.css'
+import { useEffect, useRef } from 'react'
+import { livePage } from '../lib/sound'
+import { sakuraSound } from '../themes/sakura-sound'
+
 // Sakura theme backdrop: a blossom branch in the corner, petals drifting down
 // and landing on still water, each leaving a ripple. Purely decorative.
 const PETALS = [
@@ -44,6 +49,35 @@ export default function SakuraScene() {
           </span>
         )
       })}
+    </div>
+  )
+}
+
+// Page B during a session: answers each set moved on (see ThemeSession in ThemeScene.tsx).
+// A soft koto pluck per set and a single petal let go from the branch; a breeze with
+// chimes every 15-30 s. No big visual, the sound is the point.
+export function SakuraSession({ steps }: { steps: number }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const last = useRef(steps)
+
+  useEffect(() => {
+    if (steps > last.current && livePage(ref.current)) sakuraSound.set(steps)
+    last.current = steps
+  }, [steps])
+
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>
+    const loop = () => {
+      if (livePage(ref.current)) sakuraSound.ambient()
+      t = setTimeout(loop, 15000 + Math.random() * 15000)
+    }
+    t = setTimeout(loop, 12000 + Math.random() * 8000)
+    return () => clearTimeout(t)
+  }, [])
+
+  return (
+    <div className="sakura-session" ref={ref} aria-hidden="true">
+      {steps > 0 && <i key={steps} className="sk-drift" />}
     </div>
   )
 }

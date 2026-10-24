@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Icon, type IconName } from '../components/icons'
 import { PLANS, type Tier } from '../lib/plan'
-import { THEME_PRICE, shopItem } from '../lib/theme'
+import { themePrice, shopItem } from '../lib/theme'
 import { TokyoIcon } from './IconsPage'
 import ThemeScene from '../components/ThemeScene'
 import { startCheckout, cardToken, savePending, loadOmise, useSubscription, type Method } from '../lib/billing'
@@ -28,7 +28,7 @@ export default function CheckoutPage({ tier = 'premium', theme: themeKey, guest 
   const [error, setError] = useState<string | null>(null)
   // the reason the bank, Omise or our server gave, in small print under the message
   const [reason, setReason] = useState<string | null>(null)
-  const price = '฿' + (theme ? THEME_PRICE : plan.price).toLocaleString()
+  const price = '฿' + (theme ? themePrice(theme.key) : plan.price).toLocaleString()
 
   function pick(m: Method) {
     setMethod(m); setError(null)

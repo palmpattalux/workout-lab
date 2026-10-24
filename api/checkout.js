@@ -1,7 +1,7 @@
 // POST { tier | theme, method: 'card' | 'promptpay' | 'truemoney', token?, phone? }
 // Starts a payment for the signed-in account and says what the page should do next:
 // show a QR code, send the person to their bank/wallet to confirm, or that it's paid.
-import { PRICES, NAMES, THEME_PRICE, THEME_NAMES, db, omise, userOf, send, grant } from './_lib.js'
+import { PRICES, NAMES, THEME_PRICE, THEME_PRICES, THEME_NAMES, db, omise, userOf, send, grant } from './_lib.js'
 
 // the Terms and Refund Policy version the buyer agreed to (kept on the Omise charge as proof)
 const TERMS_VERSION = '2026-10-19'
@@ -18,7 +18,7 @@ export default async function handler(req, res) {
       if (!THEME_NAMES[theme]) return send(res, 400, { error: 'Unknown theme' })
       const { data: owned } = await db().from('owned_themes').select('theme').eq('user_id', user.id).eq('theme', theme).maybeSingle()
       if (owned) return send(res, 409, { error: 'You already own this theme' })
-      amount = THEME_PRICE
+      amount = THEME_PRICES[theme] ?? THEME_PRICE
       metadata = { user_id: user.id, theme, method, terms: TERMS_VERSION }
       description = `Dotset: ${THEME_NAMES[theme]}`
     } else {

@@ -1,0 +1,110 @@
+/* ---------- Orbit theme ----------
+   A ringed planet partly off the top-right corner (the logo's dot in a ring), one small moon
+   circling it on a faint tilted path, sparse slow stars and a faint distant planet.
+   Light = pale lavender daylight space, dark = deep navy night with a warm orange planet. */
+:root[data-skin="orbit"], .theme-art[data-skin="orbit"] {
+  --stage: #f7f5fc; --bg: #ebe7f5; --surface: #fefdff; --sunk: #f0edf8;
+  --ink: #1f1b2c; --muted: #75708a; --hair: rgba(40, 30, 80, .07); --line: rgba(40, 30, 80, .12);
+  --sun: #8c6fdc; --active: #6f52c4; --active-soft: #ebe5fb;
+  --ob-sky1: #f9f8fd; --ob-sky2: #f1eefa; --ob-glow: #e9defa; --ob-glow-o: .9;
+  --ob-p1: #fbe3d6; --ob-p2: #e9d4f1; --ob-p3: #cdbfee;
+  --ob-band: rgba(255, 255, 255, .5); --ob-ring: rgba(132, 108, 200, .5); --ob-path: rgba(120, 100, 190, .2);
+  --ob-m1: #ffffff; --ob-m2: #c9bde6;
+  --ob-star: #9a8ad0; --ob-star-o: .75;
+  --ob-shade: #8f7cc8; --ob-shade-o: .28;
+  --ob-far1: #e6eefa; --ob-far2: #ccd8f0; --ob-far-o: .7; --ob-far-ring: rgba(130, 150, 200, .35);
+}
+:root[data-skin="orbit"][data-mode="dark"], :root[data-mode="dark"] .theme-art[data-skin="orbit"] {
+  --stage: #0c0e1c; --bg: #070812; --surface: #1a1c2f; --sunk: #10121f;
+  --ink: #eeecf4; --muted: #9b99b0; --hair: rgba(255, 255, 255, .06); --line: rgba(255, 255, 255, .11);
+  --sun: #f29a52; --active: #f4a05c; --active-soft: #3a2a24;
+  --ob-sky1: #0d1020; --ob-sky2: #090a16; --ob-glow: #f08a3c; --ob-glow-o: .16;
+  --ob-p1: #f6b47e; --ob-p2: #d27440; --ob-p3: #6e3122;
+    --ob-shade: #0a0b18; --ob-shade-o: .55;
+  --ob-band: rgba(255, 230, 200, .18); --ob-ring: rgba(255, 190, 140, .5); --ob-path: rgba(255, 220, 190, .14);
+  --ob-m1: #f4efe6; --ob-m2: #a8a2b4;
+  --ob-star: #ffffff; --ob-star-o: .85;
+  --ob-far1: #6e7bb0; --ob-far2: #2b3160; --ob-far-o: .55; --ob-far-ring: rgba(150, 165, 220, .3);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="orbit"]:not([data-mode="light"]), :root:not([data-mode="light"]) .theme-art[data-skin="orbit"] {
+    --stage: #0c0e1c; --bg: #070812; --surface: #1a1c2f; --sunk: #10121f;
+    --ink: #eeecf4; --muted: #9b99b0; --hair: rgba(255, 255, 255, .06); --line: rgba(255, 255, 255, .11);
+    --sun: #f29a52; --active: #f4a05c; --active-soft: #3a2a24;
+    --ob-sky1: #0d1020; --ob-sky2: #090a16; --ob-glow: #f08a3c; --ob-glow-o: .16;
+    --ob-p1: #f6b47e; --ob-p2: #d27440; --ob-p3: #6e3122;
+    --ob-shade: #0a0b18; --ob-shade-o: .55;
+    --ob-band: rgba(255, 230, 200, .18); --ob-ring: rgba(255, 190, 140, .5); --ob-path: rgba(255, 220, 190, .14);
+    --ob-m1: #f4efe6; --ob-m2: #a8a2b4;
+    --ob-star: #ffffff; --ob-star-o: .85;
+    --ob-far1: #6e7bb0; --ob-far2: #2b3160; --ob-far-o: .55; --ob-far-ring: rgba(150, 165, 220, .3);
+    color-scheme: dark;
+  }
+}
+.theme-art[data-skin="orbit"] { color: var(--ink); }
+.orbit-scene {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0;
+  background: linear-gradient(180deg, var(--ob-sky1), var(--ob-sky2));
+}
+.orbit-scene svg * { stroke: none; }
+.ob-sky { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ob-stars circle { fill: var(--ob-star); opacity: calc(var(--ob-star-o) * .7); }
+.ob-stars circle.tw { animation: ob-tw 9s ease-in-out infinite; }
+@keyframes ob-tw { 50% { opacity: calc(var(--ob-star-o) * .12); } }
+.ob-far { opacity: var(--ob-far-o); }
+.orbit-scene .ob-far-ring { fill: none; stroke: var(--ob-far-ring); stroke-width: 1; }
+
+.ob-corner { position: absolute; top: 0; right: 0; width: 72cqw; height: auto; overflow: visible; }
+.ob-planet { animation: ob-breathe 16s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+@keyframes ob-breathe { to { transform: scale(1.015); } }
+.orbit-scene .ob-bands path { fill: none; stroke: var(--ob-band); stroke-width: 3; stroke-linecap: round; }
+.orbit-scene .ob-bands path.thin { stroke-width: 1.4; }
+.orbit-scene .ob-ring { fill: none; stroke: var(--ob-ring); stroke-width: 1.6; }
+.orbit-scene .ob-path { fill: none; stroke: var(--ob-path); stroke-width: .8; stroke-dasharray: 2 4; }
+.ob-moon { stroke: none; }
+.ob-mx { animation: ob-x 10s ease-in-out infinite alternate; }
+.ob-my { animation: ob-y 10s ease-in-out infinite alternate; animation-delay: -5s; }
+@keyframes ob-x { from { transform: translateX(calc(var(--ob-rx) * -1)); } to { transform: translateX(var(--ob-rx)); } }
+@keyframes ob-y { from { transform: translateY(calc(var(--ob-ry) * -1)); } to { transform: translateY(var(--ob-ry)); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ob-stars circle.tw, .ob-planet, .ob-mx, .ob-my { animation: none; }
+  .ob-mx { transform: translateX(calc(var(--ob-rx) * -.8)); }
+  .ob-my { transform: translateY(calc(var(--ob-ry) * .6)); }
+}
+
+/* ---------- page B during a session: a small planetary system that grows a moon per set ---------- */
+.orbit-scene.ob-session { background: none; }
+.ob-sys { position: absolute; left: 0; bottom: 0; width: 100cqw; height: 100cqw; overflow: visible; }
+.ob-echo { position: absolute; right: 0; top: 0; width: 52cqw; height: 52cqw; overflow: visible; }
+.orbit-scene .ob-sys-ring { fill: none; stroke: var(--ob-path); stroke-width: .9; }
+.orbit-scene .ob-sys-ring.r1 { stroke-dasharray: 2 5; }
+.orbit-scene .ob-sys-ring.r2 { opacity: .7; }
+.ob-sys-glow { opacity: .45; }
+.ob-sys-planet { opacity: .7; }
+.orbit-scene .ob-sys-halo { fill: none; stroke: var(--ob-ring); stroke-width: 1; opacity: .5; }
+.ob-sys-moon { fill: color-mix(in srgb, var(--ob-m2), var(--ink) 22%); opacity: .9; }
+.ob-sys-moon.sat { fill: var(--sun); opacity: .75; }
+.ob-sys-moonglow { opacity: .8; }
+.ob-echo-sun { fill: var(--sun); opacity: .35; }
+.ob-sw { animation: ob-sw 30s ease-in-out infinite alternate; }
+@keyframes ob-sw { from { transform: rotate(var(--a0)); } to { transform: rotate(var(--a1)); } }
+.ob-join { animation: ob-join 1.4s cubic-bezier(.2, .8, .3, 1) both; }
+@keyframes ob-join { 0% { transform: scale(0); opacity: 0; } 35% { opacity: 1; } 55% { transform: scale(1.5); } 100% { transform: scale(1); opacity: 1; } }
+
+.ob-shoot { position: absolute; width: 36cqw; height: 2px; transform-origin: 0 50%; }
+.ob-shoot i { position: absolute; inset: 0; border-radius: 2px; opacity: 0;
+  background: linear-gradient(90deg, transparent, var(--ob-star) 85%, var(--ob-m1));
+  box-shadow: 0 0 6px var(--ob-glow); animation: ob-shoot 1.5s cubic-bezier(.3, .6, .4, 1) both; }
+@keyframes ob-shoot {
+  0% { transform: translateX(-10cqw) scaleX(.3); opacity: 0; }
+  25% { opacity: .55; }
+  100% { transform: translateX(40cqw) scaleX(.6); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ob-sw, .ob-join { animation: none; }
+  .ob-sw { transform: rotate(var(--a0)); }
+  .ob-shoot { display: none; }
+}

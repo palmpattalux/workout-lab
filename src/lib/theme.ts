@@ -7,16 +7,27 @@ import { atLeast, getPlan, onPlanChange, type Tier } from './plan'
 // ones with Exclusive and up. Desert is the first exclusive one.
 // has: what the theme brings beyond its look (shown as small icons under its picture)
 export type Feature = 'anim' | 'sound' | 'live'
-export type Theme = { key: string; name: string; blurb: string; tier: Tier; has: Feature[] }
-export const THEME_SLOTS = 15
+// price: what one theme costs on its own, in baht. Three steps: Lite ฿75 (animated), Premium ฿149
+// (animated + its own sounds), Exclusive ฿159 (animated, sounds, reacts to your sets).
+export type Theme = { key: string; name: string; blurb: string; tier: Tier; price: number; has: Feature[] }
+export const THEME_SLOTS = 20
 export const THEMES: (Theme | null)[] = [
-  { key: 'sakura', name: 'Sakura', blurb: 'Blossom branches, petals drifting onto still water.', tier: 'premium', has: ['anim'] },
-  { key: 'nightcity', name: 'Night City', blurb: 'A gothic skyline in the rain. Searchlights and lightning by night, the sun about to rise by day.', tier: 'premium', has: ['anim'] },
-  { key: 'neon', name: 'Neon', blurb: 'A cyber city. Neon rooftops and light trails by night, a clean black and white skyline by day.', tier: 'premium', has: ['anim'] },
-  { key: 'manga', name: 'Manga', blurb: 'Black ink on paper. Speech bubbles at home, sword slashes once a session starts.', tier: 'premium', has: ['anim', 'sound', 'live'] },
-  { key: 'summit', name: 'To the Top', blurb: 'Stone pillars in an ink painting. Each set you finish pushes the boulder further up the mountain.', tier: 'premium', has: ['anim', 'sound', 'live'] },
-  { key: 'desert', name: 'Desert', blurb: 'Sand dunes, cacti and red rocks under the sun. At night, a campfire under a sky full of colour and stars.', tier: 'exclusive', has: ['anim'] },
-  ...Array.from({ length: THEME_SLOTS - 6 }, () => null),
+  { key: 'sakura', name: 'Sakura', blurb: 'Blossom branches, petals drifting onto still water.', tier: 'premium', price: 149, has: ['anim', 'sound'] },
+  { key: 'nightcity', name: 'Night City', blurb: 'A gothic skyline in the rain. Searchlights and lightning by night, the sun about to rise by day.', tier: 'premium', price: 149, has: ['anim', 'sound'] },
+  { key: 'neon', name: 'Neon', blurb: 'A cyber city. Neon rooftops and light trails by night, a clean black and white skyline by day.', tier: 'premium', price: 149, has: ['anim', 'sound'] },
+  { key: 'manga', name: 'Manga', blurb: 'Black ink on paper. Speech bubbles at home, sword slashes once a session starts.', tier: 'premium', price: 149, has: ['anim', 'sound', 'live'] },
+  { key: 'summit', name: 'To the Top', blurb: 'Stone pillars in an ink painting. Each set you finish pushes the boulder further up the mountain.', tier: 'premium', price: 149, has: ['anim', 'sound', 'live'] },
+  { key: 'ocean', name: 'Ocean', blurb: 'Rolling waves and a lighthouse. Gulls by day, a sweeping beam over a moonlit sea by night.', tier: 'premium', price: 75, has: ['anim'] },
+  { key: 'forest', name: 'Forest', blurb: 'Layers of pine in morning mist. Fireflies drift between the trees at night.', tier: 'premium', price: 75, has: ['anim'] },
+  { key: 'snow', name: 'Snowfall', blurb: 'Quiet mountains under soft falling snow. A cabin window glows at night.', tier: 'premium', price: 75, has: ['anim'] },
+  { key: 'autumn', name: 'Autumn', blurb: 'A maple branch in the corner, red leaves floating down and settling on the ground.', tier: 'premium', price: 75, has: ['anim'] },
+  { key: 'zen', name: 'Zen Garden', blurb: 'Raked sand, a still stone and bamboo leaves. Slow ripples circle the stone.', tier: 'premium', price: 75, has: ['anim'] },
+  { key: 'rain', name: 'Rain', blurb: 'Soft rain on glass, drops sliding down. A grey day, or city lights blurred at night.', tier: 'premium', price: 75, has: ['anim'] },
+  { key: 'desert', name: 'Desert', blurb: 'Sand dunes, cacti and red rocks under the sun. At night, a campfire under a sky full of colour and stars.', tier: 'exclusive', price: 159, has: ['anim', 'sound', 'live'] },
+  { key: 'lantern', name: 'Lanterns', blurb: 'Paper lanterns rising into the sky, glowing warm against the night.', tier: 'exclusive', price: 159, has: ['anim', 'sound', 'live'] },
+  { key: 'orbit', name: 'Orbit', blurb: 'A planet in the corner and one small moon circling it among slow stars.', tier: 'exclusive', price: 159, has: ['anim', 'sound', 'live'] },
+  { key: 'koi', name: 'Koi Pond', blurb: 'Koi gliding under lily pads. Their shadows pass slowly across the water.', tier: 'exclusive', price: 159, has: ['anim', 'sound', 'live'] },
+  ...Array.from({ length: THEME_SLOTS - 15 }, () => null),
 ]
 
 // Other things sold the same way as a theme (once, kept for good, or free with a plan).
@@ -52,7 +63,9 @@ const SKIN_KEY = 'workout-lab:skin'
 let applied: string | null = (() => { try { return localStorage.getItem(SKIN_KEY) } catch { return null } })()
 export const themeTier = (key: string): Tier => shopItem(key)?.tier ?? 'premium'
 // Any single theme can also be bought on its own, once, and kept (billing.ts loads them).
+// Extras (icon packs) cost the Premium price.
 export const THEME_PRICE = 149
+export const themePrice = (key: string): number => { const x = shopItem(key); return x && 'price' in x ? x.price : THEME_PRICE }
 let owned: string[] = []
 export function setOwnedThemes(keys: string[]) { owned = keys; paint() }
 export const ownsTheme = (key: string) => owned.includes(key)

@@ -8,7 +8,9 @@ export const PRICES = { premium: 14900, exclusive: 32900 }
 export const NAMES = { premium: 'Premium', exclusive: 'Exclusive' }
 // Single themes, bought once and kept for good (keys match src/lib/theme.ts).
 export const THEME_PRICE = 14900
-export const THEME_NAMES = { sakura: 'Sakura', nightcity: 'Night City', neon: 'Neon', manga: 'Manga', summit: 'To the Top', desert: 'Desert', 'tokyo-icons': 'Tokyo icons' }
+// Per-theme prices (satang): Lite ฿75, Premium ฿149, Exclusive ฿159. Keys not listed cost THEME_PRICE.
+export const THEME_PRICES = { ocean: 7500, forest: 7500, snow: 7500, autumn: 7500, zen: 7500, rain: 7500, desert: 15900, lantern: 15900, orbit: 15900, koi: 15900 }
+export const THEME_NAMES = { sakura: 'Sakura', nightcity: 'Night City', neon: 'Neon', manga: 'Manga', summit: 'To the Top', desert: 'Desert', ocean: 'Ocean', forest: 'Forest', snow: 'Snowfall', autumn: 'Autumn', zen: 'Zen Garden', lantern: 'Lanterns', orbit: 'Orbit', rain: 'Rain', koi: 'Koi Pond', 'tokyo-icons': 'Tokyo icons' }
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://cafxkuokunjgtvexqaar.supabase.co'
 let admin = null

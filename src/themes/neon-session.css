@@ -1,0 +1,15 @@
+/* Neon, page B during a session: a thin neon line along the bottom edge that charges up on each set */
+.ne-session { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.ne-session .ne-base, .ne-session .ne-pulse { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; }
+.ne-session .ne-pulse::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 28px; opacity: .35;
+  background: linear-gradient(0deg, color-mix(in srgb, var(--ne-c) 60%, transparent), transparent); }
+.ne-session .ne-base { opacity: .22; background: linear-gradient(90deg, transparent, var(--ne-a) 20%, var(--ne-c) 50%, var(--ne-b) 80%, transparent);
+  box-shadow: 0 0 calc(var(--ne-halo) * 8px) var(--ne-c); }
+.ne-session.flick .ne-base { animation: ne-s-flick .45s steps(1) both; }
+@keyframes ne-s-flick { 0%, 100% { opacity: .22; } 22% { opacity: .06; } 36% { opacity: .3; } 70% { opacity: .1; } }
+.ne-session .ne-pulse { opacity: 0; transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--ne-a), var(--ne-c) 50%, var(--ne-b));
+  box-shadow: 0 0 calc(var(--ne-halo) * 10px) var(--ne-b), 0 0 calc(var(--ne-halo) * 3px) var(--ne-a);
+  animation: ne-s-pulse 1.4s cubic-bezier(.2, .8, .3, 1) both; }
+@keyframes ne-s-pulse { 0% { transform: scaleX(0); opacity: .9; } 35% { transform: scaleX(1); opacity: .9; } 100% { transform: scaleX(1); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .ne-session * { animation: none !important; } .ne-session .ne-pulse { display: none; } }
