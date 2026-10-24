@@ -45,9 +45,9 @@ const curve = (y0: number, dip: number) => (x: number) => Math.round(y0 + dip * 
 const LAYERS = [
   { base: curve(600, 22), hMin: 38, hMax: 150, step: 22, gap: null as [number, number] | null, seed: 1 },
   { base: curve(690, 30), hMin: 30, hMax: 190, step: 30, gap: [120, 270] as [number, number], seed: 40 },
-  { base: curve(800, 26), hMin: 26, hMax: 230, step: 40, gap: [96, 300] as [number, number], seed: 90 },
+  { base: curve(816, 22), hMin: 26, hMax: 236, step: 40, gap: [96, 300] as [number, number], seed: 90 },
 ]
-const RIDGE = [[244, 52], [262, 66], [279, 48], [296, 74], [313, 58], [331, 80], [348, 62], [366, 70], [384, 56], [400, 66]]
+const RIDGE = [[240, 40], [258, 52], [276, 38], [294, 58], [312, 46], [330, 62], [348, 50], [366, 58], [384, 44], [400, 54]]
   .map(([x, h], i) => pine(x, 182 - (i % 2) * 4, h)).join('')
 const ground = (b: (x: number) => number) => {
   let d = `M-10 ${H} L-10 ${b(-10)}`
@@ -102,12 +102,12 @@ export default function ForestScene() {
           {/* by night the sun becomes a crescent moon */}
           <mask id={gid + 'moon'}>
             <rect width={W} height="240" fill="#fff" />
-            <circle cx="333" cy="96" r="20" fill="#000" className="fo-bite" />
+            <circle cx="333" cy="90" r="20" fill="#000" className="fo-bite" />
           </mask>
         </defs>
         <rect width={W} height={H} fill={g('sky')} />
-        <circle cx="320" cy="108" r="78" fill={g('halo')} className="fo-halo" />
-        <circle cx="320" cy="108" r="24" className="fo-sun" mask={g('moon')} />
+        <circle cx="320" cy="102" r="78" fill={g('halo')} className="fo-halo" />
+        <circle cx="320" cy="102" r="24" className="fo-sun" mask={g('moon')} />
         {/* a few distant pines in front of the sun, dissolving into the mist below */}
         <path className="fo-ridge" d={RIDGE} mask={g('ridge')} />
         {LAYERS.map((l, i) => (

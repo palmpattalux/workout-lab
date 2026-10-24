@@ -4,8 +4,8 @@
   --stage: #e4f2ee; --bg: #d3e8e2; --surface: #fbfefd; --sunk: #e7f2ef;
   --ink: #17302b; --muted: #5f7d76; --hair: rgba(20, 60, 52, .08); --line: rgba(20, 60, 52, .14);
   --sun: #e2712d; --active: #d8692a; --active-soft: #fbe4d4;
-  --ko-w1: #e6f4f0; --ko-w2: #d2ebe4; --ko-w3: #bfe0d7;
-  --ko-deep: #4f9c8d; --ko-deep-o: .12; --ko-caustic: rgba(255, 255, 255, .5);
+  --ko-w1: #e3f3ee; --ko-w2: #cde9e1; --ko-w3: #b4dbd0;
+  --ko-deep: #4f9c8d; --ko-deep-o: .12; --ko-caustic: rgba(255, 255, 255, .2);
   --ko-moon: #fff; --ko-moon-o: 0;
   --ko-fish-o: .62; --ko-white: #fffaf3; --ko-orange: #ee7a34; --ko-pale: #f6b07a; --ko-black: #2b3433;
   --ko-fin: rgba(255, 246, 236, .85); --ko-sheen: rgba(255, 255, 255, .55);
@@ -19,7 +19,7 @@
   --ink: #e5f2ef; --muted: #8fb1ab; --hair: rgba(220, 255, 245, .07); --line: rgba(220, 255, 245, .12);
   --sun: #f28c4a; --active: #f28c4a; --active-soft: #3a2c22;
   --ko-w1: #123236; --ko-w2: #0c2528; --ko-w3: #081b1e;
-  --ko-deep: #02090a; --ko-deep-o: .35; --ko-caustic: rgba(150, 220, 210, .06);
+  --ko-deep: #02090a; --ko-deep-o: .35; --ko-caustic: rgba(150, 220, 210, .035);
   --ko-moon: #e8f4ee; --ko-moon-o: .5;
   --ko-fish-o: .55; --ko-white: #e9eee6; --ko-orange: #f2894a; --ko-pale: #f5b183; --ko-black: #0a1415;
   --ko-fin: rgba(230, 240, 232, .6); --ko-sheen: rgba(255, 255, 255, .35);
@@ -35,7 +35,7 @@
     --ink: #e5f2ef; --muted: #8fb1ab; --hair: rgba(220, 255, 245, .07); --line: rgba(220, 255, 245, .12);
     --sun: #f28c4a; --active: #f28c4a; --active-soft: #3a2c22;
     --ko-w1: #123236; --ko-w2: #0c2528; --ko-w3: #081b1e;
-    --ko-deep: #02090a; --ko-deep-o: .35; --ko-caustic: rgba(150, 220, 210, .06);
+    --ko-deep: #02090a; --ko-deep-o: .35; --ko-caustic: rgba(150, 220, 210, .035);
     --ko-moon: #e8f4ee; --ko-moon-o: .5;
     --ko-fish-o: .55; --ko-white: #e9eee6; --ko-orange: #f2894a; --ko-pale: #f5b183; --ko-black: #0a1415;
     --ko-fin: rgba(230, 240, 232, .6); --ko-sheen: rgba(255, 255, 255, .35);
@@ -51,9 +51,13 @@
 .koi-scene .ko-art { position: absolute; inset: 0; width: 100%; height: 100%; }
 .koi-scene svg * { stroke: none; }
 
-.koi-scene .ko-caustic path { fill: none; stroke: var(--ko-caustic); stroke-width: 26; stroke-linecap: round; animation: ko-drift 18s ease-in-out infinite alternate; }
-.koi-scene .ko-caustic path + path { stroke-width: 34; animation-duration: 22s; animation-direction: alternate-reverse; }
+.koi-scene .ko-caustic path { fill: none; stroke: var(--ko-caustic); stroke-width: 46; stroke-linecap: round; animation: ko-drift 18s ease-in-out infinite alternate; }
+.koi-scene .ko-caustic path + path { stroke-width: 60; animation-duration: 22s; animation-direction: alternate-reverse; }
 @keyframes ko-drift { from { transform: translateY(-8px); } to { transform: translateY(10px); } }
+.ko-moon-core { fill: var(--ko-moon); opacity: calc(var(--ko-moon-o) * .7); }
+.koi-scene .ko-moon-glint path { fill: none; stroke: var(--ko-moon); stroke-width: 1.2; stroke-linecap: round; opacity: calc(var(--ko-moon-o) * .7); animation: ko-glint 6s ease-in-out infinite alternate; }
+.koi-scene .ko-moon-glint path:nth-child(2) { animation-duration: 7.5s; animation-delay: -3s; }
+@keyframes ko-glint { from { transform: translateX(-3px); opacity: calc(var(--ko-moon-o) * .25); } to { transform: translateX(3px); } }
 .ko-moon { animation: ko-moon 9s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
 @keyframes ko-moon { from { transform: scaleX(1); opacity: .8; } to { transform: scaleX(1.12); opacity: 1; } }
 
@@ -97,5 +101,5 @@
 @keyframes ko-sway { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .ko-caustic path, .ko-moon, .ko-tail, .ko-ripple, .ko-bob, .ko-lotus { animation: none; }
+  .ko-caustic path, .ko-moon, .ko-moon-glint path, .ko-tail, .ko-ripple, .ko-bob, .ko-lotus { animation: none; }
 }

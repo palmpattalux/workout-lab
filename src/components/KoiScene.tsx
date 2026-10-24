@@ -95,6 +95,8 @@ export default function KoiScene() {
           <path d="M-20 520 C120 480 240 560 410 500" />
         </g>
         <ellipse className="ko-moon" cx="268" cy="104" rx="46" ry="30" fill={`url(#${gid}moon)`} />
+        <ellipse className="ko-moon-core" cx="268" cy="104" rx="11" ry="9" />
+        <g className="ko-moon-glint"><path d="M250 122 L286 122" /><path d="M258 130 L278 130" /></g>
 
         {/* shadows on the floor, offset from each fish */}
         <g className="ko-shadows" transform="translate(7 12)">
