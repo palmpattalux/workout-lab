@@ -1,1 +1,52 @@
 /* ---------- Bauhaus theme ---------- */
+:root[data-skin="bauhaus"], .theme-art[data-skin="bauhaus"] {
+  --stage: #f5f0e6; --bg: #e9e2d4; --surface: #fdfaf4; --sunk: #eee8dc;
+  --ink: #26231f; --muted: #786f64; --hair: rgba(40, 32, 20, .08); --line: rgba(40, 32, 20, .14);
+  --sun: #c4604a; --active: #34558f; --active-soft: #e0e5ef;
+  --bh-red: #cf7259; --bh-red-o: .7; --bh-mustard: #dcae52; --bh-mustard-o: .72;
+  --bh-blue: #4566a0; --bh-blue-o: .7; --bh-ink: rgba(38, 35, 31, .55); --bh-line: rgba(38, 35, 31, .28);
+}
+:root[data-skin="bauhaus"][data-mode="dark"], :root[data-mode="dark"] .theme-art[data-skin="bauhaus"] {
+  --stage: #161513; --bg: #0e0d0c; --surface: #211f1c; --sunk: #131210;
+  --ink: #ece6dc; --muted: #9a9184; --hair: rgba(255, 245, 230, .06); --line: rgba(255, 245, 230, .11);
+  --sun: #d8ae58; --active: #d8ae58; --active-soft: #342a19;
+  --bh-red: #a3513f; --bh-red-o: .62; --bh-mustard: #b8913f; --bh-mustard-o: .55;
+  --bh-blue: #4a6496; --bh-blue-o: .62; --bh-ink: rgba(236, 230, 220, .4); --bh-line: rgba(236, 230, 220, .2);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="bauhaus"]:not([data-mode="light"]), :root:not([data-mode="light"]) .theme-art[data-skin="bauhaus"] {
+    --stage: #161513; --bg: #0e0d0c; --surface: #211f1c; --sunk: #131210;
+    --ink: #ece6dc; --muted: #9a9184; --hair: rgba(255, 245, 230, .06); --line: rgba(255, 245, 230, .11);
+    --sun: #d8ae58; --active: #d8ae58; --active-soft: #342a19;
+    --bh-red: #a3513f; --bh-red-o: .62; --bh-mustard: #b8913f; --bh-mustard-o: .55;
+    --bh-blue: #4a6496; --bh-blue-o: .62; --bh-ink: rgba(236, 230, 220, .4); --bh-line: rgba(236, 230, 220, .2);
+    color-scheme: dark;
+  }
+}
+.bauhaus-scene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.bh-art { position: absolute; inset: 0; width: 100cqw; height: 100cqh; }
+.bh-art .bh-red { fill: var(--bh-red); opacity: var(--bh-red-o); stroke: none; }
+.bh-art .bh-mustard { fill: var(--bh-mustard); opacity: var(--bh-mustard-o); stroke: none; }
+.bh-art .bh-blue { fill: var(--bh-blue); opacity: var(--bh-blue-o); stroke: none; }
+.bh-art .bh-ink { fill: var(--bh-ink); stroke: none; }
+.bh-art .soft { opacity: calc(var(--bh-red-o) * .8); }
+.bh-art .bh-mustard.soft { opacity: calc(var(--bh-mustard-o) * .75); }
+.bh-art .bh-ring { fill: none; stroke: var(--bh-line); stroke-width: 1.2; }
+.bh-art .bh-line { fill: none; stroke: var(--bh-line); stroke-width: 1.4; stroke-linecap: round; }
+.bh-art .bh-arc { fill: none; stroke: var(--bh-blue); opacity: var(--bh-blue-o); stroke-width: 8; stroke-linecap: butt; }
+
+.bh-move { transform-box: fill-box; transform-origin: 50% 50%; animation: bh-drift 16s ease-in-out infinite alternate; }
+.bh-m1 { animation-duration: 20s; --bh-dx: -3px; --bh-dy: 4px; --bh-r: 0deg; }
+.bh-m2 { animation-duration: 18s; animation-delay: -6s; --bh-dx: 4px; --bh-dy: -3px; --bh-r: 0deg; }
+.bh-m3 { animation-duration: 17s; animation-delay: -3s; --bh-dx: 0px; --bh-dy: 0px; --bh-r: 3deg; }
+.bh-m4 { animation-duration: 14s; animation-delay: -5s; --bh-dx: -5px; --bh-dy: 7px; --bh-r: 0deg; }
+.bh-m5 { animation-duration: 19s; animation-delay: -9s; --bh-dx: 0px; --bh-dy: -9px; --bh-r: 0deg; }
+.bh-m6 { animation-duration: 13s; animation-delay: -2s; --bh-dx: 3px; --bh-dy: 4px; --bh-r: 12deg; }
+.bh-m7 { transform-origin: 100% 100%; animation-duration: 16s; animation-delay: -7s; --bh-dx: 0px; --bh-dy: 0px; --bh-r: -4deg; }
+.bh-m8 { animation-duration: 15s; animation-delay: -11s; --bh-dx: 6px; --bh-dy: 0px; --bh-r: 0deg; }
+@keyframes bh-drift {
+  from { transform: translate(0, 0) rotate(0deg); }
+  to { transform: translate(var(--bh-dx), var(--bh-dy)) rotate(var(--bh-r)); }
+}
+@media (prefers-reduced-motion: reduce) { .bh-move { animation: none; } }
