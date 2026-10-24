@@ -1,1 +1,101 @@
-/* ---------- Koi Pond theme ---------- */
+/* ---------- Koi Pond theme: clear jade water by day, deep night-teal under the moon ----------
+   Lily pads with a lotus are the anchor top-right; koi glide slowly behind the controls. */
+:root[data-skin="koi"], .theme-art[data-skin="koi"] {
+  --stage: #e4f2ee; --bg: #d3e8e2; --surface: #fbfefd; --sunk: #e7f2ef;
+  --ink: #17302b; --muted: #5f7d76; --hair: rgba(20, 60, 52, .08); --line: rgba(20, 60, 52, .14);
+  --sun: #e2712d; --active: #d8692a; --active-soft: #fbe4d4;
+  --ko-w1: #e6f4f0; --ko-w2: #d2ebe4; --ko-w3: #bfe0d7;
+  --ko-deep: #4f9c8d; --ko-deep-o: .12; --ko-caustic: rgba(255, 255, 255, .5);
+  --ko-moon: #fff; --ko-moon-o: 0;
+  --ko-fish-o: .62; --ko-white: #fffaf3; --ko-orange: #ee7a34; --ko-pale: #f6b07a; --ko-black: #2b3433;
+  --ko-fin: rgba(255, 246, 236, .85); --ko-sheen: rgba(255, 255, 255, .55);
+  --ko-shadow: rgba(30, 90, 78, .13);
+  --ko-pad: #7fbf8e; --ko-pad-b: #6fb382; --ko-pad-c: #93cb9c; --ko-vein: rgba(255, 255, 255, .35); --ko-pad-shadow: rgba(30, 90, 78, .14);
+  --ko-petal: #f6c2d2; --ko-petal-o: #eea3bb; --ko-petal-i: #fbe0e8; --ko-heart: #f2c860;
+  --ko-ripple: rgba(255, 255, 255, .85);
+}
+:root[data-skin="koi"][data-mode="dark"], :root[data-mode="dark"] .theme-art[data-skin="koi"] {
+  --stage: #0d2628; --bg: #081a1c; --surface: #15363a; --sunk: #0f2b2e;
+  --ink: #e5f2ef; --muted: #8fb1ab; --hair: rgba(220, 255, 245, .07); --line: rgba(220, 255, 245, .12);
+  --sun: #f28c4a; --active: #f28c4a; --active-soft: #3a2c22;
+  --ko-w1: #123236; --ko-w2: #0c2528; --ko-w3: #081b1e;
+  --ko-deep: #02090a; --ko-deep-o: .35; --ko-caustic: rgba(150, 220, 210, .06);
+  --ko-moon: #e8f4ee; --ko-moon-o: .5;
+  --ko-fish-o: .55; --ko-white: #e9eee6; --ko-orange: #f2894a; --ko-pale: #f5b183; --ko-black: #0a1415;
+  --ko-fin: rgba(230, 240, 232, .6); --ko-sheen: rgba(255, 255, 255, .35);
+  --ko-shadow: rgba(0, 0, 0, .28);
+  --ko-pad: #2f5e4c; --ko-pad-b: #2a5444; --ko-pad-c: #366a56; --ko-vein: rgba(200, 240, 220, .14); --ko-pad-shadow: rgba(0, 0, 0, .3);
+  --ko-petal: #d697ac; --ko-petal-o: #b97a92; --ko-petal-i: #ecc3d1; --ko-heart: #e8c36a;
+  --ko-ripple: rgba(190, 235, 225, .4);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="koi"]:not([data-mode="light"]), :root:not([data-mode="light"]) .theme-art[data-skin="koi"] {
+    --stage: #0d2628; --bg: #081a1c; --surface: #15363a; --sunk: #0f2b2e;
+    --ink: #e5f2ef; --muted: #8fb1ab; --hair: rgba(220, 255, 245, .07); --line: rgba(220, 255, 245, .12);
+    --sun: #f28c4a; --active: #f28c4a; --active-soft: #3a2c22;
+    --ko-w1: #123236; --ko-w2: #0c2528; --ko-w3: #081b1e;
+    --ko-deep: #02090a; --ko-deep-o: .35; --ko-caustic: rgba(150, 220, 210, .06);
+    --ko-moon: #e8f4ee; --ko-moon-o: .5;
+    --ko-fish-o: .55; --ko-white: #e9eee6; --ko-orange: #f2894a; --ko-pale: #f5b183; --ko-black: #0a1415;
+    --ko-fin: rgba(230, 240, 232, .6); --ko-sheen: rgba(255, 255, 255, .35);
+    --ko-shadow: rgba(0, 0, 0, .28);
+    --ko-pad: #2f5e4c; --ko-pad-b: #2a5444; --ko-pad-c: #366a56; --ko-vein: rgba(200, 240, 220, .14); --ko-pad-shadow: rgba(0, 0, 0, .3);
+    --ko-petal: #d697ac; --ko-petal-o: #b97a92; --ko-petal-i: #ecc3d1; --ko-heart: #e8c36a;
+    --ko-ripple: rgba(190, 235, 225, .4);
+    color-scheme: dark;
+  }
+}
+.theme-art[data-skin="koi"] { color: var(--ink); }
+.koi-scene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.koi-scene .ko-art { position: absolute; inset: 0; width: 100%; height: 100%; }
+.koi-scene svg * { stroke: none; }
+
+.koi-scene .ko-caustic path { fill: none; stroke: var(--ko-caustic); stroke-width: 26; stroke-linecap: round; animation: ko-drift 18s ease-in-out infinite alternate; }
+.koi-scene .ko-caustic path + path { stroke-width: 34; animation-duration: 22s; animation-direction: alternate-reverse; }
+@keyframes ko-drift { from { transform: translateY(-8px); } to { transform: translateY(10px); } }
+.ko-moon { animation: ko-moon 9s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+@keyframes ko-moon { from { transform: scaleX(1); opacity: .8; } to { transform: scaleX(1.12); opacity: 1; } }
+
+/* koi */
+.ko-shadows path, .ko-shadows ellipse { fill: var(--ko-shadow); }
+.ko-fish { opacity: var(--ko-fish-o); }
+.ko-fish .ko-body { fill: var(--ko-white); }
+.ko-fish .ko-tail path, .ko-fish .ko-fin { fill: var(--ko-fin); }
+.ko-fish .ko-patch ellipse { fill: var(--ko-orange); }
+.ko-fish.ko-orange .ko-body { fill: var(--ko-orange); }
+.ko-fish.ko-orange .ko-tail path, .ko-fish.ko-orange .ko-fin { fill: var(--ko-pale); }
+.ko-fish .ko-patch ellipse.ko-pale { fill: var(--ko-pale); opacity: .7; }
+.ko-fish.ko-utsuri .ko-patch ellipse { fill: var(--ko-black); }
+.koi-scene .ko-sheen { fill: none; stroke: var(--ko-sheen); stroke-width: 1.4; stroke-linecap: round; }
+.ko-tail { transform-box: fill-box; transform-origin: 100% 50%; animation: ko-wag var(--ko-wag, 1.8s) ease-in-out infinite alternate; }
+@keyframes ko-wag { from { transform: rotate(-11deg); } to { transform: rotate(11deg); } }
+
+/* ripples */
+.koi-scene .ko-ripple ellipse { fill: none; stroke: var(--ko-ripple); stroke-width: 1; }
+.ko-ripple { opacity: 0; transform: scale(.1); animation: ko-ripple 14s ease-out infinite; }
+@keyframes ko-ripple {
+  0%, 70% { transform: scale(.1); opacity: 0; }
+  72% { opacity: .9; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+/* lily pads and lotus */
+.ko-pad { fill: var(--ko-pad); }
+.ko-pad.b { fill: var(--ko-pad-b); }
+.ko-pad.c { fill: var(--ko-pad-c); }
+.ko-pad-shadow { fill: var(--ko-pad-shadow); }
+.koi-scene .ko-vein { fill: none; stroke: var(--ko-vein); stroke-width: 1; stroke-linecap: round; }
+.ko-bob { animation: ko-bob 16s ease-in-out infinite alternate; }
+@keyframes ko-bob { from { transform: rotate(-5deg) translate(-1px, 0); } to { transform: rotate(5deg) translate(1.5px, 1px); } }
+.ko-petal { fill: var(--ko-petal); }
+.ko-petal.o { fill: var(--ko-petal-o); }
+.ko-petal.i { fill: var(--ko-petal-i); }
+.ko-heart { fill: var(--ko-heart); }
+.ko-lotus-shadow { fill: var(--ko-pad-shadow); }
+.ko-lotus { animation: ko-sway 12s ease-in-out infinite alternate; }
+@keyframes ko-sway { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ko-caustic path, .ko-moon, .ko-tail, .ko-ripple, .ko-bob, .ko-lotus { animation: none; }
+}

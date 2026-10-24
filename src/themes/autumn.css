@@ -1,1 +1,65 @@
-/* ---------- Autumn theme ---------- */
+/* ---------- Autumn theme ----------
+   A maple branch top-right, leaves drifting down onto a soft band of fallen leaves.
+   Light = a warm paper day, dark = a deep brown-plum night with muted leaves. */
+:root[data-skin="autumn"], .theme-art[data-skin="autumn"] {
+  --stage: #fbf6ee; --bg: #f1e7da; --surface: #fffcf7; --sunk: #f5ece0;
+  --ink: #2a1f1a; --muted: #7c6a5e;
+  --sun: #d65f34; --active: #c2532b; --active-soft: #fbe2d3;
+  --au-red: #dc6a48; --au-amber: #e7a35a; --au-rust: #c45140;
+  --au-wood: rgba(96, 68, 52, .5); --au-ground: rgba(226, 180, 136, .34); --au-fallen-o: .5;
+}
+:root[data-skin="autumn"][data-mode="dark"], :root[data-mode="dark"] .theme-art[data-skin="autumn"] {
+  --stage: #1c1418; --bg: #130d10; --surface: #281d21; --sunk: #171013;
+  --ink: #f1e8e1; --muted: #a8968e;
+  --sun: #ec8a5e; --active: #ef8f62; --active-soft: #40251f;
+  --au-red: #ad5a43; --au-amber: #b78550; --au-rust: #94473b;
+  --au-wood: rgba(232, 208, 192, .28); --au-ground: rgba(120, 62, 50, .3); --au-fallen-o: .42;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="autumn"]:not([data-mode="light"]), :root:not([data-mode="light"]) .theme-art[data-skin="autumn"] {
+    --stage: #1c1418; --bg: #130d10; --surface: #281d21; --sunk: #171013;
+    --ink: #f1e8e1; --muted: #a8968e;
+    --sun: #ec8a5e; --active: #ef8f62; --active-soft: #40251f;
+    --au-red: #ad5a43; --au-amber: #b78550; --au-rust: #94473b;
+    --au-wood: rgba(232, 208, 192, .28); --au-ground: rgba(120, 62, 50, .3); --au-fallen-o: .42;
+  }
+}
+
+.autumn-scene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.autumn-scene .au-red { fill: var(--au-red); }
+.autumn-scene .au-amber { fill: var(--au-amber); }
+.autumn-scene .au-rust { fill: var(--au-rust); }
+.autumn-scene svg path { stroke: none; }
+
+.au-branch { position: absolute; top: -1cqh; right: -2cqw; width: 62cqw; height: auto; }
+.au-branch .au-wood { fill: none; stroke: var(--au-wood); stroke-width: 3.2; stroke-linecap: round; }
+.au-branch .au-wood.thin { stroke-width: 1.8; }
+.au-branch .au-leaf { opacity: .9; transform-box: fill-box; transform-origin: 50% 100%; }
+.au-branch .au-sway { animation: au-sway 9s ease-in-out infinite alternate; }
+@keyframes au-sway { from { transform: rotate(-6deg); } to { transform: rotate(7deg); } }
+
+.au-ground {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 14cqh;
+  background: linear-gradient(180deg, transparent, var(--au-ground) 55%, var(--au-ground));
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 65%);
+          mask-image: linear-gradient(180deg, transparent, #000 65%);
+}
+.au-ground svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.au-ground .au-fallen { opacity: var(--au-fallen-o); }
+
+.au-fall {
+  position: absolute; left: var(--x); top: 0; width: 15px; height: 15px; overflow: visible; opacity: 0;
+  animation-name: au-fall; animation-iteration-count: infinite; animation-timing-function: linear;
+}
+@keyframes au-fall {
+  0% { transform: translate(0, -4cqh) rotate(0deg) scaleX(1); opacity: 0; }
+  6% { opacity: .9; }
+  25% { transform: translate(calc(var(--drift) * -.5), calc(var(--land) * .26)) rotate(80deg) scaleX(.3); }
+  45% { transform: translate(calc(var(--drift) * .5), calc(var(--land) * .5)) rotate(160deg) scaleX(1); }
+  65% { transform: translate(calc(var(--drift) * .2), calc(var(--land) * .74)) rotate(250deg) scaleX(.35); }
+  80% { transform: translate(var(--drift), var(--land)) rotate(320deg) scale(1, .55); opacity: .9; }
+  92% { transform: translate(var(--drift), var(--land)) rotate(322deg) scale(1, .55); opacity: 0; }
+  100% { transform: translate(var(--drift), var(--land)); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) { .au-fall, .au-sway { animation: none; } }

@@ -1,1 +1,93 @@
-/* ---------- Lanterns theme ---------- */
+/* ---------- Lanterns theme: paper lanterns at dusk, glowing amber at night ----------
+   A string of round lanterns is the anchor top-right; sky lanterns drift up behind the controls. */
+:root[data-skin="lantern"], .theme-art[data-skin="lantern"] {
+  --stage: #faf0ee; --bg: #efe1e0; --surface: #fffaf8; --sunk: #f5e9e6;
+  --ink: #2b2026; --muted: #7e6c72; --hair: rgba(60, 30, 40, .07); --line: rgba(60, 30, 40, .12);
+  --sun: #e08a2c; --active: #b8651a; --active-soft: #fbe7d1;
+  --ln-sky1: #e4dcef; --ln-sky2: #f3e3ec; --ln-sky3: #fbe4d6;
+  --ln-glow: #ffb562; --ln-halo: .28; --ln-refl: .5;
+  --ln-paper1: #fbd9a6; --ln-paper2: #efab68; --ln-rib: rgba(170, 92, 40, .35); --ln-cap: #9a7468;
+  --ln-cord: rgba(120, 88, 92, .42); --ln-stars-o: 0;
+  --ln-hill-far: #e6cfdc; --ln-hill-near: #dbc0d0;
+  --ln-water1: #ecd8e0; --ln-water2: #f6e8e8; --ln-line: rgba(255, 255, 255, .38);
+  --ln-sky-paper: rgba(239, 170, 104, .55); --ln-sky-flame: rgba(255, 210, 150, .7); --ln-rise-halo: 0;
+}
+:root[data-skin="lantern"][data-mode="dark"], :root[data-mode="dark"] .theme-art[data-skin="lantern"] {
+  --stage: #13142e; --bg: #0b0c20; --surface: #22223f; --sunk: #181936;
+  --ink: #f3ece2; --muted: #a8a2bd; --hair: rgba(255, 255, 255, .06); --line: rgba(255, 255, 255, .1);
+  --sun: #ffb35a; --active: #f5ac52; --active-soft: #3c2e2c;
+  --ln-sky1: #0b0d29; --ln-sky2: #171840; --ln-sky3: #2a2350;
+  --ln-glow: #ffa940; --ln-halo: .5; --ln-refl: .75;
+  --ln-paper1: #ffd896; --ln-paper2: #f08a2e; --ln-rib: rgba(150, 60, 10, .45); --ln-cap: #3a2a2a;
+  --ln-cord: rgba(210, 190, 200, .28); --ln-stars-o: 1;
+  --ln-hill-far: #1d1c44; --ln-hill-near: #161536;
+  --ln-water1: #16173a; --ln-water2: #101130; --ln-line: rgba(255, 190, 120, .08);
+  --ln-sky-paper: rgba(255, 170, 80, .85); --ln-sky-flame: #ffe0a0; --ln-rise-halo: 1;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="lantern"]:not([data-mode="light"]), :root:not([data-mode="light"]) .theme-art[data-skin="lantern"] {
+    --stage: #13142e; --bg: #0b0c20; --surface: #22223f; --sunk: #181936;
+    --ink: #f3ece2; --muted: #a8a2bd; --hair: rgba(255, 255, 255, .06); --line: rgba(255, 255, 255, .1);
+    --sun: #ffb35a; --active: #f5ac52; --active-soft: #3c2e2c;
+    --ln-sky1: #0b0d29; --ln-sky2: #171840; --ln-sky3: #2a2350;
+    --ln-glow: #ffa940; --ln-halo: .5; --ln-refl: .75;
+    --ln-paper1: #ffd896; --ln-paper2: #f08a2e; --ln-rib: rgba(150, 60, 10, .45); --ln-cap: #3a2a2a;
+    --ln-cord: rgba(210, 190, 200, .28); --ln-stars-o: 1;
+    --ln-hill-far: #1d1c44; --ln-hill-near: #161536;
+    --ln-water1: #16173a; --ln-water2: #101130; --ln-line: rgba(255, 190, 120, .08);
+    --ln-sky-paper: rgba(255, 170, 80, .85); --ln-sky-flame: #ffe0a0; --ln-rise-halo: 1;
+    color-scheme: dark;
+  }
+}
+.theme-art[data-skin="lantern"] { color: var(--ink); }
+.lantern-scene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.lantern-scene .ln-art { position: absolute; inset: 0; width: 100%; height: 100%; }
+.lantern-scene svg * { stroke: none; }
+
+.ln-stars circle { fill: #fff; opacity: calc(var(--ln-stars-o) * .6); }
+.ln-stars circle.tw { animation: ln-tw 4s ease-in-out infinite; }
+@keyframes ln-tw { 50% { opacity: calc(var(--ln-stars-o) * .12); } }
+
+.ln-hill.far { fill: var(--ln-hill-far); }
+.ln-hill.near { fill: var(--ln-hill-near); }
+.lantern-scene .ln-lines path { fill: none; stroke: var(--ln-line); stroke-width: 1; }
+.ln-refl { opacity: var(--ln-refl); }
+.ln-glint { fill: var(--ln-glow); }
+.ln-refl g { animation: ln-refl 9s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 0; }
+@keyframes ln-refl { to { opacity: .5; transform: scaleX(1.35); } }
+
+.lantern-scene .ln-cord { fill: none; stroke: var(--ln-cord); stroke-width: 1.2; }
+.lantern-scene .ln-drop { fill: none; stroke: var(--ln-cord); stroke-width: 1; }
+.ln-cap { fill: var(--ln-cap); }
+.lantern-scene .ln-rib { fill: none; stroke: var(--ln-rib); stroke-width: .8; }
+.lantern-scene .ln-tassel { fill: none; stroke: var(--ln-cap); stroke-width: 1.4; }
+.ln-hang { transform-box: view-box; animation: ln-sway 10s ease-in-out infinite alternate; }
+@keyframes ln-sway { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
+
+/* sky lanterns drift up from the water and fade into the sky */
+.ln-rise {
+  position: absolute; top: 0; display: block; opacity: 0;
+  animation: ln-rise 18s linear infinite;
+}
+.ln-rise svg { display: block; width: 100%; height: auto; position: relative; }
+.ln-rise::before {
+  content: ""; position: absolute; left: 50%; top: 55%; width: 340%; aspect-ratio: 1; transform: translate(-50%, -50%);
+  border-radius: 50%; opacity: var(--ln-rise-halo);
+  background: radial-gradient(closest-side, rgba(255, 170, 70, .32), rgba(255, 170, 70, .08) 50%, transparent);
+}
+.ln-sky-body { fill: var(--ln-sky-paper); }
+.lantern-scene .ln-sky-seam { fill: none; stroke: rgba(150, 70, 20, .18); stroke-width: .7; }
+.ln-sky-flame { fill: var(--ln-sky-flame); }
+@keyframes ln-rise {
+  0% { transform: translate(0, 80cqh) scale(1); opacity: 0; }
+  10% { opacity: .9; }
+  35% { transform: translate(var(--ln-sway), 58cqh) scale(.92); }
+  65% { transform: translate(calc(var(--ln-sway) * -.6), 34cqh) scale(.8); opacity: .8; }
+  100% { transform: translate(calc(var(--ln-sway) * .4), 8cqh) scale(.62); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ln-stars circle.tw, .ln-refl g, .ln-hang, .ln-rise { animation: none; }
+  .ln-rise { opacity: .7; transform: translate(0, 40cqh) scale(.85); }
+}
