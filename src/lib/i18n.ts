@@ -89,6 +89,10 @@ const ROWS: [string, string, string, string][] = [
   ['Renew {plan}', 'ต่ออายุ {plan}', '{plan} を更新', '续订 {plan}'],
   ['Skip', 'ข้าม', 'スキップ', '跳过'],
   ['Next', 'ถัดไป', '次へ', '下一步'],
+  ['All themes', 'ธีมทั้งหมด', 'すべてのテーマ', '全部主题'],
+  ['Sort', 'เรียง', '並べ替え', '排序'],
+  ['All', 'ทั้งหมด', 'すべて', '全部'],
+  ['Basic', 'Basic', 'Basic', 'Basic'],
   ['Continue session', 'ทำต่อ', 'セッションを続ける', '继续训练'],
   ['{n} more saved. They come back when you renew.', 'เก็บไว้อีก {n} ท่า จะกลับมาเมื่อคุณต่ออายุ', 'ほかに {n} 件保存されています。更新すると戻ります。', '另有 {n} 个已保存，续订后恢复。'],
   ['Sound', 'เสียง', 'サウンド', '音效'],
@@ -261,6 +265,7 @@ const ROWS: [string, string, string, string][] = [
   ["Try on", "ลองใช้", "試してみる", "试用"],
   ["Stop trying", "หยุดลอง", "試用をやめる", "停止试用"],
   ["Get {price}", "รับ {price}", "{price}で入手", "获取 {price}"],
+  ["Get", "รับเลย", "入手", "获取"],
   ["Or get every theme with Premium", "หรือรับทุกธีมกับ Premium", "またはPremiumですべてのテーマを", "或通过 Premium 获得所有主题"],
   ["Theme · yours to keep", "ธีม · เป็นของคุณตลอดไป", "テーマ・ずっと使えます", "主题 · 永久拥有"],
   ["one time", "ครั้งเดียว", "1回払い", "一次性"],
@@ -622,6 +627,7 @@ const ROWS: [string, string, string, string][] = [
   ["A planet in the corner and one small moon circling it among slow stars.", "ดาวเคราะห์ที่มุมจอ กับดวงจันทร์ดวงเล็กที่โคจรรอบท่ามกลางดวงดาว", "隅に惑星、そのまわりを小さな月がゆっくりと回り、星がまたたく。", "角落里一颗行星，一颗小卫星在缓慢的星光中绕它运行。"],
   ["Soft rain on glass, drops sliding down. A grey day, or city lights blurred at night.", "สายฝนบนกระจก หยดน้ำไหลลงช้าๆ วันฟ้าครึ้ม หรือแสงไฟเมืองพร่ามัวยามค่ำคืน", "ガラスに降る優しい雨、滑り落ちるしずく。曇りの日、または夜ににじむ街の灯り。", "轻雨落在玻璃上，水珠缓缓滑落。阴天，或夜晚朦胧的城市灯光。"],
   ["Koi gliding under lily pads. Their shadows pass slowly across the water.", "ปลาคาร์ปว่ายใต้ใบบัว เงาของพวกมันเคลื่อนผ่านผิวน้ำช้าๆ", "蓮の葉の下を泳ぐ鯉。その影が水面をゆっくりと横切る。", "锦鲤在睡莲叶下游弋，影子缓缓掠过水面。"],
+  ["A spinning star sweeping its beams through space. It turns and ticks with every rep and load you choose.", "ดาวที่หมุนวนกวาดลำแสงผ่านอวกาศ มันหมุนและส่งเสียงติ๊กทุกครั้งที่คุณเลือกจำนวนครั้งและน้ำหนัก", "宇宙に光のビームを放ちながら回る星。回数や重さを選ぶたびに回転し、チクタクと鳴る。", "旋转的星体在太空中扫出光束。每次选择次数和重量时，它都会转动并发出滴答声。"],
 ]
 for (const [en, th, ja, zh] of ROWS) { D.th[en] = th; D.ja[en] = ja; D.zh[en] = zh }
 

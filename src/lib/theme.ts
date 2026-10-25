@@ -17,6 +17,7 @@ export const THEMES: (Theme | null)[] = [
   { key: 'neon', name: 'Neon', blurb: 'A cyber city. Neon rooftops and light trails by night, a clean black and white skyline by day.', tier: 'premium', price: 149, has: ['anim', 'sound'] },
   { key: 'manga', name: 'Manga', blurb: 'Black ink on paper. Speech bubbles at home, sword slashes once a session starts.', tier: 'premium', price: 149, has: ['anim', 'sound', 'live'] },
   { key: 'summit', name: 'To the Top', blurb: 'Stone pillars in an ink painting. Each set you finish pushes the boulder further up the mountain.', tier: 'premium', price: 149, has: ['anim', 'sound', 'live'] },
+  { key: 'pulsar', name: 'Pulsar', blurb: 'A spinning star sweeping its beams through space. It turns and ticks with every rep and load you choose.', tier: 'premium', price: 149, has: ['anim', 'sound', 'live'] },
   { key: 'ocean', name: 'Ocean', blurb: 'Rolling waves and a lighthouse. Gulls by day, a sweeping beam over a moonlit sea by night.', tier: 'premium', price: 75, has: ['anim'] },
   { key: 'forest', name: 'Forest', blurb: 'Layers of pine in morning mist. Fireflies drift between the trees at night.', tier: 'premium', price: 75, has: ['anim'] },
   { key: 'snow', name: 'Snowfall', blurb: 'Quiet mountains under soft falling snow. A cabin window glows at night.', tier: 'premium', price: 75, has: ['anim'] },
@@ -27,7 +28,7 @@ export const THEMES: (Theme | null)[] = [
   { key: 'lantern', name: 'Lanterns', blurb: 'Paper lanterns rising into the sky, glowing warm against the night.', tier: 'exclusive', price: 159, has: ['anim', 'sound', 'live'] },
   { key: 'orbit', name: 'Orbit', blurb: 'A planet in the corner and one small moon circling it among slow stars.', tier: 'exclusive', price: 159, has: ['anim', 'sound', 'live'] },
   { key: 'koi', name: 'Koi Pond', blurb: 'Koi gliding under lily pads. Their shadows pass slowly across the water.', tier: 'exclusive', price: 159, has: ['anim', 'sound', 'live'] },
-  ...Array.from({ length: THEME_SLOTS - 15 }, () => null),
+  ...Array.from({ length: THEME_SLOTS - 16 }, () => null),
 ]
 
 // Other things sold the same way as a theme (once, kept for good, or free with a plan).
@@ -82,7 +83,19 @@ function paint() {
 }
 function subscribe(fn: () => void) { listeners.add(fn); return () => { listeners.delete(fn) } }
 
-export function setPreview(key: string | null) { preview = key; paint() }
+export function setPreview(key: string | null) { preview = key; if (!key) releaseMode(); paint() }
+// The store's sun/moon picks day or night for that page. When someone leaves the store while
+// trying a theme on, the try-on keeps that look; their own setting comes back when it ends.
+let heldMode: string | null | undefined
+export function holdMode(before: string | null) { heldMode = before }
+export const heldModeOr = (now: string | null) => (heldMode === undefined ? now : heldMode)
+export function dropHeldMode() { heldMode = undefined }
+function releaseMode() {
+  if (heldMode === undefined) return
+  const root = document.documentElement
+  if (heldMode === null) root.removeAttribute('data-mode'); else root.setAttribute('data-mode', heldMode)
+  heldMode = undefined
+}
 export function getPreview() { return preview }
 export function usePreview(): string | null { return useSyncExternalStore(subscribe, () => preview) }
 
@@ -96,6 +109,7 @@ export function applyTheme(key: string | null) {
   applied = key
   try { if (key) localStorage.setItem(SKIN_KEY, key); else localStorage.removeItem(SKIN_KEY) } catch { /* private mode */ }
   preview = null
+  releaseMode()
   paint()
 }
 

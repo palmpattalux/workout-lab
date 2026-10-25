@@ -14,6 +14,7 @@ import LanternScene, { LanternSession } from './LanternScene'
 import OrbitScene, { OrbitSession } from './OrbitScene'
 import RainScene from './RainScene'
 import KoiScene, { KoiSession } from './KoiScene'
+import PulsarScene, { PulsarSession } from './PulsarScene'
 
 // The home-page backdrop for each theme, by key.
 export default function ThemeScene({ skin }: { skin: string | null }) {
@@ -32,6 +33,7 @@ export default function ThemeScene({ skin }: { skin: string | null }) {
   if (skin === 'orbit') return <OrbitScene />
   if (skin === 'rain') return <RainScene />
   if (skin === 'koi') return <KoiScene />
+  if (skin === 'pulsar') return <PulsarScene />
   return null
 }
 
@@ -45,6 +47,7 @@ const SESSION: Record<string, ComponentType<{ steps: number }>> = {
   lantern: LanternSession,
   orbit: OrbitSession,
   koi: KoiSession,
+  pulsar: PulsarSession,
 }
 export function ThemeSession({ skin, steps }: { skin: string | null; steps: number }) {
   const C = skin ? SESSION[skin] : undefined

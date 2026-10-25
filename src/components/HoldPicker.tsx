@@ -55,7 +55,7 @@ export default function HoldPicker({ options, title, visible, extra, start = 0, 
     setLocal(nextLocal)
     if (nextOffset + nextLocal !== before) {
       if (!getPreview()) onChange?.(nextOffset + nextLocal)
-      sound.tick()
+      sound.pick(nextOffset + nextLocal - before)
     }
   }
 
