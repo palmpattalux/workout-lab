@@ -2498,3 +2498,24 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 /* exclusive themes: the gold frame, on the sides only; it fades out with the picture */
 .themes .theme-card.exclusive .theme-art::after { content: ''; position: absolute; inset: 0; z-index: 5; pointer-events: none; border-radius: inherit;
   border-left: 1.5px solid #d9b45a; border-right: 1.5px solid #d9b45a; }
+
+/* themes page, three layers (2026-10-25): swipe up for the next price level, down for the
+   previous one, like a feed; a small rail on the right edge shows which layer you're on */
+.themes-body { touch-action: none; }
+.themes .theme-track { touch-action: pan-x; }
+.theme-track.enter-up { animation: tl-in-up .5s cubic-bezier(.2, .8, .3, 1) both; }
+.theme-track.enter-down { animation: tl-in-down .5s cubic-bezier(.2, .8, .3, 1) both; }
+@keyframes tl-in-up { from { transform: translateY(60px); opacity: 0; } }
+@keyframes tl-in-down { from { transform: translateY(-60px); opacity: 0; } }
+.theme-layers { position: absolute; right: 0; top: 50%; transform: translateY(-50%); z-index: 4; display: flex; flex-direction: column; gap: 2px; }
+.theme-layers button { width: 22px; height: 26px; padding: 0; border: 0; background: none; cursor: pointer; display: grid; place-items: center; }
+.theme-layers button::before { content: ''; width: 4px; height: 10px; border-radius: 3px; background: var(--line); transition: height .25s var(--ease), background .25s; }
+.theme-layers button.on::before { height: 22px; background: var(--ink); }
+.theme-layers button.gold.on::before { background: #d9b45a; }
+.themes .theme-pips { margin-bottom: 8px; }
+.theme-next-layer { align-self: center; margin: 0 0 2.2cqh; display: inline-flex; align-items: center; gap: 4px; border: 0; background: none; color: var(--muted);
+  font: 600 .72rem var(--font); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; padding: 6px 12px; animation: tl-hint 2.4s ease-in-out infinite; }
+.theme-next-layer svg { transform: rotate(90deg); }
+@keyframes tl-hint { 50% { transform: translateY(-3px); } }
+@media (prefers-reduced-motion: reduce) { .theme-track.enter-up, .theme-track.enter-down, .theme-next-layer { animation: none; } }
+.themes > .theme-pips, .themes > .theme-next-layer { touch-action: none; }
