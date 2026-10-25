@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Icon } from '../components/icons'
 import ThemeScene from '../components/ThemeScene'
-import { type Feature, THEMES, THEME_SLOTS, THEME_PRICE, setPreview, usePreview, useApplied, useOwnedThemes, applyTheme, canUseTheme } from '../lib/theme'
+import { type Feature, THEMES, THEME_SLOTS, themePrice, setPreview, usePreview, useApplied, useOwnedThemes, applyTheme, canUseTheme } from '../lib/theme'
 import { usePlan, atLeast } from '../lib/plan'
 import { canPay } from '../lib/billing'
 import { sound } from '../lib/sound'
@@ -14,7 +14,7 @@ import { t } from '../lib/i18n'
 // under each picture, bottom right: animated, custom sounds, reacts to what you do
 const FEATS: { key: Feature; icon: 'sparkle' | 'speaker' | 'hand'; label: string }[] = [
   { key: 'anim', icon: 'sparkle', label: 'Animated' },
-  { key: 'sound', icon: 'speaker', label: 'Custom sounds' },
+  { key: 'sound', icon: 'speaker', label: 'Sound' },
   { key: 'live', icon: 'hand', label: 'Interactive' },
 ]
 function Feats({ has, style }: { has: Feature[]; style: CSSProperties }) {
@@ -76,7 +76,7 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
   const viewing = theme && preview === theme.key
   const owner = !!theme && canUseTheme(theme.key, plan)
   const bought = !!theme && ownedThemes.includes(theme.key)
-  const price = '฿' + THEME_PRICE
+  const price = '฿' + (theme ? themePrice(theme.key) : '')
   const has = (key: string) => ownedThemes.includes(key) || atLeast(plan, THEMES.find((x) => x?.key === key)?.tier ?? 'premium')
   const buy = (key: string) => { setPreview(null); sound.tap(); location.hash = 'checkout-theme-' + key }
 
@@ -114,7 +114,7 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
                 onClick={() => goTo(i)}
               >
                 {th && d < 0.5 && <TierChip tier={th.tier} />}
-                {th && <span className={`price-pill${has(th.key) ? ' owned' : ''}`}>{has(th.key) ? <><Icon name="check" size="13px" strokeWidth={2.8} />{t('Owned')}</> : price}</span>}
+                {th && <span className={`price-pill${has(th.key) ? ' owned' : ''}`}>{has(th.key) ? <><Icon name="check" size="13px" strokeWidth={2.8} />{t('Owned')}</> : '฿' + themePrice(th.key)}</span>}
                 {th ? (
                   <div className={`theme-art skin-${th.key}${settled === i ? '' : ' paused'}`} data-skin={th.key}>
                     {Math.abs(i - pos) < 1.6 && <ThemeScene skin={th.key} />}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Icon } from '../components/icons'
 import { PLANS } from '../lib/plan'
-import { THEME_PRICE, applyTheme, shopItem } from '../lib/theme'
+import { themePrice, applyTheme, shopItem } from '../lib/theme'
 import { setPrefs } from '../lib/prefs'
 import { chargeStatus, getPending, clearPending, refreshSubscription } from '../lib/billing'
 import { formatDate } from '../lib/format'
@@ -44,7 +44,7 @@ export default function PayPage({ userId }: { userId: string | null }) {
 
       {view === 'waiting' && pending?.method === 'promptpay' && pending.qr && (
         <section className="pay-qr">
-          <p className="co-label">{t('Scan to pay {price}', { price: '฿' + (theme ? THEME_PRICE : plan?.price ?? 0).toLocaleString() })}</p>
+          <p className="co-label">{t('Scan to pay {price}', { price: '฿' + (theme ? themePrice(theme.key) : plan?.price ?? 0).toLocaleString() })}</p>
           <div className="qr-box"><img src={pending.qr} alt={t('PromptPay QR code')} /></div>
           <p className="pay-hint">{t('Open any Thai banking app and scan. On this phone? Save the QR, then pick it from your gallery in the banking app.')}</p>
           <a className="pay-save" href={pending.qr} download="dotset-promptpay.png" target="_blank" rel="noreferrer">{t('Save QR')}</a>

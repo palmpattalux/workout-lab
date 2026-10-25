@@ -30,7 +30,8 @@ function unlock() {
 // Mix with any music playing instead of pausing it (Safari).
 try { (navigator as unknown as { audioSession?: { type: string } }).audioSession!.type = 'ambient' } catch { /* not supported */ }
 
-function tone(from: number, to: number, dur: number, gain: number, type: OscillatorType) {
+// tone / noise / buzz are shared with the theme sound files (src/themes/*-sound.ts).
+export function tone(from: number, to: number, dur: number, gain: number, type: OscillatorType) {
   const c = audio()
   if (!c || c.state !== 'running') return
   const t = c.currentTime
@@ -47,13 +48,13 @@ function tone(from: number, to: number, dur: number, gain: number, type: Oscilla
   o.stop(t + dur + 0.02)
 }
 
-function buzz(ms: number) {
+export function buzz(ms: number) {
   try { navigator.vibrate?.(ms) } catch { /* not supported */ }
 }
 
 // A short burst of filtered noise: paper, swords, impacts (Manga theme).
 let noiseBuf: AudioBuffer | null = null
-function noise(dur: number, gain: number, type: BiquadFilterType, from: number, to: number, at = 0, q = 0.9) {
+export function noise(dur: number, gain: number, type: BiquadFilterType, from: number, to: number, at = 0, q = 0.9) {
   const c = audio()
   if (!c || c.state !== 'running') return
   if (!noiseBuf) {
@@ -77,6 +78,9 @@ function noise(dur: number, gain: number, type: BiquadFilterType, from: number, 
   src.start(t, Math.random() * 0.5)
   src.stop(t + dur + 0.02)
 }
+
+// Sounds only for the theme in use on the page, never from the little previews in the gallery.
+export const livePage = (el: Element | null) => !!el && !el.closest('.theme-art')
 
 export const sound = {
   tap() { tone(1000, 620, 0.05, 0.16, 'sine') },

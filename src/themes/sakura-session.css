@@ -1,0 +1,16 @@
+/* Sakura page B: one petal let go from the branch, top right, each time a set is moved on. */
+.sakura-session { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.sk-drift {
+  position: absolute; top: 9%; right: 16%; width: 10px; height: 8px; display: block;
+  border-radius: 80% 0 55% 50% / 55% 0 80% 50%;
+  background: linear-gradient(135deg, var(--pink), var(--pink-deep)); opacity: 0;
+  animation: sk-drift 3.6s cubic-bezier(.35, .1, .55, 1) forwards;
+}
+@keyframes sk-drift {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  10% { opacity: .85; }
+  40% { transform: translate(-7vw, 9vh) rotate(130deg); }
+  70% { transform: translate(-3vw, 17vh) rotate(250deg); opacity: .7; }
+  100% { transform: translate(-11vw, 25vh) rotate(360deg); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .sk-drift { animation: none; display: none; } }

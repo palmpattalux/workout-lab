@@ -4,7 +4,7 @@ import ThemeScene from '../components/ThemeScene'
 import DemoPhone, { DEMOS } from '../components/DemoPhone'
 import DesktopCreate from '../components/DesktopCreate'
 import ViewPage from './ViewPage'
-import { THEMES, THEME_PRICE, canUseTheme, ownsTheme, useOwnedThemes, type Theme, type Feature } from '../lib/theme'
+import { THEMES, themePrice, canUseTheme, ownsTheme, useOwnedThemes, type Theme, type Feature } from '../lib/theme'
 import { PLANS, FREE_WORKOUTS, FREE_SETS, usePlan, tierName } from '../lib/plan'
 import { useSubscription } from '../lib/billing'
 import { signOut, type AppUser } from '../lib/auth'
@@ -20,10 +20,12 @@ import { LEGAL } from '../legal/info'
 //  3. buyers: themes and plans at the website price (cheaper than in the store apps)
 // Phones never see these pages.
 const themes = THEMES.filter((x): x is Theme => !!x)
-const APP_PRICE: Record<string, number> = { theme: 179, premium: 179, exclusive: 399 }
+const APP_PRICE: Record<string, number> = { premium: 179, exclusive: 399 }
+// a single theme in the store apps: about 20% more, rounded to a store price point
+const APP_THEME: Record<number, number> = { 75: 89, 149: 179, 159: 189 }
 const FEATS: { key: Feature; icon: 'sparkle' | 'speaker' | 'hand'; label: string }[] = [
   { key: 'anim', icon: 'sparkle', label: 'Animated' },
-  { key: 'sound', icon: 'speaker', label: 'Custom sounds' },
+  { key: 'sound', icon: 'speaker', label: 'Sound' },
   { key: 'live', icon: 'hand', label: 'Interactive' },
 ]
 
@@ -133,7 +135,6 @@ export default function LandingPage({ user }: { user: AppUser | null | undefined
   const plan = usePlan()
   const sub = useSubscription()
   useOwnedThemes() // re-render when purchases load
-  const price = '฿' + THEME_PRICE
 
   return (
     <DesktopFrame user={user} here="home">
@@ -251,8 +252,8 @@ export default function LandingPage({ user }: { user: AppUser | null | undefined
                     {have
                       ? <span className="ld-owned"><Icon name="check" size="15px" strokeWidth={2.6} />{ownsTheme(th.key) ? t('Owned') : t('Included in your plan')}</span>
                       : <>
-                        <button className="ld-btn" onClick={() => open('checkout-theme-' + th.key)}>{t('Get {price}', { price })}</button>
-                        <span className="ld-was">{t('In the app {price}', { price: '฿' + APP_PRICE.theme })}</span>
+                        <button className="ld-btn" onClick={() => open('checkout-theme-' + th.key)}>{t('Get {price}', { price: '฿' + themePrice(th.key) })}</button>
+                        <span className="ld-was">{t('In the app {price}', { price: '฿' + (APP_THEME[themePrice(th.key)] ?? 179) })}</span>
                       </>}
                   </div>
                   {!have && <p className="ld-free-with">{t('Free with {plan}', { plan: tierName(th.tier) })}</p>}

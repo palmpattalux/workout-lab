@@ -1,0 +1,124 @@
+/* ---------- Ocean theme: a calm coast. Day = gulls over a soft sea, night = moonlit sea and a sweeping beam ----------
+   The lighthouse on its rock is the anchor top-right; the sea rolls along the bottom quarter. */
+:root[data-skin="ocean"], .theme-art[data-skin="ocean"] {
+  --stage: #eef4f5; --bg: #dfe9eb; --surface: #fcfeff; --sunk: #e9f1f2;
+  --ink: #17292e; --muted: #5f7479;
+  --sun: #2a9d97; --active: #1f8580; --active-soft: #d7eeec;
+  --oc-sky1: #cfe5f1; --oc-sky2: #e5f0f2; --oc-sky3: #f4ede0;
+  --oc-sea0: rgba(150, 200, 208, .38); --oc-sea1: rgba(112, 180, 190, .34); --oc-sea2: rgba(84, 160, 172, .3);
+  --oc-crest: rgba(255, 255, 255, .55);
+  --oc-rock: #9aa9a8; --oc-rock-shade: rgba(60, 80, 84, .18);
+  --oc-tower: #fbfaf6; --oc-tower-shade: rgba(60, 80, 90, .1); --oc-stripe: #5fa8a6; --oc-cap: #4d6b70;
+  --oc-glass: #d8ecef; --oc-lamp: #f3e2b0; --oc-door: #6b8187; --oc-foam: rgba(255, 255, 255, .85); --oc-pool: rgba(120, 180, 190, .22);
+  --oc-beam: #fff2c4; --oc-beam-o: 0; --oc-halo-o: 0;
+  --oc-moon: #f3efe0; --oc-moon-o: 0; --oc-star-o: 0; --oc-shimmer-o: 0;
+  --oc-gull: rgba(55, 72, 80, .5); --oc-gull-o: 1;
+}
+:root[data-skin="ocean"][data-mode="dark"], :root[data-mode="dark"] .theme-art[data-skin="ocean"] {
+  --stage: #0d1a2b; --bg: #081220; --surface: #15263a; --sunk: #0f1d2e;
+  --ink: #e8f0f3; --muted: #93a7b5;
+  --sun: #5cc9c1; --active: #62d0c7; --active-soft: #163b45;
+  --oc-sky1: #08142a; --oc-sky2: #0e1f38; --oc-sky3: #15304a;
+  --oc-sea0: rgba(30, 64, 92, .55); --oc-sea1: rgba(22, 52, 80, .6); --oc-sea2: rgba(14, 40, 66, .7);
+  --oc-crest: rgba(170, 205, 225, .14);
+  --oc-rock: #1a2a3d; --oc-rock-shade: rgba(0, 0, 0, .25);
+  --oc-tower: #4d5f73; --oc-tower-shade: rgba(0, 0, 0, .22); --oc-stripe: #2f4d5d; --oc-cap: #24384b;
+  --oc-glass: #3a4c5e; --oc-lamp: #ffe7a6; --oc-door: #1c2a3a; --oc-foam: rgba(190, 215, 230, .3); --oc-pool: rgba(40, 80, 110, .35);
+  --oc-beam: #fff0bf; --oc-beam-o: 1; --oc-halo-o: 1;
+  --oc-moon: #f4efdc; --oc-moon-o: 1; --oc-star-o: 1; --oc-shimmer-o: 1;
+  --oc-gull: rgba(0, 0, 0, 0); --oc-gull-o: 0;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="ocean"]:not([data-mode="light"]), :root:not([data-mode="light"]) .theme-art[data-skin="ocean"] {
+    --stage: #0d1a2b; --bg: #081220; --surface: #15263a; --sunk: #0f1d2e;
+    --ink: #e8f0f3; --muted: #93a7b5;
+    --sun: #5cc9c1; --active: #62d0c7; --active-soft: #163b45;
+    --oc-sky1: #08142a; --oc-sky2: #0e1f38; --oc-sky3: #15304a;
+    --oc-sea0: rgba(30, 64, 92, .55); --oc-sea1: rgba(22, 52, 80, .6); --oc-sea2: rgba(14, 40, 66, .7);
+    --oc-crest: rgba(170, 205, 225, .14);
+    --oc-rock: #1a2a3d; --oc-rock-shade: rgba(0, 0, 0, .25);
+    --oc-tower: #4d5f73; --oc-tower-shade: rgba(0, 0, 0, .22); --oc-stripe: #2f4d5d; --oc-cap: #24384b;
+    --oc-glass: #3a4c5e; --oc-lamp: #ffe7a6; --oc-door: #1c2a3a; --oc-foam: rgba(190, 215, 230, .3); --oc-pool: rgba(40, 80, 110, .35);
+    --oc-beam: #fff0bf; --oc-beam-o: 1; --oc-halo-o: 1;
+    --oc-moon: #f4efdc; --oc-moon-o: 1; --oc-star-o: 1; --oc-shimmer-o: 1;
+    --oc-gull: rgba(0, 0, 0, 0); --oc-gull-o: 0;
+    color-scheme: dark;
+  }
+}
+.theme-art[data-skin="ocean"] { color: var(--ink); }
+
+.ocean-scene {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0;
+  background: linear-gradient(180deg, var(--oc-sky1), var(--oc-sky2) 45%, var(--oc-sky3) 76%);
+}
+.ocean-scene svg * { stroke: none; }
+
+/* top: sky details, beam and the lighthouse */
+.oc-top { position: absolute; top: 0; right: 0; width: 100cqw; height: auto; overflow: visible; }
+.oc-stars circle { fill: #fff; opacity: calc(var(--oc-star-o) * .6); }
+.oc-stars circle.tw { animation: oc-tw 9s ease-in-out infinite; }
+@keyframes oc-tw { 50% { opacity: calc(var(--oc-star-o) * .15); } }
+.oc-moon { opacity: var(--oc-moon-o); }
+.oc-moon-disc { fill: var(--oc-moon); }
+.oc-beam {
+  opacity: calc(var(--oc-beam-o) * .45); transform-box: view-box; transform-origin: 334px 77px;
+  animation: oc-sweep 16s ease-in-out infinite;
+}
+@keyframes oc-sweep {
+  0% { transform: scaleX(1); opacity: calc(var(--oc-beam-o) * .45); }
+  40% { transform: scaleX(.08); opacity: calc(var(--oc-beam-o) * .2); }
+  50% { transform: scaleX(-.18); opacity: 0; }
+  60% { transform: scaleX(.08); opacity: calc(var(--oc-beam-o) * .2); }
+  100% { transform: scaleX(1); opacity: calc(var(--oc-beam-o) * .45); }
+}
+.oc-halo { opacity: var(--oc-halo-o); animation: oc-pulse 8s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes oc-pulse { 50% { transform: scale(.82); opacity: calc(var(--oc-halo-o) * .7); } }
+.oc-gulls { opacity: var(--oc-gull-o); }
+.oc-gull {
+  fill: var(--oc-gull); transform-box: fill-box; transform-origin: center;
+  animation: oc-glide 16s ease-in-out infinite alternate;
+}
+@keyframes oc-glide {
+  0% { transform: translate(0, 0) scaleY(1); }
+  25% { transform: translate(9px, -3px) scaleY(.7); }
+  50% { transform: translate(18px, 1px) scaleY(1); }
+  75% { transform: translate(26px, -2px) scaleY(.75); }
+  100% { transform: translate(34px, 2px) scaleY(1); }
+}
+.oc-rock { fill: var(--oc-rock); }
+.oc-pool { fill: var(--oc-pool); }
+.oc-rock-shade { fill: var(--oc-rock-shade); }
+.oc-tower { fill: var(--oc-tower); }
+.oc-tower-shade { fill: var(--oc-tower-shade); }
+.oc-stripe { fill: var(--oc-stripe); }
+.oc-door { fill: var(--oc-door); }
+.oc-gallery, .oc-cap { fill: var(--oc-cap); }
+.oc-glass { fill: var(--oc-glass); }
+.oc-lamp { fill: var(--oc-lamp); }
+.ocean-scene .oc-foam path { fill: none; stroke: var(--oc-foam); stroke-width: 1.2; stroke-linecap: round; animation: oc-foam 9s ease-in-out infinite alternate; }
+@keyframes oc-foam { to { transform: translateX(-4px); opacity: .45; } }
+
+/* bottom: calm sea bands */
+.oc-sea {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 25cqh;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 14%);
+          mask-image: linear-gradient(180deg, transparent, #000 14%);
+}
+.oc-band { position: absolute; left: 0; width: 200cqw; height: 100%; animation: oc-roll linear infinite; }
+.oc-band.b1 { animation-direction: reverse; }
+.oc-band path { fill: var(--oc-sea0); }
+.oc-band.b1 path { fill: var(--oc-sea1); }
+.oc-band.b2 path { fill: var(--oc-sea2); }
+@keyframes oc-roll { from { transform: translateX(0); } to { transform: translateX(-50cqw); } }
+.oc-shimmer { position: absolute; left: 52.3%; top: 0; bottom: 0; width: 0; opacity: var(--oc-shimmer-o); }
+.oc-shimmer i {
+  position: absolute; left: 0; display: block; height: 2px; border-radius: 2px; transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, rgba(244, 239, 220, .34), transparent);
+  animation: oc-glint 8s ease-in-out infinite;
+}
+@keyframes oc-glint { 50% { opacity: .3; transform: translateX(-50%) scaleX(.7); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .oc-beam, .oc-halo, .oc-gull, .oc-stars circle.tw, .ocean-scene .oc-foam path, .oc-band, .oc-shimmer i { animation: none; }
+}

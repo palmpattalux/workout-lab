@@ -14,8 +14,9 @@ export type PickerOption = { key: string; node: ReactNode; label?: string }
 //
 // `visible` shows only that many options at once. Holding the finger at the top
 // of the line keeps scrolling to higher options; at the bottom, back down.
-export default function HoldPicker({ options, visible, extra, start = 0, side = 'above', instant, onTap, onPick, onChange, maxStep, className, style, ariaLabel, children }: {
+export default function HoldPicker({ options, title, visible, extra, start = 0, side = 'above', instant, onTap, onPick, onChange, maxStep, className, style, ariaLabel, children }: {
   options: PickerOption[]
+  title?: string // shown above the line while it's open, e.g. "Choose an icon"
   visible?: number
   extra?: { node: ReactNode; label: string; onPick: () => void } // a target left of the line: slide onto it and let go
   start?: number // option the line opens on (e.g. the weight already set), so long lists don't start from the bottom
@@ -171,6 +172,7 @@ export default function HoldPicker({ options, visible, extra, start = 0, side = 
             <span key={o.key} className={i === local ? 'on' : undefined}>{o.node}</span>
           ))}
           <div className="fill" style={{ height: (local + 1) * ruler.step }} />
+          {title && <div className="ruler-title">{title}</div>}
           {label && !onExtra && (
             <div className={`tag${side === 'left' ? ' left' : ''}`} style={{ bottom: (local + 0.5) * ruler.step }}>{label}</div>
           )}

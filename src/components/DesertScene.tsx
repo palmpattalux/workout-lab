@@ -1,4 +1,7 @@
-import { useId } from 'react'
+import '../themes/desert-session.css'
+import { useEffect, useId, useRef, useState } from 'react'
+import { livePage } from '../lib/sound'
+import { desertSound } from '../themes/desert-sound'
 
 // Desert theme. Day: a pale sky, the sun, red mesas on the horizon, dunes with a lit and a
 // shaded side, saguaro cacti and rocks, sand blowing off the crests, a hawk gliding.
@@ -107,6 +110,107 @@ export default function DesertScene() {
         </g>
       </svg>
       <svg className="ds-hawk" viewBox="0 0 30 10"><path d="M1 6 Q8 0 15 5 Q22 0 29 6 Q22 3 15 7 Q8 3 1 6 Z" /></svg>
+    </div>
+  )
+}
+
+// Page B during a session: answers each set moved on (see ThemeSession in ThemeScene.tsx).
+// Two low dunes along the bottom edge with a footprint trail on the front crest, one print
+// per set (the journey so far); each set sends a soft gust carrying a thin ribbon of sand
+// across the dunes. A tap on the empty page lifts a tiny puff of sand. Now and then a far
+// breeze drifts a faint wisp over the back dune, or a distant chime sounds.
+const BW = 390, BH = 110
+const front = (x: number) => 40 + 40 * Math.sin(Math.PI * Math.min(BW, Math.max(0, x)) / BW) ** 1.3
+const back = (x: number) => 52 - 30 * Math.exp(-(((x - 250) / 150) ** 2))
+const ridge = (f: (x: number) => number) =>
+  `M-2 ${BH} ` + Array.from({ length: 41 }, (_, i) => { const x = -2 + i * (BW + 4) / 40; return `L${x.toFixed(1)} ${f(x).toFixed(1)}` }).join(' ') + ` L${BW + 2} ${BH} Z`
+const FRONT_D = ridge(front), BACK_D = ridge(back)
+const MAX_PRINTS = 14, GAP = 26
+const GRAINS = [0, 1, 2, 3, 4, 5]
+
+function print(j: number, k: number) {
+  const x = 22 + j * GAP
+  const slope = (front(x + 1) - front(x - 1)) / 2
+  const a = Math.atan(slope), side = k % 2 ? 3.2 : -3.2
+  const px = x - Math.sin(a) * side, py = front(x) + 9 + Math.cos(a) * side
+  return `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px) rotate(${(a * 57.3 + (k % 2 ? 6 : -6)).toFixed(1)}deg)`
+}
+
+type Puff = { id: number; x: number; y: number }
+
+export function DesertSession({ steps }: { steps: number }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const last = useRef(steps)
+  const [gust, setGust] = useState(0)
+  const [wisp, setWisp] = useState(0)
+  const [puff, setPuff] = useState<Puff | null>(null)
+  const n = steps + 1
+  const start = Math.max(0, n - MAX_PRINTS)
+
+  useEffect(() => {
+    if (steps > last.current) { setGust((g) => g + 1); if (livePage(ref.current)) desertSound.step() }
+    last.current = steps
+  }, [steps])
+
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>
+    const loop = () => {
+      if (Math.random() < 0.7) { setWisp((w) => w + 1); if (livePage(ref.current)) desertSound.breeze() }
+      else if (livePage(ref.current)) desertSound.chime()
+      t = setTimeout(loop, 16000 + Math.random() * 14000)
+    }
+    t = setTimeout(loop, 9000 + Math.random() * 6000)
+    return () => clearTimeout(t)
+  }, [])
+
+  useEffect(() => {
+    const page = ref.current?.parentElement
+    if (!page) return
+    let id = 0
+    let t: ReturnType<typeof setTimeout>
+    const down = (e: PointerEvent) => {
+      const el = e.target as Element | null
+      if (!ref.current || el?.closest('button, a, input, textarea, select, [role="button"], [role="dialog"]')) return
+      const r = ref.current.getBoundingClientRect()
+      setPuff({ id: ++id, x: e.clientX - r.left, y: e.clientY - r.top })
+      if (livePage(ref.current)) desertSound.puff()
+      clearTimeout(t)
+      t = setTimeout(() => setPuff(null), 1300)
+    }
+    page.addEventListener('pointerdown', down)
+    return () => { page.removeEventListener('pointerdown', down); clearTimeout(t) }
+  }, [])
+
+  const prints = []
+  for (let k = Math.max(0, start - 1); k < n; k++) {
+    const j = k - start
+    prints.push(
+      <g key={k} className={`ds-print${j < 0 ? ' gone' : ''}`} style={{ transform: print(j, k) }}>
+        <g className="ds-print-in"><ellipse cx="1.6" rx="4.6" ry="2.4" /><ellipse cx="-5.4" rx="2.4" ry="2" /></g>
+      </g>,
+    )
+  }
+
+  return (
+    <div className="desert-scene ds-trek" ref={ref} aria-hidden="true">
+      <svg className="ds-dunes" viewBox={`0 0 ${BW} ${BH}`} preserveAspectRatio="xMidYMax slice">
+        <path className="ds-dune-back" d={BACK_D} />
+        {wisp > 0 && <path key={'w' + wisp} className="ds-wisp-far" d="M0 0 C30 -5 60 -4 90 1 C110 4 130 3 150 -1" />}
+        <path className="ds-dune-front" d={FRONT_D} />
+        <g className="ds-prints">{prints}</g>
+        {gust > 0 && (
+          <g key={'g' + gust} className="ds-gust">
+            <path className="ds-ribbon" d="M0 0 C40 -7 80 -6 120 0 C150 5 180 4 210 -2" />
+            <path className="ds-ribbon thin" d="M20 7 C60 2 100 3 140 8 C160 10 175 9 190 6" />
+            {GRAINS.map((i) => <circle key={i} className="ds-grain" r={0.9 + (i % 3) * 0.35} cx={150 + i * 9} cy={(i % 2 ? -3 : 4)} style={{ animationDelay: `${i * 60}ms`, ['--gy' as string]: `${-6 - (i % 3) * 5}px` }} />)}
+          </g>
+        )}
+      </svg>
+      {puff && (
+        <div key={puff.id} className="ds-puff" style={{ left: puff.x, top: puff.y }}>
+          {[0, 1, 2, 3, 4].map((i) => <i key={i} style={{ ['--px' as string]: `${(i - 2) * 7 + 6}px`, ['--py' as string]: `${-8 - (i % 2) * 6}px`, animationDelay: `${i * 30}ms` }} />)}
+        </div>
+      )}
     </div>
   )
 }

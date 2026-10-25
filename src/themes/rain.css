@@ -1,0 +1,121 @@
+/* ---------- Rain theme: a window pane. Light = grey day, dark = city lights at night ----------
+   Rain cloud (streetlamp by night) is the anchor top-right; drops and streaks stay faint. */
+:root[data-skin="rain"], .theme-art[data-skin="rain"] {
+  --stage: #edf1f4; --bg: #dde4ea; --surface: #fbfcfd; --sunk: #e6ebef;
+  --ink: #1d252c; --muted: #6a7782; --hair: rgba(25, 40, 55, .07); --line: rgba(25, 40, 55, .13);
+  --sun: #4f87b3; --active: #3d79a6; --active-soft: #dce9f3;
+  --rn-sky1: #e4e9ee; --rn-sky2: #edf1f4; --rn-sky3: #e6ecf0;
+  --rn-cloud: #d3dce4; --rn-cloud-o: .9; --rn-cloud-top: #f6f8fa; --rn-cloud-belly: #c3ced8;
+  --rn-cloud-rain: rgba(110, 145, 175, .32);
+  --rn-roof: #cfd8df; --rn-roof-o: .75; --rn-bokeh-o: 0; --rn-warm: #000; --rn-cool: #000;
+  --rn-lamp-o: 0; --rn-lamp: #ffd7a0; --rn-post: #000;
+  --rn-streak: rgba(110, 140, 168, .38);
+  --rn-bead-hi: rgba(255, 255, 255, .95); --rn-bead-body: rgba(170, 192, 212, .35); --rn-bead-edge: rgba(95, 125, 150, .3);
+  --rn-trail: rgba(130, 158, 184, .3); --rn-glass: rgba(255, 255, 255, .35);
+}
+:root[data-skin="rain"][data-mode="dark"], :root[data-mode="dark"] .theme-art[data-skin="rain"] {
+  --stage: #151b22; --bg: #0d1116; --surface: #1f262f; --sunk: #12171d;
+  --ink: #e5eaef; --muted: #8b97a3; --hair: rgba(255, 255, 255, .06); --line: rgba(255, 255, 255, .1);
+  --sun: #7fb0d6; --active: #86b8de; --active-soft: #1e3142;
+  --rn-sky1: #121820; --rn-sky2: #161d25; --rn-sky3: #19212a;
+  --rn-cloud: #000; --rn-cloud-o: 0; --rn-cloud-top: #000; --rn-cloud-belly: #000; --rn-cloud-rain: rgba(0, 0, 0, 0);
+  --rn-roof: #10151b; --rn-roof-o: .85; --rn-bokeh-o: 1; --rn-warm: rgba(226, 170, 110, .34); --rn-cool: rgba(120, 160, 205, .28);
+  --rn-lamp-o: 1; --rn-lamp: #f2c98e; --rn-post: rgba(150, 165, 180, .32);
+  --rn-streak: rgba(170, 195, 220, .26);
+  --rn-bead-hi: rgba(255, 228, 190, .8); --rn-bead-body: rgba(130, 160, 190, .12); --rn-bead-edge: rgba(160, 190, 220, .32);
+  --rn-trail: rgba(150, 180, 210, .16); --rn-glass: rgba(255, 255, 255, .03);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="rain"]:not([data-mode="light"]), :root:not([data-mode="light"]) .theme-art[data-skin="rain"] {
+    --stage: #151b22; --bg: #0d1116; --surface: #1f262f; --sunk: #12171d;
+    --ink: #e5eaef; --muted: #8b97a3; --hair: rgba(255, 255, 255, .06); --line: rgba(255, 255, 255, .1);
+    --sun: #7fb0d6; --active: #86b8de; --active-soft: #1e3142;
+    --rn-sky1: #121820; --rn-sky2: #161d25; --rn-sky3: #19212a;
+    --rn-cloud: #000; --rn-cloud-o: 0; --rn-cloud-top: #000; --rn-cloud-belly: #000; --rn-cloud-rain: rgba(0, 0, 0, 0);
+    --rn-roof: #10151b; --rn-roof-o: .85; --rn-bokeh-o: 1; --rn-warm: rgba(226, 170, 110, .34); --rn-cool: rgba(120, 160, 205, .28);
+    --rn-lamp-o: 1; --rn-lamp: #f2c98e; --rn-post: rgba(150, 165, 180, .32);
+    --rn-streak: rgba(170, 195, 220, .26);
+    --rn-bead-hi: rgba(255, 228, 190, .8); --rn-bead-body: rgba(130, 160, 190, .12); --rn-bead-edge: rgba(160, 190, 220, .32);
+    --rn-trail: rgba(150, 180, 210, .16); --rn-glass: rgba(255, 255, 255, .03);
+    color-scheme: dark;
+  }
+}
+.theme-art[data-skin="rain"] { color: var(--ink); }
+.rain-scene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.rain-scene .rn-art { position: absolute; inset: 0; width: 100%; height: 100%; }
+.rain-scene svg * { stroke: none; }
+
+/* behind the glass */
+.rn-clouds ellipse { fill: var(--rn-cloud-top); opacity: calc(var(--rn-cloud-o) * .7); }
+.rn-roofs { fill: var(--rn-roof); opacity: var(--rn-roof-o); }
+.rn-bokeh { opacity: var(--rn-bokeh-o); }
+.rn-bokeh .w { fill: var(--rn-warm); }
+.rn-bokeh .c { fill: var(--rn-cool); }
+
+/* anchor: rain cloud by day */
+.rn-cloud, .rn-cloud-rain { opacity: var(--rn-cloud-o); }
+.rn-cloud { animation: rn-drift 18s ease-in-out infinite alternate; }
+.rn-cloud-body { fill: var(--rn-cloud); }
+.rn-cloud-belly { fill: var(--rn-cloud-belly); opacity: .6; }
+.rain-scene .rn-cloud-rain path { fill: none; stroke: var(--rn-cloud-rain); stroke-width: 1.4; stroke-linecap: round; }
+@keyframes rn-drift { to { transform: translateX(-8px); } }
+
+/* anchor: streetlamp by night */
+.rn-lampset { opacity: calc(var(--rn-lamp-o) * .85); }
+.rn-glow { transform-box: fill-box; transform-origin: center; animation: rn-breathe 12s ease-in-out infinite alternate; }
+@keyframes rn-breathe { to { transform: scale(1.06); opacity: .8; } }
+.rain-scene .rn-post { fill: none; stroke: var(--rn-post); stroke-width: 3; stroke-linecap: round; }
+.rn-head { fill: var(--rn-post); }
+.rn-bulb { fill: var(--rn-lamp); opacity: .9; }
+
+/* rain outside: thin slanted streaks falling slowly */
+.rn-streak {
+  position: absolute; top: 0; width: 1px; display: block;
+  background: linear-gradient(180deg, transparent, var(--rn-streak) 60%, transparent);
+  animation: rn-fall 10s linear infinite;
+}
+@keyframes rn-fall {
+  from { transform: translate(4cqw, -14cqh) rotate(12deg); }
+  to { transform: translate(-22cqw, 108cqh) rotate(12deg); }
+}
+
+/* drops on the glass: hold, slide, hold, slide, fade, leaving a faint trail */
+.rn-drop { position: absolute; display: block; width: var(--rn-s); height: var(--rn-fall); }
+.rn-bead, .rn-trail { position: absolute; display: block; animation-iteration-count: infinite; animation-timing-function: ease-in-out; }
+.rn-bead {
+  left: 0; top: 0; width: var(--rn-s); height: calc(var(--rn-s) * 1.18);
+  border-radius: 50% 50% 48% 48% / 44% 44% 56% 56%;
+  background:
+    radial-gradient(circle at 34% 30%, var(--rn-bead-hi) 0 14%, transparent 26%),
+    radial-gradient(circle at 50% 70%, var(--rn-bead-body), transparent 75%);
+  box-shadow: inset 0 0 0 1px var(--rn-bead-edge), 0 1px 1.5px var(--rn-bead-edge);
+  animation-name: rn-slide;
+}
+.rn-trail {
+  left: 50%; top: 0; width: calc(var(--rn-s) * .32); margin-left: calc(var(--rn-s) * -.16); height: var(--rn-fall);
+  border-radius: 999px; background: linear-gradient(180deg, transparent, var(--rn-trail) 70%);
+  transform-origin: 50% 0; animation-name: rn-trail;
+}
+@keyframes rn-slide {
+  0% { transform: translateY(0); opacity: 0; }
+  8%, 30% { transform: translateY(0); opacity: 1; }
+  46%, 62% { transform: translateY(calc(var(--rn-fall) * .42)); opacity: 1; }
+  82% { transform: translateY(var(--rn-fall)); opacity: 1; }
+  92%, 100% { transform: translateY(var(--rn-fall)) scale(.6); opacity: 0; }
+}
+@keyframes rn-trail {
+  0%, 30% { transform: scaleY(0); opacity: 0; }
+  32% { opacity: 1; }
+  46%, 62% { transform: scaleY(.42); opacity: 1; }
+  82% { transform: scaleY(1); opacity: .9; }
+  100% { transform: scaleY(1); opacity: 0; }
+}
+
+/* the pane itself: a faint sheen across the glass */
+.rn-glass {
+  position: absolute; inset: 0;
+  background: linear-gradient(118deg, transparent 30%, var(--rn-glass) 46%, transparent 60%);
+}
+
+@media (prefers-reduced-motion: reduce) { .rn-cloud, .rn-glow, .rn-streak, .rn-bead, .rn-trail { animation: none; } }
