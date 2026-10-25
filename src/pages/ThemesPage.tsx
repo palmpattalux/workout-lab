@@ -156,7 +156,8 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
       </header>
       {/* every theme: buy it once and keep it, or get it free with the plan it belongs to */}
       <div className="themes-body" onPointerDown={swipeDown} onPointerMove={swipeMove} onPointerUp={swipeUp} onPointerCancel={swipeUp}>
-      <p className="themes-note">{t('Buy a theme to keep forever, or get them all free with a plan.')}</p>
+      {/* what the theme in view has (animation, sound, touch), fixed above the picture's right edge */}
+      <div className="themes-feats-row">{theme && <Feats key={theme.key} has={theme.has} style={{}} />}</div>
 
       <div
         className="theme-track"
@@ -188,7 +189,6 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
                 <span className="theme-veil top" aria-hidden="true" />
                 <span className="theme-veil bottom" aria-hidden="true" />
               </button>
-              {th && <Feats has={th.has} style={{ transform: `scale(${1 - d * 0.16})`, opacity: 1 - d * 0.45 }} />}
             </div>
           )
         })}
