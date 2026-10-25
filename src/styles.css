@@ -2495,3 +2495,6 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 70px, #000 calc(100% - 330px), rgba(0,0,0,.55) calc(100% - 170px), transparent 100%);
   mask-image: linear-gradient(to bottom, transparent 0, #000 70px, #000 calc(100% - 330px), rgba(0,0,0,.55) calc(100% - 170px), transparent 100%); }
 .themes .theme-info { margin-top: -262px; }
+/* exclusive themes: the gold frame, on the sides only; it fades out with the picture */
+.themes .theme-card.exclusive .theme-art::after { content: ''; position: absolute; inset: 0; z-index: 5; pointer-events: none; border-radius: inherit;
+  border-left: 1.5px solid #d9b45a; border-right: 1.5px solid #d9b45a; }
