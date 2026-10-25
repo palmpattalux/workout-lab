@@ -2505,3 +2505,25 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .themes .theme-name-row { margin: 0; }
 .themes .theme-name-row .theme-feats, .themes .theme-info .theme-name-row .theme-feats { right: -2%; }
 .themes .theme-info .theme-plan-link, .themes .theme-info .theme-count, .themes .theme-info .owned-tag { color: color-mix(in srgb, var(--ink) 72%, transparent); }
+
+/* themes page, buy box top left (2026-10-25, user pick): a smaller glass box under the
+   title so the lower part of each picture, where the detail is, stays clear */
+.themes .theme-info { position: absolute; top: calc(var(--head-b, 70px) + 6px); left: 4%; margin: 0; width: clamp(214px, 58%, 250px);
+  padding: 12px 14px 10px; border-radius: 22px; align-items: flex-start; text-align: left; gap: 2px; }
+.themes .theme-info .theme-count { font-size: .62rem; }
+.themes .theme-info .theme-name-row { justify-content: space-between; align-items: center; width: 100%; gap: 8px; }
+.themes .theme-info .theme-name-row .theme-feats { position: static; transform: none; flex: none; }
+.themes .theme-info .theme-name-row h2 { font-size: 1.2rem; margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.themes .theme-info .theme-blurb { font-size: .74rem; line-height: 1.35; }
+.themes .theme-info .owned-tag { margin-top: 8px; font-size: .58rem; }
+.themes .theme-info .theme-buy { margin-top: 8px; width: 100%; gap: 6px; }
+.themes .theme-info .theme-buy .theme-view { font-size: .82rem; padding: 9px 6px; border-radius: 12px; }
+.themes .theme-info > .theme-view { margin-top: 8px; width: 100%; min-width: 0; font-size: .85rem; padding: 9px 10px; border-radius: 12px; }
+.themes .theme-info .theme-plan-link { margin-top: 6px; font-size: .7rem; align-self: center; }
+.themes > .theme-pips { position: absolute; left: 0; right: 0; bottom: max(18px, env(safe-area-inset-bottom)); margin: 0; padding: 0; z-index: 3; pointer-events: none; }
+.themes > .theme-pips i { box-shadow: 0 0 0 1px color-mix(in srgb, var(--stage) 40%, transparent); }
+/* narrow phones: the plan chip moves to the bottom right so it never meets the box */
+@media (max-width: 380px) {
+  .themes .theme-card .tier-chip { top: auto; bottom: calc(max(18px, env(safe-area-inset-bottom)) + 22px); }
+  @container theme-card (max-width: 200px) { .themes .theme-card .tier-chip { top: auto; } }
+}

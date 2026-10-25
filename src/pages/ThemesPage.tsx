@@ -223,9 +223,6 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
             <button className="theme-plan-link" onClick={() => { setPreview(null); location.hash = 'plans' }}>{t('Or get it free with {plan}', { plan: theme.tier === 'exclusive' ? t('Exclusive') : t('Premium') })}</button>
           </>
         ))}
-        <div className="theme-pips" aria-hidden="true">
-          {ORDER.map((th, i) => <i key={i} className={`${i === index ? 'on' : ''}${th?.tier === 'exclusive' ? ' gold' : ''}`} />)}
-        </div>
       </div>
 
       </div>
@@ -260,6 +257,9 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
         </div>
       )}
 
+      <div className="theme-pips" aria-hidden="true">
+        {ORDER.map((th, i) => <i key={i} className={`${i === index ? 'on' : ''}${th?.tier === 'exclusive' ? ' gold' : ''}`} />)}
+      </div>
     </main>
   )
 }
