@@ -43,4 +43,4 @@ Old screenshots that used to sit in the repo root.
 
 | File | What it was |
 | --- | --- |
-| `HoloThumb.tsx` | The first-run "right thumb" blueprint that slid up from "+" and the page B buttons, used with a pointing-hand icon. Replaced by the Spotlight style (touch dot, ring, solid card) on 2026-10-25. Its styles (`.holo-thumb`, `.holo-hand`, `.holo-arrow`) are in `src/styles.css` before that change, in git commit `f91bca2`. |
+| `HoloThumb.tsx` | The first-run "right thumb" blueprint that slid up from "+" and the page B buttons, used with a pointing-hand icon. Replaced by the Glass style (frosted pills, sweeping ring, glassy touch circle) on 2026-10-25. Its styles (`.holo-thumb`, `.holo-hand`, `.holo-arrow`) are in `src/styles.css` before that change, in git commit `f91bca2`. |

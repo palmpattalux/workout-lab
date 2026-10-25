@@ -2215,9 +2215,9 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 @keyframes tour-glow { 50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--active) 55%, transparent), 0 0 22px color-mix(in srgb, var(--active) 35%, transparent); } }
 @media (prefers-reduced-motion: reduce) { .tour-tip, .tour-target { animation: none; } }
 
-/* ---------- hologram guides, Spotlight style (picked 2026-10-25) ----------
-   The page recedes around the target, a calm ring breathes, a solid card with a small accent dot
-   holds the words, and a single touch dot shows the slide or tap. No finger drawings, no flicker. */
+/* ---------- hologram guides, Glass style (picked 2026-10-25) ----------
+   Frosted see-through pills with a thin lit edge, a light sweeping round the target, and a glassy
+   touch circle for the slide or tap. No finger drawings, no flicker, no neon glow. */
 :root .holo { filter: none; --d: min(18.7cqw, 10.6cqh); }
 :root .holo-label, :root .holo-input { animation: holo-rise .5s var(--ease) both; }
 @keyframes holo-rise { from { opacity: 0; translate: 0 4px; } }
@@ -2242,36 +2242,43 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 @keyframes holo-calm-b1 { 0%, 100% { box-shadow: var(--lift), 0 0 0 1.5px var(--active); } 50% { box-shadow: var(--lift), 0 0 0 1.5px var(--active), 0 0 0 7px color-mix(in srgb, var(--active) 14%, transparent); } }
 :root .holo-end .holo-label { left: -60px; top: 12px; }
 
-:root .holo-create::before, :root .holo-tap:not(.holo-next)::before {
-  content: ""; position: absolute; left: -150vmax; top: -150vmax; width: 300vmax; height: 300vmax; z-index: -1;
-  background: radial-gradient(circle, transparent calc(var(--d) / 2 + 16px), color-mix(in srgb, var(--bg) 62%, transparent) calc(var(--d) / 2 + 60px));
-  animation: holo-rise .8s ease both;
+:root .holo-label, :root .tour-tip, :root .holo-input {
+  color: var(--ink); background: color-mix(in srgb, var(--surface) 42%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ink) 9%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 10px 30px -12px rgba(0, 0, 0, .35);
+  backdrop-filter: blur(18px) saturate(1.7); -webkit-backdrop-filter: blur(18px) saturate(1.7);
 }
-:root .holo-label {
-  padding: 10px 15px 10px 28px; border-radius: 14px; font: 650 .82rem var(--font); letter-spacing: -.005em;
-  color: var(--ink); background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--float);
-  backdrop-filter: none; -webkit-backdrop-filter: none;
+:root .holo-label { padding: 9px 16px; font: 600 .8rem var(--font); letter-spacing: .01em; overflow: hidden; }
+:root .holo-create .holo-label { border-radius: 18px; padding: 11px 18px; }
+:root .holo-label small { color: var(--muted); }
+/* a lit edge along the bottom */
+:root .holo-label::after, :root .tour-tip::after {
+  content: ""; position: absolute; left: 14%; right: 14%; bottom: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--active), transparent); animation: glass-edge 3.2s ease-in-out infinite;
 }
-:root .holo-label::before { content: ""; position: absolute; left: 13px; top: 15px; width: 7px; height: 7px; border-radius: 50%; background: var(--active); }
-:root .holo-label small { color: var(--muted); font: 550 .72rem var(--font); }
-:root .holo-ring { border: 1.5px solid var(--active); animation: spot-halo 2.6s ease-out infinite; }
-@keyframes spot-halo { 0% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 color-mix(in srgb, var(--active) 30%, transparent); } 70% { box-shadow: 0 0 0 14px transparent; } 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 14px transparent; } }
-:root .holo-tap.again .holo-ring { border-color: var(--sun); }
+@keyframes glass-edge { 0%, 100% { opacity: .5; transform: translateX(-18%); } 50% { opacity: 1; transform: translateX(18%); } }
+/* a light sweeping round the target */
+:root .holo-ring {
+  border: 0; padding: 1.5px; animation: glass-sweep 2.6s linear infinite;
+  background: conic-gradient(from 0deg, transparent 0 55%, color-mix(in srgb, var(--active) 40%, transparent) 75%, var(--active) 99%, transparent 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+@keyframes glass-sweep { to { transform: rotate(1turn); } }
+:root .holo-tap.again .holo-ring { background: conic-gradient(from 0deg, transparent 0 55%, var(--sun) 99%, transparent 100%); }
 :root .holo-create::after, :root .holo-slide::after, :root .holo-tap::after, :root .holo-move::after {
-  background: var(--active); box-shadow: 0 0 0 5px color-mix(in srgb, var(--active) 18%, transparent), 0 6px 14px -4px color-mix(in srgb, var(--active) 60%, transparent);
-  width: 14px; height: 14px; left: -7px; top: -7px;
+  width: 34px; height: 34px; left: -17px; top: -17px;
+  background: radial-gradient(circle at 50% 35%, rgba(255, 255, 255, .55), color-mix(in srgb, var(--surface) 25%, transparent) 70%);
+  border: 1px solid rgba(255, 255, 255, .45); box-shadow: 0 6px 18px -6px rgba(0, 0, 0, .35), inset 0 0 0 1px color-mix(in srgb, var(--ink) 6%, transparent);
+  backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
 }
-:root .holo-track { width: 1.5px; opacity: .7; background: linear-gradient(to top, transparent, color-mix(in srgb, var(--active) 70%, transparent)); }
-:root .holo-pick { background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--float); color: var(--ink); }
-:root .holo-nums { color: var(--ink); font-weight: 700; opacity: .7; }
-:root .holo-input { border: 1px solid var(--hair); background: var(--surface); box-shadow: var(--float); color: var(--ink); }
-:root .tour-tip { background: var(--surface); color: var(--ink); border-color: var(--hair); box-shadow: var(--float); backdrop-filter: none; padding: 12px 14px 10px; }
-:root .tour-tip::before { border-color: var(--hair); }
-:root .tour-tip b { display: flex; align-items: center; gap: 8px; }
-:root .tour-tip b::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--active); flex: none; }
-:root .tour-tip small { padding-left: 15px; }
-:root .tour-actions button.on { background: var(--ink); color: var(--surface); padding: 5px 12px; }
-:root .tour-target { box-shadow: 0 0 0 1.5px var(--active) !important; animation: spot-target 2.6s ease-out infinite; }
-@keyframes spot-target { 0% { box-shadow: 0 0 0 1.5px var(--active), 0 0 0 0 color-mix(in srgb, var(--active) 30%, transparent); } 70%, 100% { box-shadow: 0 0 0 1.5px var(--active), 0 0 0 12px transparent; } }
+:root .holo-track { width: 1px; opacity: .8; background: linear-gradient(to top, transparent, color-mix(in srgb, var(--ink) 35%, transparent)); }
+:root .holo-pick { color: var(--ink); background: color-mix(in srgb, var(--surface) 42%, transparent); border: 1px solid color-mix(in srgb, var(--ink) 9%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+:root .holo-nums { color: var(--ink); opacity: .65; }
+:root .tour-tip { overflow: visible; padding: 11px 14px 9px; background: color-mix(in srgb, var(--surface) 78%, transparent); }
+:root .tour-tip::before { background: color-mix(in srgb, var(--surface) 80%, transparent); border-color: color-mix(in srgb, var(--ink) 9%, transparent); }
+:root .tour-tip small { color: var(--muted); }
+:root .tour-actions button.on { background: color-mix(in srgb, var(--ink) 10%, transparent); color: var(--ink); }
+:root .tour-target { box-shadow: 0 0 0 1px color-mix(in srgb, var(--active) 70%, transparent), 0 0 0 5px color-mix(in srgb, var(--active) 10%, transparent) !important; animation: none; }
 
 @media (prefers-reduced-motion: reduce) { :root .holo-ring, :root .holo::after, :root .holo-label::after { animation-duration: 5s; } }
