@@ -32,13 +32,15 @@ function Feats({ has, style }: { has: Feature[]; style: CSSProperties }) {
   )
 }
 
-type Sort = 'featured' | 'low' | 'high' | 'owned'
+// the grid lists themes cheapest first; the chips narrow it to one price level
+type Sort = 'all' | 'basic' | 'premium' | 'exclusive'
 const SORTS: { key: Sort; label: string }[] = [
-  { key: 'featured', label: 'Featured' },
-  { key: 'low', label: 'Price: low to high' },
-  { key: 'high', label: 'Price: high to low' },
-  { key: 'owned', label: 'Owned first' },
+  { key: 'all', label: 'All' },
+  { key: 'basic', label: 'Basic' },
+  { key: 'premium', label: 'Premium' },
+  { key: 'exclusive', label: 'Exclusive' },
 ]
+const LEVEL: Record<Exclude<Sort, 'all'>, number> = { basic: 75, premium: 149, exclusive: 159 }
 
 export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
   const preview = usePreview()
@@ -121,11 +123,11 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
 
   // all themes at once, 3 across, with a sort; tapping one jumps the big view to it
   const [grid, setGrid] = useState(false)
-  const [sort, setSort] = useState<Sort>('featured')
+  const [sort, setSort] = useState<Sort>('all')
   const listed = THEMES.map((th, i) => ({ th, i })).filter((x): x is { th: NonNullable<typeof x.th>; i: number } => !!x.th)
-  const sorted = sort === 'featured' ? listed
-    : sort === 'owned' ? [...listed].sort((a, b) => Number(has(b.th.key)) - Number(has(a.th.key)))
-    : [...listed].sort((a, b) => (sort === 'low' ? 1 : -1) * (themePrice(a.th.key) - themePrice(b.th.key)))
+  const sorted = [...listed]
+    .filter((x) => sort === 'all' || themePrice(x.th.key) === LEVEL[sort])
+    .sort((a, b) => themePrice(a.th.key) - themePrice(b.th.key))
   function pick(i: number) {
     setGrid(false)
     const el = track.current, card = el?.firstElementChild as HTMLElement | null
