@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Icon } from '../components/icons'
 import ThemeScene from '../components/ThemeScene'
-import { type Feature, type Theme, THEMES, themePrice, setPreview, usePreview, useApplied, useOwnedThemes, applyTheme, canUseTheme } from '../lib/theme'
+import { type Feature, type Theme, THEMES, themePrice, setPreview, getPreview, holdMode, heldModeOr, dropHeldMode, usePreview, useApplied, useOwnedThemes, applyTheme, canUseTheme } from '../lib/theme'
 import { usePlan, atLeast } from '../lib/plan'
 import { canPay } from '../lib/billing'
 import { sound } from '../lib/sound'
@@ -59,9 +59,16 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
   const last = useRef(0)
   // sun / moon in the header: see every theme by day or by night, on this page only
   const root = document.documentElement
-  const before = useRef(root.getAttribute('data-mode'))
+  // back in the store mid try-on: the user's own setting is still the one held for later
+  const [before] = useState(() => heldModeOr(root.getAttribute('data-mode')))
   const [night, setNight] = useState(() => root.getAttribute('data-mode') === 'dark' || (!root.hasAttribute('data-mode') && matchMedia('(prefers-color-scheme: dark)').matches))
-  useEffect(() => () => { if (before.current === null) root.removeAttribute('data-mode'); else root.setAttribute('data-mode', before.current) }, [])
+  useEffect(() => {
+    dropHeldMode()
+    return () => {
+      if (getPreview()) { holdMode(before); return }
+      if (before === null) root.removeAttribute('data-mode'); else root.setAttribute('data-mode', before)
+    }
+  }, [])
   function flipMode() { const n = !night; setNight(n); root.setAttribute('data-mode', n ? 'dark' : 'light'); sound.tap() }
   const [layer, setLayer] = useState(0)
   const [enter, setEnter] = useState<'up' | 'down' | null>(null)

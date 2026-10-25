@@ -83,7 +83,19 @@ function paint() {
 }
 function subscribe(fn: () => void) { listeners.add(fn); return () => { listeners.delete(fn) } }
 
-export function setPreview(key: string | null) { preview = key; paint() }
+export function setPreview(key: string | null) { preview = key; if (!key) releaseMode(); paint() }
+// The store's sun/moon picks day or night for that page. When someone leaves the store while
+// trying a theme on, the try-on keeps that look; their own setting comes back when it ends.
+let heldMode: string | null | undefined
+export function holdMode(before: string | null) { heldMode = before }
+export const heldModeOr = (now: string | null) => (heldMode === undefined ? now : heldMode)
+export function dropHeldMode() { heldMode = undefined }
+function releaseMode() {
+  if (heldMode === undefined) return
+  const root = document.documentElement
+  if (heldMode === null) root.removeAttribute('data-mode'); else root.setAttribute('data-mode', heldMode)
+  heldMode = undefined
+}
 export function getPreview() { return preview }
 export function usePreview(): string | null { return useSyncExternalStore(subscribe, () => preview) }
 
@@ -97,6 +109,7 @@ export function applyTheme(key: string | null) {
   applied = key
   try { if (key) localStorage.setItem(SKIN_KEY, key); else localStorage.removeItem(SKIN_KEY) } catch { /* private mode */ }
   preview = null
+  releaseMode()
   paint()
 }
 
