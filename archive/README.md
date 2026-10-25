@@ -38,3 +38,9 @@ The same opening screens are also on the git branches `splash-sidekick`, `splash
 ## Screenshots (`screenshots/`)
 
 Old screenshots that used to sit in the repo root.
+
+## Hologram guides (`holograms/`)
+
+| File | What it was |
+| --- | --- |
+| `HoloThumb.tsx` | The first-run "right thumb" blueprint that slid up from "+" and the page B buttons, used with a pointing-hand icon. Replaced by the Spotlight style (touch dot, ring, solid card) on 2026-10-25. Its styles (`.holo-thumb`, `.holo-hand`, `.holo-arrow`) are in `src/styles.css` before that change, in git commit `f91bca2`. |

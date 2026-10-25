@@ -1135,8 +1135,6 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 
 /* ---------- first-run holograms (guests) ---------- */
 .holo { position: absolute; z-index: 7; pointer-events: none; color: var(--active); filter: drop-shadow(0 0 6px color-mix(in srgb, var(--active) 65%, transparent)); }
-.holo-hand { position: absolute; width: 34px; height: 34px; opacity: 0; }
-.holo-hand svg { fill: color-mix(in srgb, var(--active) 18%, transparent); }
 .holo-label {
   position: absolute; white-space: nowrap; padding: 6px 12px; border-radius: 999px; font: 700 .8rem var(--font); color: var(--active);
   background: color-mix(in srgb, var(--surface) 70%, transparent); border: 1px solid color-mix(in srgb, var(--active) 45%, transparent);
@@ -1147,24 +1145,7 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 /* "+": slide up, an icon lights, then again for a letter */
 .holo-create { left: 20%; top: 87%; width: 0; height: 0; }
 .holo-track { position: absolute; left: -1px; bottom: 0; width: 2px; height: 130px; border-radius: 2px; background: linear-gradient(to top, transparent, color-mix(in srgb, var(--active) 55%, transparent)); opacity: .5; }
-.holo-thumb { position: absolute; left: 0; top: 0; width: 0; height: 0; opacity: 0; animation: holo-swipe 3.2s var(--ease) infinite; }
-.holo-thumb svg {
-  position: absolute; left: -32px; top: -4px; width: 64px; height: 200px; overflow: visible;
-  transform-origin: 32px 4px; transform: rotate(-32deg);
-  -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 95%); mask-image: linear-gradient(to bottom, #000 45%, transparent 95%);
-}
-.holo-thumb .th-body { fill: color-mix(in srgb, var(--active) 14%, transparent); stroke: var(--active); stroke-width: 1.6; }
-.holo-thumb .th-nail { fill: none; stroke: var(--active); stroke-width: 1.2; stroke-dasharray: 3 3; opacity: .8; }
-.holo-thumb .th-line { fill: none; stroke: var(--active); stroke-width: 1; opacity: .55; }
-.holo-thumb .th-tip { fill: var(--active); opacity: .9; }
 .holo-create .holo-label { animation: holo-flicker 4s linear infinite; }
-@keyframes holo-swipe {
-  0% { opacity: 0; transform: translateY(0) scale(1); }
-  10% { opacity: .9; transform: translateY(0) scale(.88); }
-  48% { opacity: .9; transform: translateY(-118px) scale(.88); }
-  60% { opacity: .9; transform: translateY(-118px) scale(1); }
-  72%, 100% { opacity: 0; transform: translateY(-118px) scale(1); }
-}
 .holo-pick {
   position: absolute; left: -24px; top: -158px; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; opacity: 0;
   border: 1.5px solid color-mix(in srgb, var(--active) 60%, transparent); background: color-mix(in srgb, var(--active) 12%, transparent);
@@ -1177,11 +1158,8 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .holo-create .holo-label { left: calc(min(18.7cqw, 10.6cqh) / 2 + 40px); top: -24px; display: flex; flex-direction: column; gap: 1px; border-radius: 16px; }
 .holo-create .holo-label small { font: 600 .68rem var(--font); opacity: .8; }
 /* first run: an arrow points at "+", the only thing in focus */
-.holo-arrow { position: absolute; left: calc(min(18.7cqw, 10.6cqh) / 2 + 8px); top: -12px; width: 24px; height: 24px; animation: holo-nudge 1.2s ease-in-out infinite; }
-@keyframes holo-nudge { 50% { translate: 7px 0; } }
 .page.first-run > #a2, .page.first-run > .gear, .page.first-run > .preset-btn { filter: blur(3px); opacity: .35; transition: filter .4s, opacity .4s; }
 .page:has(.add.holding) .holo-create { display: none; }
-@media (prefers-reduced-motion: reduce) { .holo-arrow { animation: none; } }
 
 /* gear: where to sign up */
 .holo-signup {
@@ -1196,8 +1174,6 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .holo-tap { width: 0; height: 0; }
 .holo-ring { position: absolute; left: calc(min(18.7cqw, 10.6cqh) / -2 - 6px); top: calc(min(18.7cqw, 10.6cqh) / -2 - 6px); width: calc(min(18.7cqw, 10.6cqh) + 12px); aspect-ratio: 1; border-radius: 50%; border: 2px solid var(--active); animation: holo-ring 1.6s ease-out infinite; }
 @keyframes holo-ring { from { transform: scale(.85); opacity: .9; } to { transform: scale(1.3); opacity: 0; } }
-.holo-tap .holo-hand { left: -6px; top: 2px; animation: holo-tap 1.6s ease-in-out infinite; }
-@keyframes holo-tap { 0%, 100% { opacity: .9; transform: translate(6px, 14px) scale(1); } 40% { opacity: .9; transform: translate(0, 0) scale(.86); } 55% { transform: translate(0, 0) scale(.86); } }
 .holo-tap .holo-label { left: 50%; top: calc(min(18.7cqw, 10.6cqh) / 2 + 30px); transform: translateX(-50%); }
 .holo-tap.again .holo-ring { border-color: var(--sun); }
 
@@ -1205,15 +1181,13 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 #b1.holo-target { box-shadow: var(--lift), 0 0 0 2px var(--active), 0 0 18px color-mix(in srgb, var(--active) 55%, transparent); animation: holo-b1 1.8s ease-in-out infinite; }
 @keyframes holo-b1 { 50% { box-shadow: var(--lift), 0 0 0 4px color-mix(in srgb, var(--active) 60%, transparent), 0 0 26px color-mix(in srgb, var(--active) 45%, transparent); } }
 .holo-end { left: calc(5.7% + 15.6cqw); top: calc(3.5% + min(11cqw, 6.2cqh) + 6px); width: 0; height: 0; z-index: 8; }
-.holo-end .holo-hand { left: -12px; top: 0; opacity: .9; animation: holo-point-up 1.6s ease-in-out infinite; }
-@keyframes holo-point-up { 50% { translate: 0 -6px; } }
 .holo-end .holo-label { left: 28px; top: 8px; }
 
 /* sign up after a guest's first session */
 .login-close { position: absolute; top: 12px; left: 4.5%; z-index: 2; }
 .login-note { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; margin: 0 0 4px; padding: 8px 14px; border-radius: 999px; background: var(--active-soft); color: var(--active); font: 700 .9rem var(--font); }
 .signup-btn { color: var(--active); border-color: color-mix(in srgb, var(--active) 40%, transparent); }
-@media (prefers-reduced-motion: reduce) { .holo-hand, .holo-ring, .holo-pick, #b1.holo-target, .new-dot { animation-duration: 3s; } }
+@media (prefers-reduced-motion: reduce) { .holo-ring, .holo-pick, #b1.holo-target, .new-dot { animation-duration: 3s; } }
 
 /* gear > open-source licences */
 .settings .credits-link span:first-child { color: var(--ink); }
@@ -2197,7 +2171,6 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .holo-nums i:nth-child(2) { animation-delay: .9s; }
 .holo-nums i:nth-child(3) { animation-delay: 1.3s; }
 @keyframes holo-num { 0% { opacity: 0; transform: translateY(6px); } 12%, 40% { opacity: .95; transform: none; } 55%, 100% { opacity: 0; } }
-.holo-move .holo-hand { left: -6px; top: 2px; animation: holo-tap 1.6s ease-in-out infinite; }
 .holo-input {
   position: absolute; left: -12px; bottom: calc(min(18.7cqw, 10.6cqh) / 2 + 14px); padding: 9px 14px; border-radius: 14px; white-space: nowrap;
   border: 1.5px dashed color-mix(in srgb, var(--active) 55%, transparent); background: color-mix(in srgb, var(--surface) 60%, transparent);
@@ -2242,145 +2215,63 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 @keyframes tour-glow { 50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--active) 55%, transparent), 0 0 22px color-mix(in srgb, var(--active) 35%, transparent); } }
 @media (prefers-reduced-motion: reduce) { .tour-tip, .tour-target { animation: none; } }
 
-/* ---------- hologram guide mockups: three premium styles (2026-10-25, pick one) ----------
-   :root[data-holo="spot"]  Spotlight: the page recedes, a calm ring, a solid card, a single touch dot
-   :root[data-holo="glass"] Glass: frosted pills with a lit edge, a light sweeping round the target
-   :root[data-holo="line"]  Fine line: no boxes, a hairline rule beside the words, focus-frame corners
-   All three: no finger or hand drawings, no flicker, no neon glow; accent colour used sparingly. */
-:root[data-holo] .holo { filter: none; --d: min(18.7cqw, 10.6cqh); }
-:root[data-holo] .holo-thumb, :root[data-holo] .holo-hand, :root[data-holo] .holo-arrow { display: none; }
-:root[data-holo] .holo-label, :root[data-holo] .holo-input { animation: holo-rise .5s var(--ease) both; }
+/* ---------- hologram guides, Spotlight style (picked 2026-10-25) ----------
+   The page recedes around the target, a calm ring breathes, a solid card with a small accent dot
+   holds the words, and a single touch dot shows the slide or tap. No finger drawings, no flicker. */
+:root .holo { filter: none; --d: min(18.7cqw, 10.6cqh); }
+:root .holo-label, :root .holo-input { animation: holo-rise .5s var(--ease) both; }
 @keyframes holo-rise { from { opacity: 0; translate: 0 4px; } }
-:root[data-holo] .holo-create .holo-label { top: -26px; left: calc(var(--d) / 2 + 22px); gap: 2px; }
-:root[data-holo] .holo-create .holo-label small { opacity: 1; }
+:root .holo-create .holo-label { top: -26px; left: calc(var(--d) / 2 + 22px); gap: 2px; }
+:root .holo-create .holo-label small { opacity: 1; }
 /* a touch point slides up the line from "+" (and from load / reps on page B) */
-:root[data-holo] .holo-create::after, :root[data-holo] .holo-slide::after {
+:root .holo-create::after, :root .holo-slide::after {
   content: ""; position: absolute; left: -9px; top: -9px; width: 18px; height: 18px; border-radius: 50%;
   animation: holo-glide 3.2s var(--ease) infinite;
 }
-:root[data-holo] .holo-slide::after { animation-name: holo-glide-b; }
+:root .holo-slide::after { animation-name: holo-glide-b; }
 @keyframes holo-glide { 0%, 8% { opacity: 0; transform: translateY(0) scale(.6); } 16% { opacity: 1; transform: translateY(0) scale(1); } 52% { opacity: 1; transform: translateY(-118px) scale(1); } 66%, 100% { opacity: 0; transform: translateY(-118px) scale(.6); } }
 @keyframes holo-glide-b { 0%, 8% { opacity: 0; transform: translateY(0) scale(.6); } 16% { opacity: 1; transform: translateY(0) scale(1); } 52% { opacity: 1; transform: translateY(-110px) scale(1); } 66%, 100% { opacity: 0; transform: translateY(-110px) scale(.6); } }
 /* a touch point presses the target */
-:root[data-holo] .holo-tap::after, :root[data-holo] .holo-move::after {
+:root .holo-tap::after, :root .holo-move::after {
   content: ""; position: absolute; left: -11px; top: -11px; width: 22px; height: 22px; border-radius: 50%;
   animation: holo-press 2.4s ease-in-out infinite;
 }
 @keyframes holo-press { 0%, 100% { opacity: 0; transform: scale(1.5); } 25% { opacity: 1; transform: scale(1); } 38% { transform: scale(.75); } 55% { opacity: 1; transform: scale(1); } 75% { opacity: 0; transform: scale(1); } }
-:root[data-holo] .holo-pick { animation-timing-function: var(--ease); }
-:root[data-holo] #b1.holo-target { animation: holo-calm-b1 2.8s ease-in-out infinite; }
+:root .holo-pick { animation-timing-function: var(--ease); }
+:root #b1.holo-target { animation: holo-calm-b1 2.8s ease-in-out infinite; }
 @keyframes holo-calm-b1 { 0%, 100% { box-shadow: var(--lift), 0 0 0 1.5px var(--active); } 50% { box-shadow: var(--lift), 0 0 0 1.5px var(--active), 0 0 0 7px color-mix(in srgb, var(--active) 14%, transparent); } }
-:root[data-holo] .holo-end .holo-label { left: -60px; top: 12px; }
+:root .holo-end .holo-label { left: -60px; top: 12px; }
 
-/* ===== 1. Spotlight ===== */
-:root[data-holo="spot"] .holo-create::before, :root[data-holo="spot"] .holo-tap:not(.holo-next)::before {
+:root .holo-create::before, :root .holo-tap:not(.holo-next)::before {
   content: ""; position: absolute; left: -150vmax; top: -150vmax; width: 300vmax; height: 300vmax; z-index: -1;
   background: radial-gradient(circle, transparent calc(var(--d) / 2 + 16px), color-mix(in srgb, var(--bg) 62%, transparent) calc(var(--d) / 2 + 60px));
   animation: holo-rise .8s ease both;
 }
-:root[data-holo="spot"] .holo-label {
+:root .holo-label {
   padding: 10px 15px 10px 28px; border-radius: 14px; font: 650 .82rem var(--font); letter-spacing: -.005em;
   color: var(--ink); background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--float);
   backdrop-filter: none; -webkit-backdrop-filter: none;
 }
-:root[data-holo="spot"] .holo-label::before { content: ""; position: absolute; left: 13px; top: 15px; width: 7px; height: 7px; border-radius: 50%; background: var(--active); }
-:root[data-holo="spot"] .holo-label small { color: var(--muted); font: 550 .72rem var(--font); }
-:root[data-holo="spot"] .holo-ring { border: 1.5px solid var(--active); animation: spot-halo 2.6s ease-out infinite; }
+:root .holo-label::before { content: ""; position: absolute; left: 13px; top: 15px; width: 7px; height: 7px; border-radius: 50%; background: var(--active); }
+:root .holo-label small { color: var(--muted); font: 550 .72rem var(--font); }
+:root .holo-ring { border: 1.5px solid var(--active); animation: spot-halo 2.6s ease-out infinite; }
 @keyframes spot-halo { 0% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 color-mix(in srgb, var(--active) 30%, transparent); } 70% { box-shadow: 0 0 0 14px transparent; } 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 14px transparent; } }
-:root[data-holo="spot"] .holo-tap.again .holo-ring { border-color: var(--sun); }
-:root[data-holo="spot"] .holo-create::after, :root[data-holo="spot"] .holo-slide::after, :root[data-holo="spot"] .holo-tap::after, :root[data-holo="spot"] .holo-move::after {
+:root .holo-tap.again .holo-ring { border-color: var(--sun); }
+:root .holo-create::after, :root .holo-slide::after, :root .holo-tap::after, :root .holo-move::after {
   background: var(--active); box-shadow: 0 0 0 5px color-mix(in srgb, var(--active) 18%, transparent), 0 6px 14px -4px color-mix(in srgb, var(--active) 60%, transparent);
   width: 14px; height: 14px; left: -7px; top: -7px;
 }
-:root[data-holo="spot"] .holo-track { width: 1.5px; opacity: .7; background: linear-gradient(to top, transparent, color-mix(in srgb, var(--active) 70%, transparent)); }
-:root[data-holo="spot"] .holo-pick { background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--float); color: var(--ink); }
-:root[data-holo="spot"] .holo-nums { color: var(--ink); font-weight: 700; opacity: .7; }
-:root[data-holo="spot"] .holo-input { border: 1px solid var(--hair); background: var(--surface); box-shadow: var(--float); color: var(--ink); }
-:root[data-holo="spot"] .tour-tip { background: var(--surface); color: var(--ink); border-color: var(--hair); box-shadow: var(--float); backdrop-filter: none; padding: 12px 14px 10px; }
-:root[data-holo="spot"] .tour-tip::before { border-color: var(--hair); }
-:root[data-holo="spot"] .tour-tip b { display: flex; align-items: center; gap: 8px; }
-:root[data-holo="spot"] .tour-tip b::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--active); flex: none; }
-:root[data-holo="spot"] .tour-tip small { padding-left: 15px; }
-:root[data-holo="spot"] .tour-actions button.on { background: var(--ink); color: var(--surface); padding: 5px 12px; }
-:root[data-holo="spot"] .tour-target { box-shadow: 0 0 0 1.5px var(--active) !important; animation: spot-target 2.6s ease-out infinite; }
+:root .holo-track { width: 1.5px; opacity: .7; background: linear-gradient(to top, transparent, color-mix(in srgb, var(--active) 70%, transparent)); }
+:root .holo-pick { background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--float); color: var(--ink); }
+:root .holo-nums { color: var(--ink); font-weight: 700; opacity: .7; }
+:root .holo-input { border: 1px solid var(--hair); background: var(--surface); box-shadow: var(--float); color: var(--ink); }
+:root .tour-tip { background: var(--surface); color: var(--ink); border-color: var(--hair); box-shadow: var(--float); backdrop-filter: none; padding: 12px 14px 10px; }
+:root .tour-tip::before { border-color: var(--hair); }
+:root .tour-tip b { display: flex; align-items: center; gap: 8px; }
+:root .tour-tip b::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--active); flex: none; }
+:root .tour-tip small { padding-left: 15px; }
+:root .tour-actions button.on { background: var(--ink); color: var(--surface); padding: 5px 12px; }
+:root .tour-target { box-shadow: 0 0 0 1.5px var(--active) !important; animation: spot-target 2.6s ease-out infinite; }
 @keyframes spot-target { 0% { box-shadow: 0 0 0 1.5px var(--active), 0 0 0 0 color-mix(in srgb, var(--active) 30%, transparent); } 70%, 100% { box-shadow: 0 0 0 1.5px var(--active), 0 0 0 12px transparent; } }
 
-/* ===== 2. Glass ===== */
-:root[data-holo="glass"] .holo-label, :root[data-holo="glass"] .tour-tip, :root[data-holo="glass"] .holo-input {
-  color: var(--ink); background: color-mix(in srgb, var(--surface) 42%, transparent);
-  border: 1px solid color-mix(in srgb, var(--ink) 9%, transparent);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 10px 30px -12px rgba(0, 0, 0, .35);
-  backdrop-filter: blur(18px) saturate(1.7); -webkit-backdrop-filter: blur(18px) saturate(1.7);
-}
-:root[data-holo="glass"] .holo-label { padding: 9px 16px; font: 600 .8rem var(--font); letter-spacing: .01em; overflow: hidden; }
-:root[data-holo="glass"] .holo-create .holo-label { border-radius: 18px; padding: 11px 18px; }
-:root[data-holo="glass"] .holo-label small { color: var(--muted); }
-/* a lit edge along the bottom */
-:root[data-holo="glass"] .holo-label::after, :root[data-holo="glass"] .tour-tip::after {
-  content: ""; position: absolute; left: 14%; right: 14%; bottom: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--active), transparent); animation: glass-edge 3.2s ease-in-out infinite;
-}
-@keyframes glass-edge { 0%, 100% { opacity: .5; transform: translateX(-18%); } 50% { opacity: 1; transform: translateX(18%); } }
-/* a light sweeping round the target */
-:root[data-holo="glass"] .holo-ring {
-  border: 0; padding: 1.5px; animation: glass-sweep 2.6s linear infinite;
-  background: conic-gradient(from 0deg, transparent 0 55%, color-mix(in srgb, var(--active) 40%, transparent) 75%, var(--active) 99%, transparent 100%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-}
-@keyframes glass-sweep { to { transform: rotate(1turn); } }
-:root[data-holo="glass"] .holo-tap.again .holo-ring { background: conic-gradient(from 0deg, transparent 0 55%, var(--sun) 99%, transparent 100%); }
-:root[data-holo="glass"] .holo-create::after, :root[data-holo="glass"] .holo-slide::after, :root[data-holo="glass"] .holo-tap::after, :root[data-holo="glass"] .holo-move::after {
-  width: 34px; height: 34px; left: -17px; top: -17px;
-  background: radial-gradient(circle at 50% 35%, rgba(255, 255, 255, .55), color-mix(in srgb, var(--surface) 25%, transparent) 70%);
-  border: 1px solid rgba(255, 255, 255, .45); box-shadow: 0 6px 18px -6px rgba(0, 0, 0, .35), inset 0 0 0 1px color-mix(in srgb, var(--ink) 6%, transparent);
-  backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
-}
-:root[data-holo="glass"] .holo-track { width: 1px; opacity: .8; background: linear-gradient(to top, transparent, color-mix(in srgb, var(--ink) 35%, transparent)); }
-:root[data-holo="glass"] .holo-pick { color: var(--ink); background: color-mix(in srgb, var(--surface) 42%, transparent); border: 1px solid color-mix(in srgb, var(--ink) 9%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
-:root[data-holo="glass"] .holo-nums { color: var(--ink); opacity: .65; }
-:root[data-holo="glass"] .tour-tip { overflow: visible; padding: 11px 14px 9px; background: color-mix(in srgb, var(--surface) 78%, transparent); }
-:root[data-holo="glass"] .tour-tip::before { background: color-mix(in srgb, var(--surface) 80%, transparent); border-color: color-mix(in srgb, var(--ink) 9%, transparent); }
-:root[data-holo="glass"] .tour-tip small { color: var(--muted); }
-:root[data-holo="glass"] .tour-actions button.on { background: color-mix(in srgb, var(--ink) 10%, transparent); color: var(--ink); }
-:root[data-holo="glass"] .tour-target { box-shadow: 0 0 0 1px color-mix(in srgb, var(--active) 70%, transparent), 0 0 0 5px color-mix(in srgb, var(--active) 10%, transparent) !important; animation: none; }
-
-/* ===== 3. Fine line ===== */
-:root[data-holo="line"] .holo-label, :root[data-holo="line"] .tour-tip {
-  background: none; border: 0; border-left: 1.5px solid var(--active); border-radius: 0; box-shadow: none;
-  backdrop-filter: none; -webkit-backdrop-filter: none; color: var(--ink);
-  text-shadow: 0 0 10px var(--stage), 0 0 3px var(--stage), 0 0 1px var(--stage);
-}
-:root[data-holo="line"] .holo-label { padding: 2px 0 2px 11px; font: 500 .84rem var(--font); letter-spacing: .005em; }
-/* the first line becomes a small spaced-out heading */
-:root[data-holo="line"] .holo-create .holo-label { font: 700 .62rem var(--font); letter-spacing: .16em; text-transform: uppercase; color: var(--active); gap: 4px; }
-:root[data-holo="line"] .holo-create .holo-label small { font: 500 .86rem var(--font); letter-spacing: .005em; text-transform: none; color: var(--ink); }
-:root[data-holo="line"] .holo-tap .holo-label, :root[data-holo="line"] .holo-slide .holo-label, :root[data-holo="line"] .holo-move .holo-label { border-left: 0; border-top: 1.5px solid var(--active); padding: 7px 2px 0; }
-/* focus-frame corners instead of a ring */
-:root[data-holo="line"] .holo-ring {
-  border: 0; border-radius: 0; --c: var(--active); --l: 12px;
-  background:
-    linear-gradient(var(--c) 0 0) left top / var(--l) 1.5px, linear-gradient(var(--c) 0 0) left top / 1.5px var(--l),
-    linear-gradient(var(--c) 0 0) right top / var(--l) 1.5px, linear-gradient(var(--c) 0 0) right top / 1.5px var(--l),
-    linear-gradient(var(--c) 0 0) left bottom / var(--l) 1.5px, linear-gradient(var(--c) 0 0) left bottom / 1.5px var(--l),
-    linear-gradient(var(--c) 0 0) right bottom / var(--l) 1.5px, linear-gradient(var(--c) 0 0) right bottom / 1.5px var(--l);
-  background-repeat: no-repeat; animation: line-frame 2.6s ease-in-out infinite;
-}
-@keyframes line-frame { 0%, 100% { transform: scale(1.06); opacity: .75; } 50% { transform: scale(.98); opacity: 1; } }
-:root[data-holo="line"] .holo-tap.again .holo-ring { --c: var(--sun); }
-:root[data-holo="line"] .holo-create::after, :root[data-holo="line"] .holo-slide::after, :root[data-holo="line"] .holo-tap::after, :root[data-holo="line"] .holo-move::after {
-  width: 7px; height: 7px; left: -3.5px; top: -3.5px; background: var(--active);
-  box-shadow: 0 0 0 1px var(--stage), 0 0 0 5px color-mix(in srgb, var(--active) 22%, transparent);
-}
-:root[data-holo="line"] .holo-track { width: 1px; left: -.5px; opacity: .9; background: repeating-linear-gradient(to top, color-mix(in srgb, var(--active) 75%, transparent) 0 2px, transparent 2px 6px); -webkit-mask: linear-gradient(to top, transparent, #000 40%); mask: linear-gradient(to top, transparent, #000 40%); }
-:root[data-holo="line"] .holo-pick { background: none; border: 1px solid color-mix(in srgb, var(--active) 60%, transparent); color: var(--ink); }
-:root[data-holo="line"] .holo-nums { color: var(--ink); font-weight: 600; opacity: .7; }
-:root[data-holo="line"] .holo-input { border: 0; border-bottom: 1px solid var(--active); border-radius: 0; background: none; color: var(--ink); }
-:root[data-holo="line"] .tour-tip { padding: 8px 12px 6px 13px; max-width: 220px; background: var(--stage); }
-:root[data-holo="line"] .tour-tip::before { display: none; }
-:root[data-holo="line"] .tour-tip b { font: 600 .86rem var(--font); }
-:root[data-holo="line"] .tour-tip small { color: var(--muted); }
-:root[data-holo="line"] .tour-actions { text-shadow: none; }
-:root[data-holo="line"] .tour-actions button.on { background: none; color: var(--active); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; padding: 4px 0 4px 8px; }
-:root[data-holo="line"] .tour-target { box-shadow: 0 0 0 1px var(--active) !important; animation: none; }
-@media (prefers-reduced-motion: reduce) { :root[data-holo] .holo-ring, :root[data-holo] .holo::after, :root[data-holo] .holo-label::after { animation-duration: 5s; } }
+@media (prefers-reduced-motion: reduce) { :root .holo-ring, :root .holo::after, :root .holo-label::after { animation-duration: 5s; } }

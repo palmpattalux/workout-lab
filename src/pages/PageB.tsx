@@ -8,7 +8,6 @@ import { Icon, WorkoutMark } from '../components/icons'
 import HoldPicker from '../components/HoldPicker'
 import HoldMenu from '../components/HoldMenu'
 import NumberPrompt from '../components/NumberPrompt'
-import HoloThumb from '../components/HoloThumb'
 import { updateWorkout, usePresets, addNote, type Workout } from '../lib/store'
 import { useSession, switchTo, goToSet, setSided, setKey, keyNum, keySide, record, recordAt, recordMove, endSession, discardSession, removeFromSession } from '../lib/session'
 import { useTimer, startTimer, stopTimer, timerState } from '../lib/timer'
@@ -199,7 +198,6 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
 
       {endHint && (
         <div className="holo holo-end" aria-hidden="true">
-          <span className="holo-hand"><Icon name="hand" size="100%" strokeWidth={1.6} /></span>
           <span className="holo-label">{t('Done? Tap Active to end the session')}</span>
         </div>
       )}
@@ -359,7 +357,6 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
           {isProgression ? (
             <div className="holo holo-move" style={{ left: '35.1%', top: '64.1%' }} aria-hidden="true">
               <span className="holo-ring" />
-              <span className="holo-hand"><Icon name="hand" size="100%" strokeWidth={1.6} /></span>
               <span className="holo-input"><span>{t('Knee push-up')}</span></span>
               <span className="holo-label">{t('Tap: new move')}</span>
             </div>
@@ -367,19 +364,16 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
             <div className="holo holo-slide" style={{ left: '35.1%', top: '64.1%' }} aria-hidden="true">
               <span className="holo-track" />
               <span className="holo-nums"><i>{unit === 'lbs' ? 45 : 20}</i><i>{unit === 'lbs' ? 95 : 40}</i><i>{unit === 'lbs' ? 135 : 60}</i></span>
-              <HoloThumb />
               <span className="holo-label">{t('Load')}</span>
             </div>
           )}
           <div className="holo holo-slide" style={{ left: '69%', top: '64.1%' }} aria-hidden="true">
             <span className="holo-track" />
             <span className="holo-nums"><i>{timed ? 10 : 6}</i><i>{timed ? 20 : 8}</i><i>{timed ? 30 : 10}</i></span>
-            <HoloThumb />
             <span className="holo-label">{timed ? t('Seconds') : t('Reps')}</span>
           </div>
           <div className="holo holo-tap holo-next" style={{ left: '85.1%', top: '43.2%' }} aria-hidden="true">
             <span className="holo-ring" />
-            <span className="holo-hand"><Icon name="hand" size="100%" strokeWidth={1.6} /></span>
             <span className="holo-label">{t('Next set')}</span>
           </div>
         </>
