@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Icon } from '../components/icons'
 import ThemeScene from '../components/ThemeScene'
 import { type Feature, THEMES, THEME_SLOTS, themePrice, setPreview, usePreview, useApplied, useOwnedThemes, applyTheme, canUseTheme } from '../lib/theme'
@@ -53,9 +53,6 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
   const applied = useApplied()
   const ownedThemes = useOwnedThemes()
   const track = useRef<HTMLDivElement>(null)
-  const head = useRef<HTMLElement>(null)
-  const [headB, setHeadB] = useState(70)
-  useLayoutEffect(() => { const h = head.current; if (h) setHeadB(h.offsetTop + h.offsetHeight) }, [])
   const [pos, setPos] = useState(0)
   const last = useRef(0)
 
@@ -149,8 +146,8 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
   }
 
   return (
-    <main className="page themes" aria-label={t('Themes')} style={{ '--head-b': headB + 'px' } as CSSProperties}>
-      <header className="create-head" ref={head}>
+    <main className="page themes" aria-label={t('Themes')}>
+      <header className="create-head">
         <h1>{t('Themes')}</h1>
         <span className="themes-head-btns">
           <button className="icon-btn" aria-label={t('All themes')} onClick={() => { setGrid(true); sound.tap() }}><Icon name="grid" size="21px" strokeWidth={1.9} /></button>
@@ -170,6 +167,7 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
             <div key={i} className="theme-cell">
               <button
                 className={`theme-card${th ? '' : ' empty'}${th && preview === th.key ? ' viewing' : ''}${th?.tier === 'exclusive' ? ' exclusive' : ''}`}
+                style={{ transform: `scale(${1 - d * 0.16})`, opacity: 1 - d * 0.45 }}
                 aria-label={th ? `${th.name} theme` : `Empty slot ${i + 1}`}
                 onClick={() => goTo(i)}
               >
