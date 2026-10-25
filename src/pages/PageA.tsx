@@ -80,7 +80,7 @@ function fan(slot: number, n: number) {
   })
 }
 
-const iconOptionsOf = (p: IconPack) => packIcons(p).map((i) => ({ key: i.key, label: t(i.name), node: <WorkoutIcon k={i.key} size="24px" strokeWidth={2} /> }))
+const iconOptionsOf = (p: IconPack) => packIcons(p).map((i) => ({ key: i.key, label: t(i.name), node: <WorkoutIcon k={i.key} size="24px" /> }))
 const letterOptionsOf = (p: IconPack) => packLetters(p).map((l) => ({ key: l.key, label: l.name, node: <b className="letter">{l.key}</b> }))
 
 export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdit, onOpenBook, onOpenSession, onThemes, onPlans, onCreate }: {
@@ -422,7 +422,7 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
               ? <Icon name="play" size="38%" strokeWidth={2} />
               : (
                 <span className={`stack n${Math.min(3, u.members.length)}`}>
-                  {u.members.slice(0, 3).map((w) => <i key={w.id}><WorkoutIcon k={w.icon} size="62%" strokeWidth={2.2} /></i>)}
+                  {u.members.slice(0, 3).map((w) => <i key={w.id}><WorkoutIcon k={w.icon} size="62%" /></i>)}
                 </span>
               )}
             {!armedMember && !badge && <span className="count">{u.members.length}</span>}
@@ -657,7 +657,7 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
       {showCreateHolo && (
         <div className="holo holo-create" aria-hidden="true">
           <span className="holo-track" />
-          <span className="holo-pick one"><WorkoutIcon k="dumbbell" size="52%" strokeWidth={2} /></span>
+          <span className="holo-pick one"><WorkoutIcon k="dumbbell" size="52%" /></span>
           <span className="holo-pick two"><b>A</b></span>
           <span className="holo-ring" />
           <span className="holo-label">{t('Start here')}<small>{t('Slide up to make an exercise')}</small></span>

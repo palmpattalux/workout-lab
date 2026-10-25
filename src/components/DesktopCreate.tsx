@@ -39,7 +39,7 @@ export default function DesktopCreate({ signedIn }: { signedIn: boolean }) {
         <div className="dc-icons" role="radiogroup" aria-label={t('Icon')}>
           {WORKOUT_ICONS.map((i) => (
             <button key={i.key} role="radio" aria-checked={i.key === icon} aria-label={t(i.name)} title={t(i.name)} className={i.key === icon ? 'on' : undefined} onClick={() => setIcon(i.key)}>
-              <WorkoutIcon k={i.key} size="22px" strokeWidth={1.9} />
+              <WorkoutIcon k={i.key} size="22px" />
             </button>
           ))}
         </div>

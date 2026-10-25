@@ -137,7 +137,7 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 }
 .ruler .fill { position: absolute; left: 50%; bottom: 12px; width: 3px; border-radius: 2px; background: var(--active); transform: translateX(-27.5px); transition: height .1s var(--ease); }
 
-.ruler .letter { font: 650 .95rem var(--font); }
+.ruler .letter { font: 500 .95rem var(--font); }
 /* what the line is for, e.g. "Choose an icon" */
 .ruler-title {
   position: absolute; bottom: 100%; left: 50%; transform: translate(-50%, -8px); white-space: nowrap;
@@ -154,7 +154,7 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 /* workout mark: icon + body-part letter */
 .mark { display: inline-flex; align-items: center; gap: .18em; line-height: 1; }
 .mark svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
-.mark-letter { font-weight: 800; font-size: .9em; }
+.mark-letter { font-weight: 500; font-size: .9em; }
 .dot.filled .mark { font-size: .95rem; }
 
 /* "+" after the icon is picked: in progress, waiting for the body-part letter */
@@ -204,12 +204,12 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 }
 .mark-sheet h2 { margin: 0 2px; font: 600 .7rem var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 .mark-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-.mark-grid.letters { grid-template-columns: repeat(4, 1fr); }
+.mark-grid.letters { grid-template-columns: repeat(7, 1fr); }
 .mark-grid button {
   aspect-ratio: 1; border: 0; border-radius: 14px; background: var(--sunk); color: var(--ink); cursor: pointer;
   display: grid; place-items: center; font: 650 1.05rem var(--font); transition: background .15s, color .15s, transform .15s var(--ease);
 }
-.mark-grid.letters button { aspect-ratio: auto; height: 44px; }
+.mark-grid.letters button { aspect-ratio: auto; height: 40px; }
 .mark-grid button:active { transform: scale(.92); }
 .mark-grid button.on { background: var(--active-soft); color: var(--active); box-shadow: inset 0 0 0 1.5px var(--active); }
 
@@ -2391,3 +2391,6 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .ruler-extra { background: var(--glass-panel); border-color: var(--glass-edge); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); }
 /* while a number line is held, the guide steps aside */
 .page:has(.holding) .b-tour, .page:has(.holding) .b-tip { opacity: 0; transition: opacity .15s; }
+/* exercise marks keep their full size inside the glass buttons, so the frosted fill reads */
+.btn .mark svg { scale: 1; }
+.dot.filled .mark { font-size: 1.08rem; }

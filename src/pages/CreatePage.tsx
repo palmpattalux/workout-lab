@@ -50,7 +50,7 @@ export default function CreatePage({ icon: icon0, letter: letter0, editing, onCl
           <div className="mark-grid">
             {packIcons(pack).map((i) => (
               <button key={i.key} aria-label={t(i.name)} aria-pressed={i.key === icon} className={i.key === icon ? 'on' : undefined} onClick={() => setIcon(i.key)}>
-                <WorkoutIcon k={i.key} size="56%" strokeWidth={1.9} />
+                <WorkoutIcon k={i.key} size="56%" />
               </button>
             ))}
           </div>
