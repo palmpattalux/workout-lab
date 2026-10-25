@@ -2464,7 +2464,14 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .themes .theme-feats { top: 48px; }
 .theme-veil.top { height: 64px; }
 .themes .theme-info .owned-tag { margin-top: 36px; }
-/* the effect icons replace the note: one row, fixed above the right edge of the picture */
-.themes-feats-row { position: relative; z-index: 3; height: 28px; margin: 2px 6% 0; display: flex; justify-content: flex-end; align-items: center; }
-.themes .themes-feats-row .theme-feats { position: relative; top: auto; right: auto; width: auto; margin: 0; }
-.themes .themes-feats-row .tf { width: 28px; height: 28px; }
+/* the effect icons sit on the picture, right of the theme name, and stay put while swiping */
+.themes .theme-name-row { position: relative; align-self: stretch; margin: 0 -8%; display: flex; justify-content: center; }
+.themes .theme-name-row .theme-feats { position: absolute; top: 50%; right: calc(6% + 16px); transform: translateY(-50%); width: auto; margin: 0; }
+.themes .theme-name-row .tf { width: 28px; height: 28px; }
+.themes .theme-name-row h2 { white-space: nowrap; }
+/* small phones: smaller icons tucked closer to the edge so they never touch the name */
+@media (max-width: 380px) {
+  .themes .theme-name-row .theme-feats { right: calc(6% + 9px); gap: 3px; }
+  .themes .theme-name-row .tf { width: 23px; height: 23px; }
+  .themes .theme-name-row .tf svg { width: 12px; height: 12px; }
+}

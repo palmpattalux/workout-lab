@@ -156,8 +156,6 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
       </header>
       {/* every theme: buy it once and keep it, or get it free with the plan it belongs to */}
       <div className="themes-body" onPointerDown={swipeDown} onPointerMove={swipeMove} onPointerUp={swipeUp} onPointerCancel={swipeUp}>
-      {/* what the theme in view has (animation, sound, touch), fixed above the picture's right edge */}
-      <div className="themes-feats-row">{theme && <Feats key={theme.key} has={theme.has} style={{}} />}</div>
 
       <div
         className="theme-track"
@@ -196,7 +194,11 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
 
       <div className="theme-info">
         <p className="theme-count">{index + 1} / {THEME_SLOTS}</p>
-        <h2>{theme ? theme.name : t('Empty slot')}</h2>
+        {/* what the theme in view has (animation, sound, touch): fixed beside the name, by the picture's right edge */}
+        <div className="theme-name-row">
+          <h2>{theme ? theme.name : t('Empty slot')}</h2>
+          {theme && <Feats key={theme.key} has={theme.has} style={{}} />}
+        </div>
         <p className="theme-blurb">{theme ? t(theme.blurb) : t('A new theme will land here.')}</p>
         {theme && (owner ? (
           <>
