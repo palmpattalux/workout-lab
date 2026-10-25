@@ -1135,8 +1135,6 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 
 /* ---------- first-run holograms (guests) ---------- */
 .holo { position: absolute; z-index: 7; pointer-events: none; color: var(--active); filter: drop-shadow(0 0 6px color-mix(in srgb, var(--active) 65%, transparent)); }
-.holo-hand { position: absolute; width: 34px; height: 34px; opacity: 0; }
-.holo-hand svg { fill: color-mix(in srgb, var(--active) 18%, transparent); }
 .holo-label {
   position: absolute; white-space: nowrap; padding: 6px 12px; border-radius: 999px; font: 700 .8rem var(--font); color: var(--active);
   background: color-mix(in srgb, var(--surface) 70%, transparent); border: 1px solid color-mix(in srgb, var(--active) 45%, transparent);
@@ -1147,24 +1145,7 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 /* "+": slide up, an icon lights, then again for a letter */
 .holo-create { left: 20%; top: 87%; width: 0; height: 0; }
 .holo-track { position: absolute; left: -1px; bottom: 0; width: 2px; height: 130px; border-radius: 2px; background: linear-gradient(to top, transparent, color-mix(in srgb, var(--active) 55%, transparent)); opacity: .5; }
-.holo-thumb { position: absolute; left: 0; top: 0; width: 0; height: 0; opacity: 0; animation: holo-swipe 3.2s var(--ease) infinite; }
-.holo-thumb svg {
-  position: absolute; left: -32px; top: -4px; width: 64px; height: 200px; overflow: visible;
-  transform-origin: 32px 4px; transform: rotate(-32deg);
-  -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 95%); mask-image: linear-gradient(to bottom, #000 45%, transparent 95%);
-}
-.holo-thumb .th-body { fill: color-mix(in srgb, var(--active) 14%, transparent); stroke: var(--active); stroke-width: 1.6; }
-.holo-thumb .th-nail { fill: none; stroke: var(--active); stroke-width: 1.2; stroke-dasharray: 3 3; opacity: .8; }
-.holo-thumb .th-line { fill: none; stroke: var(--active); stroke-width: 1; opacity: .55; }
-.holo-thumb .th-tip { fill: var(--active); opacity: .9; }
 .holo-create .holo-label { animation: holo-flicker 4s linear infinite; }
-@keyframes holo-swipe {
-  0% { opacity: 0; transform: translateY(0) scale(1); }
-  10% { opacity: .9; transform: translateY(0) scale(.88); }
-  48% { opacity: .9; transform: translateY(-118px) scale(.88); }
-  60% { opacity: .9; transform: translateY(-118px) scale(1); }
-  72%, 100% { opacity: 0; transform: translateY(-118px) scale(1); }
-}
 .holo-pick {
   position: absolute; left: -24px; top: -158px; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; opacity: 0;
   border: 1.5px solid color-mix(in srgb, var(--active) 60%, transparent); background: color-mix(in srgb, var(--active) 12%, transparent);
@@ -1177,11 +1158,8 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .holo-create .holo-label { left: calc(min(18.7cqw, 10.6cqh) / 2 + 40px); top: -24px; display: flex; flex-direction: column; gap: 1px; border-radius: 16px; }
 .holo-create .holo-label small { font: 600 .68rem var(--font); opacity: .8; }
 /* first run: an arrow points at "+", the only thing in focus */
-.holo-arrow { position: absolute; left: calc(min(18.7cqw, 10.6cqh) / 2 + 8px); top: -12px; width: 24px; height: 24px; animation: holo-nudge 1.2s ease-in-out infinite; }
-@keyframes holo-nudge { 50% { translate: 7px 0; } }
 .page.first-run > #a2, .page.first-run > .gear, .page.first-run > .preset-btn { filter: blur(3px); opacity: .35; transition: filter .4s, opacity .4s; }
 .page:has(.add.holding) .holo-create { display: none; }
-@media (prefers-reduced-motion: reduce) { .holo-arrow { animation: none; } }
 
 /* gear: where to sign up */
 .holo-signup {
@@ -1196,8 +1174,6 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .holo-tap { width: 0; height: 0; }
 .holo-ring { position: absolute; left: calc(min(18.7cqw, 10.6cqh) / -2 - 6px); top: calc(min(18.7cqw, 10.6cqh) / -2 - 6px); width: calc(min(18.7cqw, 10.6cqh) + 12px); aspect-ratio: 1; border-radius: 50%; border: 2px solid var(--active); animation: holo-ring 1.6s ease-out infinite; }
 @keyframes holo-ring { from { transform: scale(.85); opacity: .9; } to { transform: scale(1.3); opacity: 0; } }
-.holo-tap .holo-hand { left: -6px; top: 2px; animation: holo-tap 1.6s ease-in-out infinite; }
-@keyframes holo-tap { 0%, 100% { opacity: .9; transform: translate(6px, 14px) scale(1); } 40% { opacity: .9; transform: translate(0, 0) scale(.86); } 55% { transform: translate(0, 0) scale(.86); } }
 .holo-tap .holo-label { left: 50%; top: calc(min(18.7cqw, 10.6cqh) / 2 + 30px); transform: translateX(-50%); }
 .holo-tap.again .holo-ring { border-color: var(--sun); }
 
@@ -1205,15 +1181,13 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 #b1.holo-target { box-shadow: var(--lift), 0 0 0 2px var(--active), 0 0 18px color-mix(in srgb, var(--active) 55%, transparent); animation: holo-b1 1.8s ease-in-out infinite; }
 @keyframes holo-b1 { 50% { box-shadow: var(--lift), 0 0 0 4px color-mix(in srgb, var(--active) 60%, transparent), 0 0 26px color-mix(in srgb, var(--active) 45%, transparent); } }
 .holo-end { left: calc(5.7% + 15.6cqw); top: calc(3.5% + min(11cqw, 6.2cqh) + 6px); width: 0; height: 0; z-index: 8; }
-.holo-end .holo-hand { left: -12px; top: 0; opacity: .9; animation: holo-point-up 1.6s ease-in-out infinite; }
-@keyframes holo-point-up { 50% { translate: 0 -6px; } }
 .holo-end .holo-label { left: 28px; top: 8px; }
 
 /* sign up after a guest's first session */
 .login-close { position: absolute; top: 12px; left: 4.5%; z-index: 2; }
 .login-note { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; margin: 0 0 4px; padding: 8px 14px; border-radius: 999px; background: var(--active-soft); color: var(--active); font: 700 .9rem var(--font); }
 .signup-btn { color: var(--active); border-color: color-mix(in srgb, var(--active) 40%, transparent); }
-@media (prefers-reduced-motion: reduce) { .holo-hand, .holo-ring, .holo-pick, #b1.holo-target, .new-dot { animation-duration: 3s; } }
+@media (prefers-reduced-motion: reduce) { .holo-ring, .holo-pick, #b1.holo-target, .new-dot { animation-duration: 3s; } }
 
 /* gear > open-source licences */
 .settings .credits-link span:first-child { color: var(--ink); }
@@ -2197,7 +2171,6 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .holo-nums i:nth-child(2) { animation-delay: .9s; }
 .holo-nums i:nth-child(3) { animation-delay: 1.3s; }
 @keyframes holo-num { 0% { opacity: 0; transform: translateY(6px); } 12%, 40% { opacity: .95; transform: none; } 55%, 100% { opacity: 0; } }
-.holo-move .holo-hand { left: -6px; top: 2px; animation: holo-tap 1.6s ease-in-out infinite; }
 .holo-input {
   position: absolute; left: -12px; bottom: calc(min(18.7cqw, 10.6cqh) / 2 + 14px); padding: 9px 14px; border-radius: 14px; white-space: nowrap;
   border: 1.5px dashed color-mix(in srgb, var(--active) 55%, transparent); background: color-mix(in srgb, var(--surface) 60%, transparent);
@@ -2241,3 +2214,71 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .tour-target { box-shadow: 0 0 0 2px var(--active), 0 0 16px color-mix(in srgb, var(--active) 45%, transparent) !important; animation: tour-glow 1.8s ease-in-out infinite; }
 @keyframes tour-glow { 50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--active) 55%, transparent), 0 0 22px color-mix(in srgb, var(--active) 35%, transparent); } }
 @media (prefers-reduced-motion: reduce) { .tour-tip, .tour-target { animation: none; } }
+
+/* ---------- hologram guides, Glass style (picked 2026-10-25) ----------
+   Frosted see-through pills with a thin lit edge, a light sweeping round the target, and a glassy
+   touch circle for the slide or tap. No finger drawings, no flicker, no neon glow. */
+:root .holo { filter: none; --d: min(18.7cqw, 10.6cqh); }
+:root .holo-label, :root .holo-input { animation: holo-rise .5s var(--ease) both; }
+@keyframes holo-rise { from { opacity: 0; translate: 0 4px; } }
+:root .holo-create .holo-label { top: -26px; left: calc(var(--d) / 2 + 22px); gap: 2px; }
+:root .holo-create .holo-label small { opacity: 1; }
+/* a touch point slides up the line from "+" (and from load / reps on page B) */
+:root .holo-create::after, :root .holo-slide::after {
+  content: ""; position: absolute; left: -9px; top: -9px; width: 18px; height: 18px; border-radius: 50%;
+  animation: holo-glide 3.2s var(--ease) infinite;
+}
+:root .holo-slide::after { animation-name: holo-glide-b; }
+@keyframes holo-glide { 0%, 8% { opacity: 0; transform: translateY(0) scale(.6); } 16% { opacity: 1; transform: translateY(0) scale(1); } 52% { opacity: 1; transform: translateY(-118px) scale(1); } 66%, 100% { opacity: 0; transform: translateY(-118px) scale(.6); } }
+@keyframes holo-glide-b { 0%, 8% { opacity: 0; transform: translateY(0) scale(.6); } 16% { opacity: 1; transform: translateY(0) scale(1); } 52% { opacity: 1; transform: translateY(-110px) scale(1); } 66%, 100% { opacity: 0; transform: translateY(-110px) scale(.6); } }
+/* a touch point presses the target */
+:root .holo-tap::after, :root .holo-move::after {
+  content: ""; position: absolute; left: -11px; top: -11px; width: 22px; height: 22px; border-radius: 50%;
+  animation: holo-press 2.4s ease-in-out infinite;
+}
+@keyframes holo-press { 0%, 100% { opacity: 0; transform: scale(1.5); } 25% { opacity: 1; transform: scale(1); } 38% { transform: scale(.75); } 55% { opacity: 1; transform: scale(1); } 75% { opacity: 0; transform: scale(1); } }
+:root .holo-pick { animation-timing-function: var(--ease); }
+:root #b1.holo-target { animation: holo-calm-b1 2.8s ease-in-out infinite; }
+@keyframes holo-calm-b1 { 0%, 100% { box-shadow: var(--lift), 0 0 0 1.5px var(--active); } 50% { box-shadow: var(--lift), 0 0 0 1.5px var(--active), 0 0 0 7px color-mix(in srgb, var(--active) 14%, transparent); } }
+:root .holo-end .holo-label { left: -60px; top: 12px; }
+
+:root .holo-label, :root .tour-tip, :root .holo-input {
+  color: var(--ink); background: color-mix(in srgb, var(--surface) 42%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ink) 9%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 10px 30px -12px rgba(0, 0, 0, .35);
+  backdrop-filter: blur(18px) saturate(1.7); -webkit-backdrop-filter: blur(18px) saturate(1.7);
+}
+:root .holo-label { padding: 9px 16px; font: 600 .8rem var(--font); letter-spacing: .01em; overflow: hidden; }
+:root .holo-create .holo-label { border-radius: 18px; padding: 11px 18px; }
+:root .holo-label small { color: var(--muted); }
+/* a lit edge along the bottom */
+:root .holo-label::after, :root .tour-tip::after {
+  content: ""; position: absolute; left: 14%; right: 14%; bottom: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--active), transparent); animation: glass-edge 3.2s ease-in-out infinite;
+}
+@keyframes glass-edge { 0%, 100% { opacity: .5; transform: translateX(-18%); } 50% { opacity: 1; transform: translateX(18%); } }
+/* a light sweeping round the target */
+:root .holo-ring {
+  border: 0; padding: 1.5px; animation: glass-sweep 2.6s linear infinite;
+  background: conic-gradient(from 0deg, transparent 0 55%, color-mix(in srgb, var(--active) 40%, transparent) 75%, var(--active) 99%, transparent 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+@keyframes glass-sweep { to { transform: rotate(1turn); } }
+:root .holo-tap.again .holo-ring { background: conic-gradient(from 0deg, transparent 0 55%, var(--sun) 99%, transparent 100%); }
+:root .holo-create::after, :root .holo-slide::after, :root .holo-tap::after, :root .holo-move::after {
+  width: 34px; height: 34px; left: -17px; top: -17px;
+  background: radial-gradient(circle at 50% 35%, rgba(255, 255, 255, .55), color-mix(in srgb, var(--surface) 25%, transparent) 70%);
+  border: 1px solid rgba(255, 255, 255, .45); box-shadow: 0 6px 18px -6px rgba(0, 0, 0, .35), inset 0 0 0 1px color-mix(in srgb, var(--ink) 6%, transparent);
+  backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+}
+:root .holo-track { width: 1px; opacity: .8; background: linear-gradient(to top, transparent, color-mix(in srgb, var(--ink) 35%, transparent)); }
+:root .holo-pick { color: var(--ink); background: color-mix(in srgb, var(--surface) 42%, transparent); border: 1px solid color-mix(in srgb, var(--ink) 9%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+:root .holo-nums { color: var(--ink); opacity: .65; }
+:root .tour-tip { overflow: visible; padding: 11px 14px 9px; background: color-mix(in srgb, var(--surface) 78%, transparent); }
+:root .tour-tip::before { background: color-mix(in srgb, var(--surface) 80%, transparent); border-color: color-mix(in srgb, var(--ink) 9%, transparent); }
+:root .tour-tip small { color: var(--muted); }
+:root .tour-actions button.on { background: color-mix(in srgb, var(--ink) 10%, transparent); color: var(--ink); }
+:root .tour-target { box-shadow: 0 0 0 1px color-mix(in srgb, var(--active) 70%, transparent), 0 0 0 5px color-mix(in srgb, var(--active) 10%, transparent) !important; animation: none; }
+
+@media (prefers-reduced-motion: reduce) { :root .holo-ring, :root .holo::after, :root .holo-label::after { animation-duration: 5s; } }

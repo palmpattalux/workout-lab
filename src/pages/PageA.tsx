@@ -17,7 +17,6 @@ import { usePlan, atLeast, tierName, FREE_WORKOUTS, showLocked } from '../lib/pl
 import { useNewWeek } from '../lib/week'
 import RenewNotice from '../components/RenewNotice'
 import BookDrop from '../components/BookDrop'
-import HoloThumb from '../components/HoloThumb'
 
 // Exercise dot positions, as % of the screen: low and toward the right, in easy reach of a
 // right thumb. The first four are always shown; the rest fill in as more workouts exist.
@@ -660,9 +659,7 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
           <span className="holo-track" />
           <span className="holo-pick one"><WorkoutIcon k="dumbbell" size="52%" strokeWidth={2} /></span>
           <span className="holo-pick two"><b>A</b></span>
-          <HoloThumb />
           <span className="holo-ring" />
-          <span className="holo-arrow"><Icon name="arrowLeft" size="100%" strokeWidth={2.4} /></span>
           <span className="holo-label">{t('Start here')}<small>{t('Slide up to make an exercise')}</small></span>
         </div>
       )}
@@ -670,7 +667,6 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
         <div className={`holo holo-tap${chosen === tapTarget ? ' again' : ''}`} aria-hidden="true"
           style={{ left: `${SLOTS[slotOf.get(tapTarget)!].left}%`, top: `${SLOTS[slotOf.get(tapTarget)!].top}%` }}>
           <span className="holo-ring" />
-          <span className="holo-hand"><Icon name="hand" size="100%" strokeWidth={1.6} /></span>
           <span className="holo-label">{chosen === tapTarget ? t('Tap again to start') : t('Tap to choose it')}</span>
         </div>
       )}
