@@ -267,6 +267,7 @@ const ROWS: [string, string, string, string][] = [
   ["Try on", "ลองใช้", "試してみる", "试用"],
   ["Stop trying", "หยุดลอง", "試用をやめる", "停止试用"],
   ["Get {price}", "รับ {price}", "{price}で入手", "获取 {price}"],
+  ["Get", "รับเลย", "入手", "获取"],
   ["Or get every theme with Premium", "หรือรับทุกธีมกับ Premium", "またはPremiumですべてのテーマを", "或通过 Premium 获得所有主题"],
   ["Theme · yours to keep", "ธีม · เป็นของคุณตลอดไป", "テーマ・ずっと使えます", "主题 · 永久拥有"],
   ["one time", "ครั้งเดียว", "1回払い", "一次性"],

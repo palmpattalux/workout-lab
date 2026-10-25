@@ -2405,7 +2405,7 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
    note sits over its top and the name over its bottom, each on a soft blur ---------- */
 .themes .create-head, .themes .themes-note, .themes .theme-info { position: relative; z-index: 2; }
 .themes .themes-note { margin-bottom: 0; padding-bottom: 4px; }
-.themes .theme-track { padding: 0 6%; margin-top: -46px; }
+.themes .theme-track { padding: 0 6%; margin-top: 10px; }
 .themes .theme-card { width: 100%; max-width: none; height: max(340px, calc(100cqh - 260px)); aspect-ratio: auto; border-radius: 30px; }
 .themes .theme-art.blank { border-radius: 30px; }
 .theme-veil { position: absolute; left: 0; right: 0; z-index: 2; pointer-events: none;
@@ -2445,3 +2445,22 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .theme-tile small { font: 600 .68rem var(--num, var(--font)); color: var(--muted); }
 .theme-tile:active .tt-art { transform: scale(.96); }
 .theme-tile .tt-art .theme-art { display: block; }
+
+/* themes page: swipe area, squarer buttons whose text scales with the phone */
+.themes-body { display: flex; flex-direction: column; flex: 1 0 auto; touch-action: pan-y; }
+.themes .theme-track { touch-action: pan-x pan-y; }
+.themes .theme-card { height: max(300px, calc(100cqh - 300px)); }
+.themes .theme-view { border-radius: 14px; font-size: clamp(.88rem, 4.1cqw, 1.05rem); padding: clamp(11px, 3.2cqw, 14px) clamp(16px, 5.5cqw, 26px); min-width: 0; }
+.themes .theme-buy { width: min(100%, 320px); }
+.themes .theme-buy .theme-view { flex: 1 1 0; max-width: none; padding-left: 10px; padding-right: 10px; }
+.themes .theme-info > .theme-view { min-width: min(60%, 220px); }
+.themes .owned-tag { font-size: clamp(.6rem, 2.8cqw, .7rem); }
+.themes .theme-info h2 { font-size: clamp(1.25rem, 6.2cqw, 1.6rem); }
+.themes .theme-blurb { font-size: clamp(.78rem, 3.6cqw, .92rem); }
+.themes .theme-plan-link { font-size: clamp(.74rem, 3.4cqw, .84rem); }
+.themes .price-pill { top: 14px; }
+.themes .theme-card .tier-chip { top: 14px; }
+@container theme-card (max-width: 200px) { .themes .theme-card .tier-chip { top: 14px; } }
+.themes .theme-feats { top: 48px; }
+.theme-veil.top { height: 64px; }
+.themes .theme-info .owned-tag { margin-top: 36px; }

@@ -77,8 +77,39 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
     return () => clearTimeout(tm)
   }, [near, Math.round(pos)])
 
-  // mouse users can drag the strip too (touch scrolls natively)
-  const drag = useRef<{ x: number; left: number } | null>(null)
+  // swipe anywhere below the title (not just on the picture) to move between themes;
+  // the strip itself still scrolls natively under a finger
+  const drag = useRef<{ x: number; y: number; left: number; t: number; on: boolean } | null>(null)
+  function swipeDown(e: React.PointerEvent) {
+    if (e.pointerType !== 'mouse' && (e.target as Element).closest('.theme-track')) return
+    drag.current = { x: e.clientX, y: e.clientY, left: track.current!.scrollLeft, t: performance.now(), on: false }
+  }
+  function swipeMove(e: React.PointerEvent) {
+    const d = drag.current, el = track.current
+    if (!d || !el) return
+    const dx = e.clientX - d.x
+    if (!d.on) {
+      if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(e.clientY - d.y)) return
+      d.on = true; el.style.scrollSnapType = 'none'
+      ;(e.currentTarget as Element).setPointerCapture?.(e.pointerId)
+    }
+    el.scrollLeft = d.left - dx
+  }
+  function swipeUp(e: React.PointerEvent) {
+    const d = drag.current, el = track.current
+    drag.current = null
+    if (!d?.on || !el) return
+    const card = el.firstElementChild as HTMLElement
+    const dx = e.clientX - d.x, fast = Math.abs(dx) / (performance.now() - d.t) > 0.4
+    const from = Math.round(d.left / card.offsetWidth)
+    const to = fast ? from - Math.sign(dx) : Math.round(el.scrollLeft / card.offsetWidth)
+    el.style.scrollSnapType = ''
+    goTo(Math.max(0, Math.min(THEME_SLOTS - 1, to)))
+    // a swipe that ends on a button doesn't press it
+    const stop = (ev: Event) => { ev.stopPropagation(); ev.preventDefault() }
+    window.addEventListener('click', stop, { capture: true, once: true })
+    setTimeout(() => window.removeEventListener('click', stop, { capture: true }), 50)
+  }
   const index = Math.min(THEME_SLOTS - 1, Math.max(0, Math.round(pos)))
   const theme = THEMES[index]
   const viewing = theme && preview === theme.key
@@ -117,15 +148,12 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
         </span>
       </header>
       {/* every theme: buy it once and keep it, or get it free with the plan it belongs to */}
+      <div className="themes-body" onPointerDown={swipeDown} onPointerMove={swipeMove} onPointerUp={swipeUp} onPointerCancel={swipeUp}>
       <p className="themes-note">{t('Buy a theme to keep forever, or get them all free with a plan.')}</p>
 
       <div
         className="theme-track"
         ref={track}
-        onPointerDown={(e) => { if (e.pointerType === 'mouse') drag.current = { x: e.clientX, left: track.current!.scrollLeft } }}
-        onPointerMove={(e) => { if (drag.current) track.current!.scrollLeft = drag.current.left - (e.clientX - drag.current.x) }}
-        onPointerUp={() => { if (drag.current) { drag.current = null; goTo(Math.round(pos)) } }}
-        onPointerLeave={() => { if (drag.current) { drag.current = null; goTo(Math.round(pos)) } }}
       >
         {THEMES.map((th, i) => {
           const d = Math.min(1.4, Math.abs(i - pos))
@@ -179,12 +207,14 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
                 ? <button className="theme-view on" onClick={() => setPreview(null)}>{t('Stop trying')}</button>
                 : <button className="theme-view on" onClick={() => { setPreview(theme.key); sound.pop(); onViewed() }}>{t('Try on')}</button>}
               {canPay
-                ? <button className="theme-view" onClick={() => buy(theme.key)}>{t('Get {price}', { price })}</button>
+                ? <button className="theme-view" onClick={() => buy(theme.key)}>{t('Get')}</button>
                 : <button className="theme-view" disabled>{t('Coming soon')}</button>}
             </div>
             <button className="theme-plan-link" onClick={() => { setPreview(null); location.hash = 'plans' }}>{t('Or get it free with {plan}', { plan: theme.tier === 'exclusive' ? t('Exclusive') : t('Premium') })}</button>
           </>
         ))}
+      </div>
+
       </div>
 
       {grid && (
