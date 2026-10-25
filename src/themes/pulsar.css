@@ -1,0 +1,81 @@
+/* ---------- Pulsar theme ----------
+   A spinning neutron star in the top-right corner with two thin beams sweeping round, faint
+   field loops and a soft pulse ring each half turn, among sparse stars and a nebula wisp.
+   Light = pale icy space with violet beams, dark = deep blue black with cyan-white beams. */
+:root[data-skin="pulsar"], .theme-art[data-skin="pulsar"] {
+  --stage: #f4f6fb; --bg: #e8ecf5; --surface: #fdfdff; --sunk: #eef1f8;
+  --ink: #181c2c; --muted: #6d7390; --hair: rgba(30, 40, 90, .07); --line: rgba(30, 40, 90, .12);
+  --sun: #6a5ce8; --active: #5546d4; --active-soft: #e7e4fc;
+  --pl-sky1: #f7f8fc; --pl-sky2: #edf0f8;
+  --pl-glow: #b8b0ff; --pl-glow-o: .55; --pl-core1: #ffffff; --pl-core2: #a99cff;
+  --pl-beam: #7d6ff0; --pl-beam-o: .42; --pl-field: rgba(110, 96, 220, .22); --pl-ring: #8a7ef0;
+  --pl-star: #8e8ad0; --pl-star-o: .7; --pl-neb: #c9c2f5; --pl-neb-o: .45;
+}
+:root[data-skin="pulsar"][data-mode="dark"], :root[data-mode="dark"] .theme-art[data-skin="pulsar"] {
+  --stage: #070a14; --bg: #04060d; --surface: #131827; --sunk: #0c1019;
+  --ink: #e9eef8; --muted: #8f97ad; --hair: rgba(255, 255, 255, .06); --line: rgba(255, 255, 255, .11);
+  --sun: #5fd8f2; --active: #6fdcf4; --active-soft: #12303a;
+  --pl-sky1: #080c18; --pl-sky2: #05070f;
+  --pl-glow: #59d6f5; --pl-glow-o: .3; --pl-core1: #ffffff; --pl-core2: #8de9ff;
+  --pl-beam: #9aeeff; --pl-beam-o: .34; --pl-field: rgba(140, 230, 255, .16); --pl-ring: #7fe3fb;
+  --pl-star: #ffffff; --pl-star-o: .85; --pl-neb: #3b3f9a; --pl-neb-o: .35;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="pulsar"]:not([data-mode="light"]), :root:not([data-mode="light"]) .theme-art[data-skin="pulsar"] {
+    --stage: #070a14; --bg: #04060d; --surface: #131827; --sunk: #0c1019;
+    --ink: #e9eef8; --muted: #8f97ad; --hair: rgba(255, 255, 255, .06); --line: rgba(255, 255, 255, .11);
+    --sun: #5fd8f2; --active: #6fdcf4; --active-soft: #12303a;
+    --pl-sky1: #080c18; --pl-sky2: #05070f;
+    --pl-glow: #59d6f5; --pl-glow-o: .3; --pl-core1: #ffffff; --pl-core2: #8de9ff;
+    --pl-beam: #9aeeff; --pl-beam-o: .34; --pl-field: rgba(140, 230, 255, .16); --pl-ring: #7fe3fb;
+    --pl-star: #ffffff; --pl-star-o: .85; --pl-neb: #3b3f9a; --pl-neb-o: .35;
+    color-scheme: dark;
+  }
+}
+.theme-art[data-skin="pulsar"] { color: var(--ink); }
+.pulsar-scene {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0;
+  background: linear-gradient(180deg, var(--pl-sky1), var(--pl-sky2));
+}
+.pulsar-scene svg * { stroke: none; }
+.pl-sky { position: absolute; inset: 0; width: 100%; height: 100%; }
+.pl-stars circle { fill: var(--pl-star); opacity: calc(var(--pl-star-o) * .7); }
+.pl-stars circle.tw { animation: pl-tw 8s ease-in-out infinite; }
+@keyframes pl-tw { 50% { opacity: calc(var(--pl-star-o) * .1); } }
+.pl-neb { animation: pl-neb 30s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+@keyframes pl-neb { to { transform: scale(1.08) translateX(8px); opacity: .8; } }
+
+.pl-corner { position: absolute; top: 0; right: 0; width: 72cqw; height: auto; overflow: visible; }
+.pulsar-scene .pl-field ellipse { fill: none; stroke: var(--pl-field); stroke-width: .9; }
+.pulsar-scene .pl-field ellipse.far { stroke-dasharray: 2 4; opacity: .7; }
+.pl-spin { animation: pl-spin 14s linear infinite; }
+@keyframes pl-spin { to { transform: rotate(360deg); } }
+.pl-beam { mix-blend-mode: screen; }
+.pl-glow { animation: pl-pulse 7s ease-out infinite; }
+.pl-halo { animation: pl-pulse 7s ease-out infinite; }
+@keyframes pl-pulse { 0%, 100% { opacity: .75; } 4% { opacity: 1; } 30% { opacity: .75; } }
+.pl-core { fill: var(--pl-core1); }
+.pulsar-scene .pl-ring { fill: none; stroke: var(--pl-ring); stroke-width: 1.2; opacity: 0; animation: pl-ring 7s cubic-bezier(.2, .6, .3, 1) infinite; }
+@keyframes pl-ring { 0% { transform: scale(1); opacity: .6; } 60%, 100% { transform: scale(7); opacity: 0; } }
+:root:not([data-mode="dark"]) .pl-beam { mix-blend-mode: multiply; }
+@media (prefers-color-scheme: dark) { :root:not([data-mode="light"]) .pl-beam { mix-blend-mode: screen; } }
+
+/* ---------- page B: a bigger pulsar low on the left that turns with every drag step ---------- */
+.pulsar-scene.pl-session { background: none; }
+.pl-sys { position: absolute; left: 0; bottom: 0; width: 100cqw; height: 100cqw; overflow: visible; }
+.pl-session .pl-turn { transition: transform .45s cubic-bezier(.2, .9, .3, 1.15); }
+.pl-session .pl-spin { animation-duration: 48s; }
+.pl-session .pl-beam { opacity: .7; }
+.pl-session .pl-glow, .pl-session .pl-halo, .pl-session .pl-ring { animation-duration: 9s; }
+.pl-tickflash { fill: var(--pl-core1); opacity: 0; animation: pl-flash .35s ease-out both; }
+@keyframes pl-flash { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(2.4); } }
+.pulsar-scene .pl-wave { fill: none; stroke: var(--pl-ring); stroke-width: 1.4; opacity: 0; animation: pl-wave 1.6s cubic-bezier(.2, .7, .3, 1) both; }
+.pulsar-scene .pl-wave.late { animation-delay: .22s; stroke-width: 1; }
+@keyframes pl-wave { 0% { transform: scale(1); opacity: .55; } 100% { transform: scale(24); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pl-stars circle.tw, .pl-neb, .pl-spin, .pl-glow, .pl-halo, .pulsar-scene .pl-ring { animation: none; }
+  .pl-spin { transform: rotate(-32deg); }
+  .pl-session .pl-turn { transition: none; }
+}

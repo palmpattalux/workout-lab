@@ -93,10 +93,20 @@ export function noise(dur: number, gain: number, type: BiquadFilterType, from: n
 // Sounds only for the theme in use on the page, never from the little previews in the gallery.
 export const livePage = (el: Element | null) => !!el && !el.closest('.theme-art')
 
+// A theme in use on page B can answer each step of a reps or load drag in its own way
+// (Pulsar spins and ticks). The hook returns true when it played its own sound.
+let pickHook: ((dir: number) => boolean) | null = null
+export function onPick(fn: (dir: number) => boolean) {
+  pickHook = fn
+  return () => { if (pickHook === fn) pickHook = null }
+}
+
 export const sound = {
   tap() { tone(1000, 620, 0.05, 0.16, 'sine') },
   pop() { tone(600, 1300, 0.08, 0.16, 'sine'); buzz(10) },
   tick() { tone(2200, 1700, 0.018, 0.1, 'triangle'); buzz(4) },
+  // a step while dragging a reps or load picker
+  pick(dir: number) { if (pickHook?.(dir)) buzz(4); else sound.tick() },
   // Manga theme
   flip() { noise(0.16, 0.22, 'bandpass', 900, 3600); noise(0.1, 0.12, 'bandpass', 2400, 1200, 0.12) },
   // a blade cutting the air (a fast swish rising in pitch), then the bite of the cut
