@@ -2489,3 +2489,9 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 @container theme-card (max-width: 200px) { .themes .theme-card .tier-chip { top: 30px; } }
 .themes .theme-track { padding-top: 6px; padding-bottom: 6px; }
 .themes .theme-info .theme-name-row .theme-feats { right: calc(6% + 16px); }
+/* longer, softer fade: the picture runs down behind the price and buttons and melts away there */
+.themes .theme-card { height: max(380px, calc(100cqh - 175px)); }
+.themes .theme-card .theme-art {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 70px, #000 calc(100% - 330px), rgba(0,0,0,.55) calc(100% - 170px), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 70px, #000 calc(100% - 330px), rgba(0,0,0,.55) calc(100% - 170px), transparent 100%); }
+.themes .theme-info { margin-top: -262px; }
