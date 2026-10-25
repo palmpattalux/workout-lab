@@ -115,20 +115,16 @@ export function endSession(): string | null {
   stopTimer()
   saveSession({ ...active, endedAt: Date.now(), snap })
   set(null)
-  try { sessionStorage.setItem('dotset:last-ended', id) } catch { /* blocked */ }
   return id
 }
 
-// Ended by mistake: the session just ended can be picked up again for a while, as if it
+// Ended by mistake: the last session can be picked up again from the book for a while, as if it
 // never ended (it comes out of the book and is saved again when it really ends).
 const CONTINUE_MS = 2 * 60 * 60 * 1000 // 2 hours (user 2026-10-25)
 export function canContinue(id: string | null): boolean {
   if (!id || active) return false
   const s = getSessions().at(-1)
   return !!s && s.id === id && !!s.endedAt && Date.now() - s.endedAt < CONTINUE_MS
-}
-export function lastEnded(): string | null {
-  try { return sessionStorage.getItem('dotset:last-ended') } catch { return null }
 }
 // returns the exercise to open
 export function continueSession(id: string): string | null {
@@ -137,7 +133,6 @@ export function continueSession(id: string): string | null {
   const { endedAt: _e, snap: _s, ...running } = s
   deleteSession(id)
   set(running)
-  try { sessionStorage.removeItem('dotset:last-ended') } catch { /* blocked */ }
   return running.current
 }
 

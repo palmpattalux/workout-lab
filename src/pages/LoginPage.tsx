@@ -3,7 +3,6 @@ import { signIn, signUp, resetPassword, resendVerification, setNewPassword, endR
 import { t } from '../lib/i18n'
 import { LangPicker } from '../components/Flag'
 import { Icon } from '../components/icons'
-import { canContinue, continueSession, lastEnded } from '../lib/session'
 
 // Log in / sign up / forgot password: the first screen for anyone not signed in. Once
 // signed in, the account is remembered until Log out (gear on page A).
@@ -152,11 +151,6 @@ export default function LoginPage({ start, note }: { start?: 'login' | 'signup';
       {!arrivedFromEmailLink && <button className="icon-btn login-close" aria-label={t('Back')} onClick={() => { if (history.length > 1) history.back(); else location.replace('#') }}><Icon name="close" size="22px" /></button>}
       <form className="login-form" onSubmit={submit}>
         {note && !forgot && <p className="login-note"><Icon name="check" size="16px" strokeWidth={2.6} />{note}</p>}
-        {note && !forgot && canContinue(lastEnded()) && (
-          <button type="button" className="continue-btn inline" onClick={() => { const w = continueSession(lastEnded()!); if (w) location.replace('#b-' + w) }}>
-            <Icon name="play" size="14px" strokeWidth={2.4} />{t('Continue session')}
-          </button>
-        )}
         <h1>{forgot ? t('Reset your password') : 'Dotset'}</h1>
         <p className="muted">{forgot ? t("Type your account email and we'll send you a link to choose a new password.") : isLogin ? t('Log in to your notes.') : t('Make an account to keep your notes.')}</p>
 
