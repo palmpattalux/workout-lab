@@ -2475,3 +2475,17 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
   .themes .theme-name-row .tf { width: 23px; height: 23px; }
   .themes .theme-name-row .tf svg { width: 12px; height: 12px; }
 }
+
+/* themes page, seamless (2026-10-25): the picture melts into the page at the top and
+   bottom instead of ending in a hard edge, so title, picture and buttons read as one */
+.themes .theme-card { background: transparent; box-shadow: none; overflow: visible; }
+.themes .theme-card.viewing { box-shadow: none; }
+.themes .theme-card .theme-art { border-radius: 30px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 70px, #000 calc(100% - 170px), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 70px, #000 calc(100% - 170px), transparent 100%); }
+.themes .theme-card.viewing .theme-art { outline: 2px solid var(--sun); outline-offset: -2px; }
+.themes .theme-veil { display: none; }
+.themes .theme-card .tier-chip { top: 30px; }
+@container theme-card (max-width: 200px) { .themes .theme-card .tier-chip { top: 30px; } }
+.themes .theme-track { padding-top: 6px; padding-bottom: 6px; }
+.themes .theme-info .theme-name-row .theme-feats { right: calc(6% + 16px); }
