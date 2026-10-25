@@ -42,6 +42,11 @@ const SORTS: { key: Sort; label: string }[] = [
 ]
 const LEVEL: Record<Exclude<Sort, 'all'>, number> = { basic: 75, premium: 149, exclusive: 159 }
 
+// the big cards run cheapest first too (slot order within a price), empty slots last
+const ORDER = THEMES.map((th, i) => ({ th, i }))
+  .sort((a, b) => (a.th ? themePrice(a.th.key) : 1e9) - (b.th ? themePrice(b.th.key) : 1e9) || a.i - b.i)
+  .map((x) => x.th)
+
 export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
   const preview = usePreview()
   const plan = usePlan()
@@ -113,7 +118,7 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
     setTimeout(() => window.removeEventListener('click', stop, { capture: true }), 50)
   }
   const index = Math.min(THEME_SLOTS - 1, Math.max(0, Math.round(pos)))
-  const theme = THEMES[index]
+  const theme = ORDER[index]
   const viewing = theme && preview === theme.key
   const owner = !!theme && canUseTheme(theme.key, plan)
   const bought = !!theme && ownedThemes.includes(theme.key)
@@ -124,7 +129,7 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
   // all themes at once, 3 across, with a sort; tapping one jumps the big view to it
   const [grid, setGrid] = useState(false)
   const [sort, setSort] = useState<Sort>('all')
-  const listed = THEMES.map((th, i) => ({ th, i })).filter((x): x is { th: NonNullable<typeof x.th>; i: number } => !!x.th)
+  const listed = ORDER.map((th, i) => ({ th, i })).filter((x): x is { th: NonNullable<typeof x.th>; i: number } => !!x.th)
   const sorted = [...listed]
     .filter((x) => sort === 'all' || themePrice(x.th.key) === LEVEL[sort])
     .sort((a, b) => themePrice(a.th.key) - themePrice(b.th.key))
@@ -157,7 +162,7 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
         className="theme-track"
         ref={track}
       >
-        {THEMES.map((th, i) => {
+        {ORDER.map((th, i) => {
           const d = Math.min(1.4, Math.abs(i - pos))
           return (
             <div key={i} className="theme-cell">
@@ -168,7 +173,6 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
                 onClick={() => goTo(i)}
               >
                 {th && d < 0.5 && <TierChip tier={th.tier} />}
-                {th && <span className={`price-pill${has(th.key) ? ' owned' : ''}`}>{has(th.key) ? <><Icon name="check" size="13px" strokeWidth={2.8} />{t('Owned')}</> : '฿' + themePrice(th.key)}</span>}
                 {th ? (
                   <div className={`theme-art skin-${th.key}${settled === i ? '' : ' paused'}`} data-skin={th.key}>
                     {Math.abs(i - pos) < 1.6 && <ThemeScene skin={th.key} />}
@@ -250,7 +254,7 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
       )}
 
       <div className="theme-pips" aria-hidden="true">
-        {THEMES.map((th, i) => <i key={i} className={`${i === index ? 'on' : ''}${th?.tier === 'exclusive' ? ' gold' : ''}`} />)}
+        {ORDER.map((th, i) => <i key={i} className={`${i === index ? 'on' : ''}${th?.tier === 'exclusive' ? ' gold' : ''}`} />)}
       </div>
     </main>
   )
