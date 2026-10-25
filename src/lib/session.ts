@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { stopTimer, getTimer } from './timer'
-import { saveSession, getWorkouts, updateWorkout, getPresets, onScopeChange, scopedKey, type Session, type SetEntry } from './store'
+import { saveSession, getSessions, deleteSession, getWorkouts, updateWorkout, getPresets, onScopeChange, scopedKey, type Session, type SetEntry } from './store'
 
 // The active session, if any. Kept in this browser so a reload doesn't lose it;
 // written to the database once, when the session ends.
@@ -115,7 +115,30 @@ export function endSession(): string | null {
   stopTimer()
   saveSession({ ...active, endedAt: Date.now(), snap })
   set(null)
+  try { sessionStorage.setItem('dotset:last-ended', id) } catch { /* blocked */ }
   return id
+}
+
+// Ended by mistake: the session just ended can be picked up again for a while, as if it
+// never ended (it comes out of the book and is saved again when it really ends).
+const CONTINUE_MS = 2 * 60 * 60 * 1000 // 2 hours (user 2026-10-25)
+export function canContinue(id: string | null): boolean {
+  if (!id || active) return false
+  const s = getSessions().at(-1)
+  return !!s && s.id === id && !!s.endedAt && Date.now() - s.endedAt < CONTINUE_MS
+}
+export function lastEnded(): string | null {
+  try { return sessionStorage.getItem('dotset:last-ended') } catch { return null }
+}
+// returns the exercise to open
+export function continueSession(id: string): string | null {
+  if (!canContinue(id)) return null
+  const s = getSessions().at(-1)!
+  const { endedAt: _e, snap: _s, ...running } = s
+  deleteSession(id)
+  set(running)
+  try { sessionStorage.removeItem('dotset:last-ended') } catch { /* blocked */ }
+  return running.current
 }
 
 // Throw the running session away without saving it.

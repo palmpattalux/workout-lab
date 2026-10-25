@@ -7,7 +7,7 @@ import { usePrefs, setPrefs } from '../lib/prefs'
 import { useIconPack } from '../lib/iconpack'
 import { useSkin, getPreview } from '../lib/theme'
 import { useSessions } from '../lib/store'
-import { useSession } from '../lib/session'
+import { useSession, canContinue, continueSession } from '../lib/session'
 import { useTimer } from '../lib/timer'
 import ThemeScene from '../components/ThemeScene'
 import { useEmail, signOut, canResetPassword } from '../lib/auth'
@@ -577,6 +577,13 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
         <button className="btn pill live-chip" onClick={() => openDot(live.current)} aria-label={t('Session active: tap to go back to it')}>
           <span className="led" />{t('Session active')}
           {timer && <span className="chip-timer" aria-label={t('Timer')}><Icon name="stopwatch" size="15px" strokeWidth={2.2} /></span>}
+        </button>
+      )}
+
+      {/* ended a session by mistake: for 2 hours it can be picked up again */}
+      {!live && !picking && canContinue(pastSessions.at(-1)?.id ?? null) && (
+        <button className="btn pill live-chip resume" onClick={() => { const w = continueSession(pastSessions.at(-1)!.id); if (w) location.hash = 'b-' + w }}>
+          <Icon name="play" size="13px" strokeWidth={2.4} />{t('Continue session')}
         </button>
       )}
 

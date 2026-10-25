@@ -89,6 +89,7 @@ const ROWS: [string, string, string, string][] = [
   ['Renew {plan}', 'ต่ออายุ {plan}', '{plan} を更新', '续订 {plan}'],
   ['Skip', 'ข้าม', 'スキップ', '跳过'],
   ['Next', 'ถัดไป', '次へ', '下一步'],
+  ['Continue session', 'ทำต่อ', 'セッションを続ける', '继续训练'],
   ['{n} more saved. They come back when you renew.', 'เก็บไว้อีก {n} ท่า จะกลับมาเมื่อคุณต่ออายุ', 'ほかに {n} 件保存されています。更新すると戻ります。', '另有 {n} 个已保存，续订后恢复。'],
   ['Sound', 'เสียง', 'サウンド', '音效'],
   ['Interactive', 'ตอบสนองการใช้งาน', 'インタラクティブ', '互动'],

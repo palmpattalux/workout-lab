@@ -2400,3 +2400,15 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .pop.on { background: var(--pick-bg); color: var(--ink); box-shadow: var(--pick-lift); transform: translate(-50%, -50%) scale(1.3); }
 .page:has(.holding) .tour-target { box-shadow: none !important; animation: none; }
 .ruler span.on:has(svg)::before { width: 30px; height: 30px; margin: -15px 0 0 -15px; }
+
+/* ended a session by mistake: pick it up again (summary page, guest sign-up page) */
+.continue-btn {
+  position: fixed; z-index: 5; top: calc(18px + env(safe-area-inset-top)); right: max(16px, calc(50% - 215px + 16px));
+  display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--hair); background: var(--surface); color: var(--ink); box-shadow: var(--lift);
+  font: 700 .8rem var(--font);
+}
+.continue-btn svg { fill: currentColor; stroke: none; color: var(--active); }
+.continue-btn:active { transform: scale(.95); }
+.continue-btn.inline { position: static; align-self: center; margin: 4px auto 0; }
+.live-chip.resume svg { fill: var(--active); stroke: none; }

@@ -6,6 +6,7 @@ import { statOf } from '../lib/progress'
 import { t } from '../lib/i18n'
 import { statsOf, whenOf, type StickerProgress, type StickerCard } from '../lib/sticker'
 import ShareSticker from '../components/ShareSticker'
+import { canContinue, continueSession } from '../lib/session'
 
 // Shown right after a session ends: this session's numbers count up from the last
 // session's, the change pops in, then everything settles still (good for a screenshot).
@@ -142,6 +143,11 @@ export default function SummaryPage({ id, workouts, onDone }: { id: string; work
         })}
       </ol>
 
+      {canContinue(s.id) && (
+        <button className="continue-btn" onClick={() => { const w = continueSession(s.id); if (w) location.replace('#b-' + w) }}>
+          <Icon name="play" size="14px" strokeWidth={2.4} />{t('Continue session')}
+        </button>
+      )}
       {rows.length > 0 && <button className="share-btn" onClick={() => setSharing(true)}><Icon name="share" size="18px" />{t('Share')}</button>}
       {sharing && <ShareSticker {...shareData()} onClose={() => setSharing(false)} />}
 
