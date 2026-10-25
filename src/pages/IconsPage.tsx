@@ -33,7 +33,7 @@ export function TokyoIcon() {
   return (
     <span className="app-icon tokyo" aria-hidden="true">
       <i className="tk-sun" />
-      <WorkoutIcon k="katana" size="40px" strokeWidth={2.2} />
+      <WorkoutIcon k="katana" size="40px" />
       <b>ア</b>
     </span>
   )
@@ -85,7 +85,7 @@ export default function IconsPage() {
       </div>
       <section className="pack-peek" aria-label={t(lookName)}>
         <div className="peek-row">
-          {packIcons(look).map((i) => <span key={i.key} title={t(i.name)}><WorkoutIcon k={i.key} size="22px" strokeWidth={1.9} /></span>)}
+          {packIcons(look).map((i) => <span key={i.key} title={t(i.name)}><WorkoutIcon k={i.key} size="22px" /></span>)}
         </div>
         <div className="peek-row letters">
           {packLetters(look).map((l) => <span key={l.key}>{l.key}</span>)}

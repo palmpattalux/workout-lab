@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useId, type ReactNode } from 'react'
 
 // Line icons drawn to match the sketch style. Stroke color comes from the parent.
 const ui = {
@@ -41,15 +41,23 @@ const ui = {
 }
 
 // The 8 workout icons offered when dragging up from "+" on page A: body parts, then equipment.
-export const WORKOUT_ICONS: { key: string; name: string; svg: ReactNode }[] = [
-  { key: 'arm', name: 'Arm', svg: <path d="M3 12.5c2.5-3.5 7-4.5 10-1.5.5-1.5.7-3 .7-4.6M13.7 6.4c-.2-1.9 1-3.2 2.7-3.2 1.8 0 3 1.3 2.8 3.2l-.3 2.3c.4 3.4.2 6-.9 7.6-1.1 1.6-3 2.2-5.4 2.2H3M9 13.2c1.3.4 2.5 1.2 3.4 2.3" /> },
-  { key: 'leg', name: 'Leg', svg: <path d="M9 2.5c.5 3 2 5.5 4 8 .8 1 .9 2 .6 3.2L12.5 19l6 1.2c.7.2 1 .7 1 1.3H9.5c-.6 0-1-.5-.9-1.1l.3-2.2c-1.6-1.6-2.1-3.8-1.2-6-.6-1.2-1.2-2.5-1.6-3.6C5.5 7 5.2 4.8 5.2 2.5" /> },
-  { key: 'torso', name: 'Torso front', svg: <><path d="M2.5 8c0-2.5 1.8-4.5 4.5-4.5h10c2.7 0 4.5 2 4.5 4.5v3.5L19 13v8H5v-8l-2.5-1.5z" /><path d="M12 4v7M6.5 9c2 1.8 3.8 2.2 5.5 1 1.7 1.2 3.5.8 5.5-1M9 14.5h6M9 18h6M12 12.5V21" /></> },
-  { key: 'back', name: 'Torso back', svg: <><path d="M2.5 8c0-2.5 1.8-4.5 4.5-4.5h10c2.7 0 4.5 2 4.5 4.5v3.5L19 13v8H5v-8l-2.5-1.5z" /><path d="M12 4v17M6.5 6.5c1 3 3 4.8 5.5 5.3 2.5-.5 4.5-2.3 5.5-5.3M8 17.5l4-2.5 4 2.5" /></> },
-  { key: 'dumbbell', name: 'Dumbbell', svg: <path d="M6.5 7v10M17.5 7v10M3.5 9.5v5M20.5 9.5v5M6.5 12h11" /> },
-  { key: 'barbell', name: 'Barbell', svg: <path d="M2 12h20M5 8v8M7.5 6.5v11M16.5 6.5v11M19 8v8" /> },
-  { key: 'pullbar', name: 'Pull-up bar', svg: <path d="M2.5 5h19M5 5v15M19 5v15M3 20h4M17 20h4" /> },
-  { key: 'dipbar', name: 'Dip bar', svg: <path d="M5 21V5.5M19 21V5.5M5 9h5.5M19 9h-5.5M3 21h4M17 21h4" /> },
+// Glass style (2026-10-25): `fill` is the frosted shape under the fine line (see WorkoutIcon).
+// Body parts redrawn the same day for proportions: a longer leg, a V-tapered torso, an arm with a fist.
+const ARM = 'M2.5 13.5C5 9.5 10 9 12.5 12l.9.8c.8-1.8 1.2-3.2 1.4-4.2L14.2 8.2 14 4.6C14 3 15.2 2.4 17 2.4h2.2c1.4.2 2 1.4 1.8 3l-.4 2.8-.3.8c1.2 3 1.3 6.5.1 9-.8 1.8-2.4 2.8-4.6 2.8H6c-2 0-3.5-1.2-3.5-3.3Z'
+const LEG = 'M14.6 1.5c1.4 3 1.3 6.5-.2 9.1l-.4 1 .2 8.6 5.4 1c.6.1.9.6.9 1.3H11.4l-.5-1.6.4-1.3c-1.7-2-2.1-5.4-1.1-8.2C8.6 8.6 7.9 5.4 8 1.5Z'
+const TORSO = 'M9.2 2.8c.6 1 5 1 5.6 0l3.8 1.3c1.9.6 3.2 2.4 3 4.4-.1 1.3-.9 2.3-2.2 2.6l-2.4 9.1c-.2.8-.7 1.3-1.6 1.3H8.6c-.9 0-1.4-.5-1.6-1.3L4.6 11.1c-1.3-.3-2.1-1.3-2.2-2.6-.2-2 1.1-3.8 3-4.4Z'
+export const WORKOUT_ICONS: { key: string; name: string; svg: ReactNode; fill?: ReactNode }[] = [
+  { key: 'arm', name: 'Arm', fill: <path d={ARM} />, svg: <><path d={ARM} /><path d="M16.8 2.5v2.4M19 2.5v2.2M14.1 6c1.5-.1 2.6.4 3.2 1.4M7 14.8c1.6-1 3.4-1 4.8.2" /></> },
+  { key: 'leg', name: 'Leg', fill: <path d={LEG} />, svg: <><path d={LEG} /><path d="M14.1 11.2c-1.2.4-2.6.4-3.9 0M12.6 3.5c.6 2 .6 4.2-.1 6" /></> },
+  { key: 'torso', name: 'Torso front', fill: <path d={TORSO} />, svg: <><path d={TORSO} /><path d="M6.8 9.2c1.8 1.4 3.6 1.7 5.2.6 1.6 1.1 3.4.8 5.2-.6M12 9.8v11.4M9.4 13.6h5.2M9.7 16.9h4.6" /></> },
+  { key: 'back', name: 'Torso back', fill: <path d={TORSO} />, svg: <><path d={TORSO} /><path d="M12 3.6v17.9M7 6.2c1.2 2.8 2.9 4.6 5 5.2 2.1-.6 3.8-2.4 5-5.2M9 17.6l3-1.8 3 1.8" /></> },
+  { key: 'dumbbell', name: 'Dumbbell', fill: <><rect x="5.4" y="6.5" width="2.4" height="11" rx="1" /><rect x="16.2" y="6.5" width="2.4" height="11" rx="1" /><rect x="2.6" y="9.2" width="1.8" height="5.6" rx=".9" /><rect x="19.6" y="9.2" width="1.8" height="5.6" rx=".9" /></>,
+    svg: <><rect x="5.4" y="6.5" width="2.4" height="11" rx="1" /><rect x="16.2" y="6.5" width="2.4" height="11" rx="1" /><rect x="2.6" y="9.2" width="1.8" height="5.6" rx=".9" /><rect x="19.6" y="9.2" width="1.8" height="5.6" rx=".9" /><path d="M7.8 12h8.4M4.4 12h1M18.6 12h1" /></> },
+  { key: 'barbell', name: 'Barbell', fill: <><rect x="4.2" y="8" width="1.8" height="8" rx=".9" /><rect x="6.9" y="6.2" width="2.4" height="11.6" rx="1" /><rect x="14.7" y="6.2" width="2.4" height="11.6" rx="1" /><rect x="18" y="8" width="1.8" height="8" rx=".9" /></>,
+    svg: <><path d="M1.8 12h2.4M9.3 12h5.4M19.8 12h2.4" /><rect x="4.2" y="8" width="1.8" height="8" rx=".9" /><rect x="6.9" y="6.2" width="2.4" height="11.6" rx="1" /><rect x="14.7" y="6.2" width="2.4" height="11.6" rx="1" /><rect x="18" y="8" width="1.8" height="8" rx=".9" /></> },
+  { key: 'pullbar', name: 'Pull-up bar', fill: <rect x="2.5" y="4" width="19" height="2.2" rx="1.1" />, svg: <><rect x="2.5" y="4" width="19" height="2.2" rx="1.1" /><path d="M5 6.2V20M19 6.2V20M3 20h4M17 20h4" /></> },
+  { key: 'dipbar', name: 'Dip bar', fill: <><rect x="5" y="7.9" width="5.8" height="2.2" rx="1.1" /><rect x="13.2" y="7.9" width="5.8" height="2.2" rx="1.1" /></>,
+    svg: <><rect x="5" y="7.9" width="5.8" height="2.2" rx="1.1" /><rect x="13.2" y="7.9" width="5.8" height="2.2" rx="1.1" /><path d="M5 21V5.5M19 21V5.5M3 21h4M17 21h4" /></> },
 ]
 
 // Icons from the first version, kept so workouts made with them still draw.
@@ -74,8 +82,8 @@ const OLD_ICONS: { key: string; svg: ReactNode }[] = [
   { key: 'timer', svg: <><circle cx="12" cy="13.5" r="7" /><path d="M12 13.5V9.5M10 3h4M12 3v3.5M18 6.5l1.5-1.5" /></> },
 ]
 
-// Letters A–H offered on the second drag (just labels, not body parts).
-export const BODY_LETTERS: { key: string; name: string }[] = 'ABCDEFGH'.split('').map((k) => ({ key: k, name: k }))
+// Letters A–Z offered on the second drag (just labels, not body parts).
+export const BODY_LETTERS: { key: string; name: string }[] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((k) => ({ key: k, name: k }))
 
 // The Tokyo pack (gear > Icon): ten Japanese icons and ten katakana in place of the above.
 const petal = 'M12 12c-1.9-2.2-2.2-5-1.2-7.4l1.2 1.1 1.2-1.1c1 2.4.7 5.2-1.2 7.4Z'
@@ -113,16 +121,30 @@ export function Icon({ name, size = '42%', strokeWidth = 1.8 }: { name: IconName
   return <Svg size={size} strokeWidth={strokeWidth}>{ui[name]}</Svg>
 }
 
-export function WorkoutIcon({ k, size = '42%', strokeWidth = 1.8 }: { k: string; size?: string; strokeWidth?: number }) {
-  const found = WORKOUT_ICONS.find((i) => i.key === k) ?? TOKYO_ICONS.find((i) => i.key === k) ?? OLD_ICONS.find((i) => i.key === k)
-  return <Svg size={size} strokeWidth={strokeWidth}>{found?.svg}</Svg>
+// Exercise icons, Glass style (picked 2026-10-25): a fine line over a soft frosted fill that fades
+// from top to bottom, in the icon's own colour. Icons without a `fill` (Tokyo, old ones) are line only.
+const FINE = 1.3
+export function WorkoutIcon({ k, size = '42%', strokeWidth = FINE }: { k: string; size?: string; strokeWidth?: number }) {
+  const found: { svg: ReactNode; fill?: ReactNode } | undefined = WORKOUT_ICONS.find((i) => i.key === k) ?? TOKYO_ICONS.find((i) => i.key === k) ?? OLD_ICONS.find((i) => i.key === k)
+  const id = 'gl' + useId().replace(/:/g, '')
+  return (
+    <Svg size={size} strokeWidth={strokeWidth}>
+      {found?.fill && (
+        <>
+          <defs><linearGradient id={id} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="currentColor" stopOpacity=".5" /><stop offset="1" stopColor="currentColor" stopOpacity=".08" /></linearGradient></defs>
+          <g fill={`url(#${id})`} stroke="none">{found.fill}</g>
+        </>
+      )}
+      {found?.svg}
+    </Svg>
+  )
 }
 
 // Icon + letter, used as the workout's title everywhere.
 export function WorkoutMark({ icon, letter, size = '1em' }: { icon: string; letter: string; size?: string }) {
   return (
     <span className="mark">
-      <WorkoutIcon k={icon} size={size} strokeWidth={2} />
+      <WorkoutIcon k={icon} size={size} />
       <span className="mark-letter">{letter}</span>
     </span>
   )
