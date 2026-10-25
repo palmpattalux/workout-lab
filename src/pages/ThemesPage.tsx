@@ -57,6 +57,12 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
   const track = useRef<HTMLDivElement>(null)
   const [pos, setPos] = useState(0)
   const last = useRef(0)
+  // sun / moon in the header: see every theme by day or by night, on this page only
+  const root = document.documentElement
+  const before = useRef(root.getAttribute('data-mode'))
+  const [night, setNight] = useState(() => root.getAttribute('data-mode') === 'dark' || (!root.hasAttribute('data-mode') && matchMedia('(prefers-color-scheme: dark)').matches))
+  useEffect(() => () => { if (before.current === null) root.removeAttribute('data-mode'); else root.setAttribute('data-mode', before.current) }, [])
+  function flipMode() { const n = !night; setNight(n); root.setAttribute('data-mode', n ? 'dark' : 'light'); sound.tap() }
   const [layer, setLayer] = useState(0)
   const [enter, setEnter] = useState<'up' | 'down' | null>(null)
   const pending = useRef<number | null>(null)
@@ -201,6 +207,7 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
       <header className="create-head">
         <h1>{t('Themes')}</h1>
         <span className="themes-head-btns">
+          <button className="icon-btn" aria-label={night ? t('Day') : t('Night')} onClick={flipMode}><Icon name={night ? 'sun' : 'moon'} size="21px" strokeWidth={1.9} /></button>
           <button className="icon-btn" aria-label={t('All themes')} onClick={() => { setGrid(true); sound.tap() }}><Icon name="grid" size="21px" strokeWidth={1.9} /></button>
           <button className="icon-btn" aria-label={t('Back')} onClick={() => history.back()}><Icon name="back" size="22px" /></button>
         </span>
