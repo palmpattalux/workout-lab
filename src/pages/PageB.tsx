@@ -29,7 +29,8 @@ function swapUsesThisWeek() {
 function noteSwapUsed() {
   try { localStorage.setItem('dotset:swap-uses', JSON.stringify({ week: weekKey(), n: swapUsesThisWeek() + 1 })) } catch { /* blocked */ }
 }
-const repOptions = Array.from({ length: 25 }, (_, i) => ({ key: String(i + 1), node: i + 1 }))
+// reps line goes to 100 (25 shown, then it scrolls); tapping types up to 999
+const repOptions = Array.from({ length: 100 }, (_, i) => ({ key: String(i + 1), node: i + 1 }))
 // timed holds: every second from 1 to 60 (45 on the line, scrolling on to 60); longer ones are typed.
 // The line is tight, so only every fifth second is numbered.
 const secOptions = Array.from({ length: 60 }, (_, i) => ({ key: String(i + 1), node: (i + 1) % 5 === 0 || i === 0 ? i + 1 : <i className="tick" />, label: t('{n} sec', { n: i + 1 }) }))
@@ -331,17 +332,17 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
       <HoldPicker
         key={timed ? 'sec' : 'reps'}
         options={timed ? secOptions : repOptions}
-        visible={timed ? 45 : undefined}
-        start={timed && reps ? Math.min(59, reps - 1) : 0}
+        visible={timed ? 45 : 25}
+        start={reps ? Math.min(timed ? 59 : 99, reps - 1) : 0}
         maxStep={20}
         instant
         extra={timed && inSession ? { node: <Icon name="stopwatch" size="22px" />, label: t('Timer'), onPick: () => startTimer(id!, key) } : undefined}
         onChange={(i) => { if (!timerHere) put('reps', countValue(i)) }}
         onPick={(i) => { if (timerHere) stopTimer(); put('reps', countValue(i)) }}
-        onTap={timed ? () => (timerHere ? stopWatch() : setTyping('reps')) : undefined}
+        onTap={() => (timerHere ? stopWatch() : setTyping('reps'))}
         className={`mid reps${timed ? ' dense' : ''}${timerHere ? (ts?.counting ? ' timing counting' : ' timing') : ''}`}
         style={{ left: '69%', top: '64.1%' }}
-        ariaLabel={timerHere ? t('Timer running: tap to stop') : `${timed ? 'Seconds' : 'Reps'} (B4)${reps ? `: ${reps}` : ''}, ${timed ? 'tap to type, ' : ''}drag up to set`}
+        ariaLabel={timerHere ? t('Timer running: tap to stop') : `${timed ? 'Seconds' : 'Reps'} (B4)${reps ? `: ${reps}` : ''}, tap to type, drag up to set`}
       >
         {timerHere && ts
           ? ts.counting
@@ -352,10 +353,11 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
       {tourOn && <BTour step={tour} progression={isProgression} timed={timed} unit={unit} onStep={setTour} onEnd={endTour} />}
       {typing && (
         <NumberPrompt
-          title={typing === 'weight' ? t('Weight') : t('Seconds')}
-          unit={typing === 'weight' ? unit : t('sec')}
+          title={typing === 'weight' ? t('Weight') : timed ? t('Seconds') : t('Reps')}
+          unit={typing === 'weight' ? unit : timed ? t('sec') : t('reps')}
           value={typing === 'weight' ? weight : reps}
           decimal={typing === 'weight'}
+          max={typing === 'reps' && !timed ? 999 : undefined}
           onSave={(n) => { if (typing === 'reps' && timerHere) stopTimer(); put(typing, n) }}
           onClose={() => setTyping(null)}
         />
