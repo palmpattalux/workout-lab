@@ -255,6 +255,10 @@ export function updateWorkout(id: string, patch: Partial<Omit<Workout, 'id'>>) {
   remote?.saveWorkout(next)
 }
 
+export function getSessions() {
+  return sessions
+}
+
 export function saveSession(x: Session) {
   sessions = [...sessions, x]
   emit()

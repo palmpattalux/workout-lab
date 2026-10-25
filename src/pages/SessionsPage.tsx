@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { WorkoutMark } from '../components/icons'
 import { useSessions, deleteSession, updateSession, useNotes, type Workout, type Session, type SetEntry } from '../lib/store'
 import { Icon } from '../components/icons'
-import { useSession, discardSession } from '../lib/session'
+import { useSession, discardSession, canContinue, continueSession } from '../lib/session'
 import SetList from '../components/SetList'
 import { keyNum, keySide } from '../lib/session'
 import { day, time, duration, setLines } from '../lib/format'
@@ -112,6 +112,8 @@ export default function SessionsList({ workouts, only, startOpen }: { workouts: 
                 )}
                 <div className="detail-actions">
                   {!s.live && <button className="edit-session" onClick={() => setEditing(s.id)}>{t('Edit')}</button>}
+                  {/* ended by mistake: the last session can be picked up again for 2 hours */}
+                  {!s.live && canContinue(s.id) && <button className="edit-session" onClick={() => { const w = continueSession(s.id); if (w) location.hash = 'b-' + w }}>{t('Continue session')}</button>}
                   <button className="remove" onClick={() => setRemoving(s)}>{t('Remove session')}</button>
                 </div>
               </div>

@@ -3,19 +3,25 @@ import { getPrefs } from './prefs'
 // Small synthesized sounds, so there are no audio files to load.
 // tap: any button press. pop: a hold picker or ring opens. tick: each step while dragging.
 let ctx: AudioContext | null = null
+const UNLOCK_ON = ['touchend', 'click', 'keydown']
 
 function audio(): AudioContext | null {
   if (!getPrefs().sound) return null
   try {
     const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
-    ctx ??= new AC()
-    if (ctx.state === 'suspended') ctx.resume()
+    if (!ctx || ctx.state === 'closed') {
+      ctx = new AC()
+      // the phone can pause the audio at any time (screen lock, a call, another app's sound):
+      // listen for the next tap again so it comes back
+      ctx.onstatechange = () => { if (ctx && ctx.state !== 'running') arm() }
+    }
+    if (ctx.state !== 'running') ctx.resume().catch(() => {})
     return ctx
   } catch { return null }
 }
 
 // Phones only let a page start sound from a finished tap (touchend / click), not from the
-// press itself, so the audio is unlocked there once; after that every press can play.
+// press itself, so the audio is unlocked there; after that every press can play.
 function unlock() {
   const c = audio()
   if (!c) return
@@ -24,9 +30,14 @@ function unlock() {
   b.buffer = c.createBuffer(1, 1, 22050)
   b.connect(c.destination)
   b.start(0)
-  if (c.state === 'running') ['touchend', 'click', 'keydown'].forEach((t) => document.removeEventListener(t, unlock, true))
+  if (c.state === 'running') UNLOCK_ON.forEach((t) => document.removeEventListener(t, unlock, true))
 }
-;['touchend', 'click', 'keydown'].forEach((t) => document.addEventListener(t, unlock, true))
+function arm() { UNLOCK_ON.forEach((t) => document.addEventListener(t, unlock, true)) }
+arm()
+// back from another app or the lock screen: wake the audio up again
+const wake = () => { if (!document.hidden && ctx && ctx.state !== 'running') { ctx.resume().catch(() => {}); arm() } }
+document.addEventListener('visibilitychange', wake)
+window.addEventListener('pageshow', wake)
 // Mix with any music playing instead of pausing it (Safari).
 try { (navigator as unknown as { audioSession?: { type: string } }).audioSession!.type = 'ambient' } catch { /* not supported */ }
 
