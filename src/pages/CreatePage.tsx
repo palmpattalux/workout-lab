@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Icon, WorkoutIcon, WorkoutMark, packIcons, packLetters } from '../components/icons'
 import { useIconPack } from '../lib/iconpack'
 import { addWorkout, updateWorkout, deleteWorkout, TINTS, type Workout } from '../lib/store'
@@ -132,9 +132,82 @@ export default function CreatePage({ icon: icon0, letter: letter0, editing, onCl
         </div>
       )}
 
+      {!editing && <CreateTour named={named} progression={!isEquipment} />}
+
       <button className="btn circle big save-new" aria-label={t('Save workout')} onClick={save}>
         <Icon name="check" strokeWidth={2.2} />
       </button>
     </main>
+  )
+}
+
+// First exercise ever: a short guided tour, one hint at a time, each pointing at its control.
+// A hint moves on when that control is used, or with Next. Shown once per device.
+const TOUR_KEY = 'dotset:create-tour'
+type Step = { sel: string; text: string; sub?: string; above?: boolean }
+
+function CreateTour({ named, progression }: { named: boolean; progression: boolean }) {
+  const [step, setStep] = useState(() => { try { return localStorage.getItem(TOUR_KEY) ? -1 : 0 } catch { return 0 } })
+  const [box, setBox] = useState<{ left: number; top: number; width: number; height: number } | null>(null)
+  const ref = useRef<HTMLDivElement>(null)
+  const steps: Step[] = [
+    { sel: '#exercise', text: t('Name your exercise'), sub: t('e.g. Bench press') },
+    { sel: '.create .unit', text: progression ? t('Tap to switch reps / seconds') : t('Tap to switch kg / lbs') },
+    { sel: '.create .switch', text: t('Equipment or progressions'), sub: t('Tap to switch') },
+    { sel: '.create .mark-btn', text: t('Tap to change the icon or colour') },
+    { sel: '.save-new', text: t('Tap to save'), above: true },
+  ]
+  const cur = step >= 0 ? steps[step] : undefined
+
+  function next() {
+    if (step + 1 >= steps.length) { try { localStorage.setItem(TOUR_KEY, '1') } catch { /* private mode */ } setStep(-1) }
+    else setStep(step + 1)
+  }
+  function skip() { try { localStorage.setItem(TOUR_KEY, '1') } catch { /* private mode */ } setStep(-1) }
+
+  // the name hint is done once the exercise has a name
+  useEffect(() => { if (step === 0 && named) setStep(1) }, [named, step])
+
+  // using the pointed-at control moves the tour on
+  useEffect(() => {
+    if (!cur || step === 0) return
+    const onClick = (e: MouseEvent) => { if ((e.target as Element).closest(cur.sel)) setTimeout(next, 250) }
+    document.addEventListener('click', onClick, true)
+    return () => document.removeEventListener('click', onClick, true)
+  })
+
+  // place the hint by its control, and light the control up
+  useLayoutEffect(() => {
+    if (!cur) return
+    const el = document.querySelector(cur.sel)
+    const main = ref.current?.parentElement
+    if (!el || !main) return
+    el.classList.add('tour-target')
+    const place = () => {
+      const r = el.getBoundingClientRect(), m = main.getBoundingClientRect()
+      setBox({ left: r.left - m.left, top: r.top - m.top + main.scrollTop, width: r.width, height: r.height })
+    }
+    place()
+    window.addEventListener('resize', place)
+    return () => { el.classList.remove('tour-target'); window.removeEventListener('resize', place) }
+  }, [step, named, progression])
+
+  if (!cur) return null
+  const center = box ? Math.min(Math.max(box.left + box.width / 2, 110), (ref.current?.parentElement?.clientWidth ?? 390) - 110) : 0
+  return (
+    <div ref={ref} className="tour-layer">
+      {box && (
+        <div key={step} className={`tour-tip${cur.above ? ' above' : ''}`} role="status"
+          style={{ left: center, top: cur.above ? box.top - 14 : box.top + box.height + 14, ['--arrow' as string]: `${box.left + box.width / 2 - center}px` }}>
+          <b>{cur.text}</b>
+          {cur.sub && <small>{cur.sub}</small>}
+          <span className="tour-actions">
+            <span className="tour-count">{step + 1}/{steps.length}</span>
+            {step < steps.length - 1 && <button onClick={skip}>{t('Skip')}</button>}
+            <button className="on" onClick={next}>{step < steps.length - 1 ? t('Next') : t('Got it')}</button>
+          </span>
+        </div>
+      )}
+    </div>
   )
 }

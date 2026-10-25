@@ -334,20 +334,21 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
   }
   const prefs = usePrefs()
   const newWeek = useNewWeek()
-  // First run for a guest (not signed in): holograms show how to make an exercise with
-  // "+" and where to sign up (gear). Once they've made one, a hologram taps it until
-  // their first session starts.
+  // First run (a guest or a brand-new account): everything but "+" is blurred and a hologram
+  // shows how to make an exercise. Once they've made one, a hologram taps it until their
+  // first session starts. Guests are asked to sign up when that first session ends (#save).
   const pastSessions = useSessions()
   const live = useSession()
   const timer = useTimer()
-  const firstRun = guest && pastSessions.length === 0 && !live
+  // also a brand-new account (no exercises or sessions yet), not only guests
+  const firstRun = pastSessions.length === 0 && !live
   const showCreateHolo = firstRun && workouts.length === 0 && pickedIcon === null && !settingsOpen
   const tapTarget = firstRun && workouts.length > 0 && !drag && !ring && !settingsOpen ? workouts[0].id : null
   const email = useEmail()
   const skin = useSkin()
 
   return (
-    <main className={`page${picking ? ' picking' : ''}`} aria-label="Page A"
+    <main className={`page${picking ? ' picking' : ''}${firstRun && workouts.length === 0 && !settingsOpen ? ' first-run' : ''}`} aria-label="Page A"
       onPointerDownCapture={(e) => { if (letterHint) setLetterHint(0); if (pickedIcon && !(e.target as Element).closest('.add')) setPickedIcon(null) }}
       onPointerDown={onBlankDown} onPointerMove={onBlankMove} onPointerUp={onBlankUp} onPointerCancel={onBlankUp}
       onClick={(e) => { if (e.target === e.currentTarget) { setChosen(null); setSettingsOpen(false); setRing(null); setPresetOpen(false); setArmedPreset(null) } }}>
@@ -492,6 +493,7 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
           options={iconOptions}
           maxStep={40}
           instant
+          title={t('Choose an icon')}
           onTap={() => setSlideHint((n) => n + 1)}
           onPick={(i) => { setPickedIcon(iconOptions[i].key); setLetterHint((n) => n + 1) }}
           className={`dot add float${slideHint ? ' hint-hidden' : ''}`}
@@ -505,6 +507,7 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
           options={letterOptions}
           maxStep={40}
           instant
+          title={pack === 'tokyo' ? t('Choose a letter') : t('Choose a body part')}
           onTap={tapAdd}
           onPick={(i) => { const icon = pickedIcon; setPickedIcon(null); onCreate(icon, letterOptions[i].key) }}
           className={`dot add float in-progress${letterHint ? ' hint-hidden' : ''}`}
@@ -658,14 +661,10 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
           <span className="holo-pick one"><WorkoutIcon k="dumbbell" size="52%" strokeWidth={2} /></span>
           <span className="holo-pick two"><b>A</b></span>
           <HoloThumb />
-          <span className="holo-label">{t('Slide up to make an exercise')}</span>
+          <span className="holo-ring" />
+          <span className="holo-arrow"><Icon name="arrowLeft" size="100%" strokeWidth={2.4} /></span>
+          <span className="holo-label">{t('Start here')}<small>{t('Slide up to make an exercise')}</small></span>
         </div>
-      )}
-      {firstRun && workouts.length === 0 && !settingsOpen && (
-        <button className="holo holo-signup" onClick={() => { location.hash = 'signup' }}>
-          <span className="holo-label">{t('Sign up or log in')}</span>
-          <span className="holo-hand"><Icon name="hand" size="100%" strokeWidth={1.6} /></span>
-        </button>
       )}
       {tapTarget && slotOf.has(tapTarget) && (
         <div className={`holo holo-tap${chosen === tapTarget ? ' again' : ''}`} aria-hidden="true"
