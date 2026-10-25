@@ -2,17 +2,18 @@ import { useState } from 'react'
 import { t } from '../lib/i18n'
 
 // Type a number instead of dragging for it (a weight, or seconds held).
-export default function NumberPrompt({ title, unit, value, decimal, onSave, onClose }: {
+export default function NumberPrompt({ title, unit, value, decimal, max = 9999, onSave, onClose }: {
   title: string
   unit: string
   value: number | null
   decimal?: boolean
+  max?: number
   onSave: (n: number) => void
   onClose: () => void
 }) {
   const [text, setText] = useState(value ? String(value) : '')
   const n = Number(text.replace(',', '.'))
-  const ok = text.trim() !== '' && Number.isFinite(n) && n > 0 && n <= 9999
+  const ok = text.trim() !== '' && Number.isFinite(n) && n > 0 && n <= max
   function save() {
     if (!ok) return
     onSave(decimal ? Math.round(n * 100) / 100 : Math.round(n))
