@@ -2400,3 +2400,31 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .pop.on { background: var(--pick-bg); color: var(--ink); box-shadow: var(--pick-lift); transform: translate(-50%, -50%) scale(1.3); }
 .page:has(.holding) .tour-target { box-shadow: none !important; animation: none; }
 .ruler span.on:has(svg)::before { width: 30px; height: 30px; margin: -15px 0 0 -15px; }
+
+/* ---------- themes page, big cards (2026-10-25 try): the picture fills the page, the
+   note sits over its top and the name over its bottom, each on a soft blur ---------- */
+.themes .create-head, .themes .themes-note, .themes .theme-info { position: relative; z-index: 2; }
+.themes .themes-note { margin-bottom: 0; padding-bottom: 4px; }
+.themes .theme-track { padding: 0 6%; margin-top: -46px; }
+.themes .theme-card { width: 100%; max-width: none; height: max(340px, calc(100cqh - 260px)); aspect-ratio: auto; border-radius: 30px; }
+.themes .theme-art.blank { border-radius: 30px; }
+.theme-veil { position: absolute; left: 0; right: 0; z-index: 2; pointer-events: none;
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  background: color-mix(in srgb, var(--stage) 38%, transparent); }
+.theme-veil.top { top: 0; height: 100px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent); mask-image: linear-gradient(to bottom, #000 45%, transparent); }
+.theme-veil.bottom { bottom: 0; height: 150px;
+  -webkit-mask-image: linear-gradient(to top, #000 55%, transparent); mask-image: linear-gradient(to top, #000 55%, transparent); }
+.themes .theme-card.empty .theme-veil { display: none; }
+.themes .price-pill { top: 58px; left: 14px; }
+.themes .theme-card .tier-chip { top: 58px; right: 14px; bottom: auto; transform: none; }
+/* features: under the plan chip, on the picture */
+.themes .theme-cell { position: relative; }
+.themes .theme-feats { position: absolute; top: 92px; right: calc(14px + 0px); width: auto; margin: 0; z-index: 3; transform-origin: top right; }
+.themes .theme-feats .tf { background: color-mix(in srgb, var(--surface) 80%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.themes .tf-tell { bottom: auto; top: calc(100% + 6px); }
+.themes .theme-info { margin-top: -132px; padding-top: 0; }
+.themes .theme-info .theme-blurb { color: var(--ink); opacity: .78; }
+.themes .theme-info .owned-tag, .themes .theme-info .theme-buy, .themes .theme-info > .theme-view { margin-top: 26px; }
+.themes .theme-buy .theme-view { margin-top: 0; }
+@container theme-card (max-width: 200px) { .themes .theme-card .tier-chip { top: 58px; } }

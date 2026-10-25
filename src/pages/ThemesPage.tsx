@@ -126,6 +126,9 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
                 ) : (
                   <div className="theme-art blank"><span>{i + 1}</span><small>{t('Coming soon')}</small></div>
                 )}
+                {/* soft blur at the top and bottom so the text over the picture stays readable */}
+                <span className="theme-veil top" aria-hidden="true" />
+                <span className="theme-veil bottom" aria-hidden="true" />
               </button>
               {th && <Feats has={th.has} style={{ transform: `scale(${1 - d * 0.16})`, opacity: 1 - d * 0.45 }} />}
             </div>
