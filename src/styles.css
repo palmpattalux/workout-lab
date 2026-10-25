@@ -2428,3 +2428,20 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .themes .theme-info .owned-tag, .themes .theme-info .theme-buy, .themes .theme-info > .theme-view { margin-top: 26px; }
 .themes .theme-buy .theme-view { margin-top: 0; }
 @container theme-card (max-width: 200px) { .themes .theme-card .tier-chip { top: 58px; } }
+
+/* themes: all of them at once, 3 across, with a sort */
+.themes-head-btns { display: flex; align-items: center; gap: 2px; }
+.theme-grid-sheet { position: absolute; inset: 0; z-index: 20; display: flex; flex-direction: column; background: var(--stage); animation: rise .2s var(--ease); }
+.theme-sort { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 10px 7% 4px; flex: none; }
+.theme-sort::-webkit-scrollbar { display: none; }
+.theme-sort button { flex: none; border: 1px solid var(--line); background: none; color: var(--muted); font: 600 .78rem var(--font); padding: 7px 13px; border-radius: 999px; cursor: pointer; white-space: nowrap; }
+.theme-sort button.on { background: var(--ink); border-color: var(--ink); color: var(--stage); }
+.theme-grid { flex: 1; overflow-y: auto; overscroll-behavior: contain; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 10px; padding: 12px 5% 40px; align-content: start; }
+.theme-tile { border: 0; background: none; padding: 0; color: var(--ink); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; }
+.theme-tile .tt-art { width: 100%; aspect-ratio: 9 / 16; border-radius: 16px; overflow: hidden; box-shadow: var(--lift); display: block; }
+.theme-tile.exclusive .tt-art { box-shadow: var(--lift), 0 0 0 1.5px #d9b45a; }
+.theme-tile.in-use .tt-art { box-shadow: var(--lift), 0 0 0 2.5px var(--sun); }
+.theme-tile b { font: 650 .78rem var(--font); margin-top: 4px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.theme-tile small { font: 600 .68rem var(--num, var(--font)); color: var(--muted); }
+.theme-tile:active .tt-art { transform: scale(.96); }
+.theme-tile .tt-art .theme-art { display: block; }

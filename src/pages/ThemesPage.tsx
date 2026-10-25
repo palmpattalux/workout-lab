@@ -32,6 +32,14 @@ function Feats({ has, style }: { has: Feature[]; style: CSSProperties }) {
   )
 }
 
+type Sort = 'featured' | 'low' | 'high' | 'owned'
+const SORTS: { key: Sort; label: string }[] = [
+  { key: 'featured', label: 'Featured' },
+  { key: 'low', label: 'Price: low to high' },
+  { key: 'high', label: 'Price: high to low' },
+  { key: 'owned', label: 'Owned first' },
+]
+
 export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
   const preview = usePreview()
   const plan = usePlan()
@@ -80,6 +88,19 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
   const has = (key: string) => ownedThemes.includes(key) || atLeast(plan, THEMES.find((x) => x?.key === key)?.tier ?? 'premium')
   const buy = (key: string) => { setPreview(null); sound.tap(); location.hash = 'checkout-theme-' + key }
 
+  // all themes at once, 3 across, with a sort; tapping one jumps the big view to it
+  const [grid, setGrid] = useState(false)
+  const [sort, setSort] = useState<Sort>('featured')
+  const listed = THEMES.map((th, i) => ({ th, i })).filter((x): x is { th: NonNullable<typeof x.th>; i: number } => !!x.th)
+  const sorted = sort === 'featured' ? listed
+    : sort === 'owned' ? [...listed].sort((a, b) => Number(has(b.th.key)) - Number(has(a.th.key)))
+    : [...listed].sort((a, b) => (sort === 'low' ? 1 : -1) * (themePrice(a.th.key) - themePrice(b.th.key)))
+  function pick(i: number) {
+    setGrid(false)
+    const el = track.current, card = el?.firstElementChild as HTMLElement | null
+    if (el && card) el.scrollTo({ left: i * card.offsetWidth })
+  }
+
   function goTo(i: number) {
     const el = track.current
     const card = el?.firstElementChild as HTMLElement | null
@@ -90,7 +111,10 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
     <main className="page themes" aria-label={t('Themes')}>
       <header className="create-head">
         <h1>{t('Themes')}</h1>
-        <button className="icon-btn" aria-label={t('Back')} onClick={() => history.back()}><Icon name="back" size="22px" /></button>
+        <span className="themes-head-btns">
+          <button className="icon-btn" aria-label={t('All themes')} onClick={() => { setGrid(true); sound.tap() }}><Icon name="grid" size="21px" strokeWidth={1.9} /></button>
+          <button className="icon-btn" aria-label={t('Back')} onClick={() => history.back()}><Icon name="back" size="22px" /></button>
+        </span>
       </header>
       {/* every theme: buy it once and keep it, or get it free with the plan it belongs to */}
       <p className="themes-note">{t('Buy a theme to keep forever, or get them all free with a plan.')}</p>
@@ -162,6 +186,36 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
           </>
         ))}
       </div>
+
+      {grid && (
+        <div className="theme-grid-sheet" role="dialog" aria-label={t('All themes')}>
+          <header className="create-head">
+            <h1>{t('All themes')}</h1>
+            <button className="icon-btn" aria-label={t('Close')} onClick={() => setGrid(false)}><Icon name="close" size="22px" /></button>
+          </header>
+          <div className="theme-sort" role="radiogroup" aria-label={t('Sort')}>
+            {SORTS.map((o) => (
+              <button key={o.key} role="radio" aria-checked={sort === o.key} className={sort === o.key ? 'on' : undefined} onClick={() => { setSort(o.key); sound.tap() }}>{t(o.label)}</button>
+            ))}
+          </div>
+          <div className="theme-grid">
+            {sorted.map(({ th, i }) => (
+              <button key={th.key} className={`theme-tile${th.tier === 'exclusive' ? ' exclusive' : ''}${applied === th.key ? ' in-use' : ''}`} onClick={() => pick(i)}>
+                <span className="tt-art">
+                  <span className="theme-art paused" data-skin={th.key}>
+                    <ThemeScene skin={th.key} />
+                    <span className="mini-dot" style={{ left: '58%', top: '57%' }} />
+                    <span className="mini-dot" style={{ left: '82%', top: '55%' }} />
+                    <span className="mini-dot small" style={{ left: '20%', top: '87%' }} />
+                  </span>
+                </span>
+                <b>{th.name}</b>
+                <small>{has(th.key) ? (applied === th.key ? t('In use') : t('Owned')) : '฿' + themePrice(th.key)}</small>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="theme-pips" aria-hidden="true">
         {THEMES.map((th, i) => <i key={i} className={`${i === index ? 'on' : ''}${th?.tier === 'exclusive' ? ' gold' : ''}`} />)}

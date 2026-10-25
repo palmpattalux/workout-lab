@@ -4,6 +4,7 @@ import { useId, type ReactNode } from 'react'
 const ui = {
   home: <><path d="M3.5 11 12 4l8.5 7" /><path d="M6 9.5V20h12V9.5" /><path d="M10 20v-5h4v5" /></>,
   plus: <path d="M12 4v16M4 12h16" />,
+  grid: <><rect x="4" y="4" width="6.5" height="6.5" rx="1.6" /><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6" /><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6" /><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6" /></>,
   book: <><path d="M12 6.5C10.2 5 7.5 4.5 4 4.8v13.5c3.5-.3 6.2.2 8 1.7 1.8-1.5 4.5-2 8-1.7V4.8c-3.5-.3-6.2.2-8 1.7z" /><path d="M12 6.5V20" /></>,
   weights: <path d="M6.5 7v10M17.5 7v10M3.5 9.5v5M20.5 9.5v5M6.5 12h11" />,
   arrowRight: <path d="M5 12h14M13 6l6 6-6 6" />,
