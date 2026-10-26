@@ -2519,3 +2519,10 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 @keyframes tl-hint { 50% { transform: translateY(-3px); } }
 @media (prefers-reduced-motion: reduce) { .theme-track.enter-up, .theme-track.enter-down, .theme-next-layer { animation: none; } }
 .themes > .theme-pips, .themes > .theme-next-layer { touch-action: none; }
+/* shorter fades (2026-10-26 try): the picture stays at full strength almost to the edges and
+   only melts away at the very top and bottom; the price tag gets a soft backing to stay readable */
+.themes .theme-card .theme-art {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 26px, #000 calc(100% - 110px), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 26px, #000 calc(100% - 110px), transparent 100%); }
+.themes .theme-info .owned-tag { color: var(--ink); background: color-mix(in srgb, var(--surface) 72%, transparent);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
