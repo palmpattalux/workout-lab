@@ -42,7 +42,8 @@ window.addEventListener('pageshow', wake)
 try { (navigator as unknown as { audioSession?: { type: string } }).audioSession!.type = 'ambient' } catch { /* not supported */ }
 
 // tone / noise / buzz are shared with the theme sound files (src/themes/*-sound.ts).
-export function tone(from: number, to: number, dur: number, gain: number, type: OscillatorType) {
+// attack softens the start; lp (Hz) rounds the sound off through a low-pass filter.
+export function tone(from: number, to: number, dur: number, gain: number, type: OscillatorType, attack = 0.004, lp = 0) {
   const c = audio()
   if (!c || c.state !== 'running') return
   const t = c.currentTime
@@ -52,9 +53,11 @@ export function tone(from: number, to: number, dur: number, gain: number, type: 
   o.frequency.setValueAtTime(from, t)
   o.frequency.exponentialRampToValueAtTime(to, t + dur)
   g.gain.setValueAtTime(0.0001, t)
-  g.gain.exponentialRampToValueAtTime(gain, t + 0.004)
+  g.gain.exponentialRampToValueAtTime(gain, t + attack)
   g.gain.exponentialRampToValueAtTime(0.0001, t + dur)
-  o.connect(g).connect(c.destination)
+  let out: AudioNode = o.connect(g)
+  if (lp) { const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = lp; f.Q.value = 0.5; out = out.connect(f) }
+  out.connect(c.destination)
   o.start(t)
   o.stop(t + dur + 0.02)
 }
@@ -102,9 +105,11 @@ export function onPick(fn: (dir: number) => boolean) {
 }
 
 export const sound = {
-  tap() { tone(1000, 620, 0.05, 0.16, 'sine') },
-  pop() { tone(600, 1300, 0.08, 0.16, 'sine'); buzz(10) },
-  tick() { tone(2200, 1700, 0.018, 0.1, 'triangle'); buzz(4) },
+  // "Felt" (2026-10-29): soft low thumps you feel more than hear. The earlier bright set was
+  // tap 1000→620 .05s .16 sine, pop 600→1300 .08s .16 sine, tick 2200→1700 .018s .1 triangle.
+  tap() { tone(190, 120, 0.06, 0.08, 'sine', 0.008, 600) },
+  pop() { tone(150, 240, 0.1, 0.07, 'sine', 0.015, 700); buzz(10) },
+  tick() { tone(320, 260, 0.02, 0.04, 'sine', 0.003, 900); buzz(4) },
   // a step while dragging a reps or load picker
   pick(dir: number) { if (pickHook?.(dir)) buzz(4); else sound.tick() },
   // Manga theme
