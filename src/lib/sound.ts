@@ -42,19 +42,22 @@ window.addEventListener('pageshow', wake)
 try { (navigator as unknown as { audioSession?: { type: string } }).audioSession!.type = 'ambient' } catch { /* not supported */ }
 
 // tone / noise / buzz are shared with the theme sound files (src/themes/*-sound.ts).
-export function tone(from: number, to: number, dur: number, gain: number, type: OscillatorType) {
+// attack softens the start; lp (Hz) rounds the sound off through a low-pass filter.
+export function tone(from: number, to: number, dur: number, gain: number, type: OscillatorType, attack = 0.004, lp = 0, at = 0) {
   const c = audio()
   if (!c || c.state !== 'running') return
-  const t = c.currentTime
+  const t = c.currentTime + at
   const o = c.createOscillator()
   const g = c.createGain()
   o.type = type
   o.frequency.setValueAtTime(from, t)
   o.frequency.exponentialRampToValueAtTime(to, t + dur)
   g.gain.setValueAtTime(0.0001, t)
-  g.gain.exponentialRampToValueAtTime(gain, t + 0.004)
+  g.gain.exponentialRampToValueAtTime(gain, t + attack)
   g.gain.exponentialRampToValueAtTime(0.0001, t + dur)
-  o.connect(g).connect(c.destination)
+  let out: AudioNode = o.connect(g)
+  if (lp) { const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = lp; f.Q.value = 0.5; out = out.connect(f) }
+  out.connect(c.destination)
   o.start(t)
   o.stop(t + dur + 0.02)
 }
@@ -102,9 +105,23 @@ export function onPick(fn: (dir: number) => boolean) {
 }
 
 export const sound = {
-  tap() { tone(1000, 620, 0.05, 0.16, 'sine') },
-  pop() { tone(600, 1300, 0.08, 0.16, 'sine'); buzz(10) },
-  tick() { tone(2200, 1700, 0.018, 0.1, 'triangle'); buzz(4) },
+  // "Felt" (2026-10-29): soft low thumps you feel more than hear. The earlier bright set was
+  // tap 1000→620 .05s .16 sine, pop 600→1300 .08s .16 sine, tick 2200→1700 .018s .1 triangle.
+  tap() { tone(190, 120, 0.06, 0.08, 'sine', 0.008, 600) },
+  pop() { tone(150, 240, 0.1, 0.07, 'sine', 0.015, 700); buzz(10) },
+  tick() { tone(320, 260, 0.02, 0.04, 'sine', 0.003, 900); buzz(4) },
+  // Felt family, one per kind of button (main.tsx picks which):
+  // confirm: two soft steps up, "thup-thup", for save / start / done / pay
+  confirm() { tone(170, 150, 0.07, 0.08, 'sine', 0.006, 600); tone(250, 235, 0.1, 0.075, 'sine', 0.008, 800, 0.06); buzz(8) },
+  // back: one thump sliding down, for back / close / cancel / skip
+  back() { tone(230, 140, 0.075, 0.07, 'sine', 0.008, 600) },
+  // forward: one thump sliding up, for next
+  forward() { tone(150, 230, 0.075, 0.07, 'sine', 0.008, 700) },
+  // a switch or choice turning on, or off
+  on() { tone(210, 290, 0.05, 0.07, 'sine', 0.005, 800) },
+  off() { tone(270, 180, 0.05, 0.06, 'sine', 0.005, 700) },
+  // remove / delete / log out: low and dull, with a small buzz
+  danger() { tone(115, 70, 0.13, 0.1, 'sine', 0.006, 400); buzz(12) },
   // a step while dragging a reps or load picker
   pick(dir: number) { if (pickHook?.(dir)) buzz(4); else sound.tick() },
   // Manga theme
