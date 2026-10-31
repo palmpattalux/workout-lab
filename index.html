@@ -13,24 +13,22 @@
       :root[data-mode="dark"] #splash { --sp-bg: #121514; --sp-ink: #e9ece9; --sp-muted: #868f89; --sp-glow: rgba(200,255,87,.6); }
       @media (prefers-color-scheme: dark) { :root:not([data-mode="light"]) #splash { --sp-bg: #121514; --sp-ink: #e9ece9; --sp-muted: #868f89; --sp-glow: rgba(200,255,87,.6); } }
       #splash.out { opacity: 0; transform: scale(1.04); pointer-events: none; }
-      /* Dotset opening: the app icon assembles slowly. A soft glow wakes up, the orange dot appears and
-         breathes, a ring draws itself around it, then the name and a quiet line fade in beneath. */
-      .ds { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1.6rem; color: var(--sp-ink); }
-      .ds-mark { position: relative; width: 6.4rem; height: 6.4rem; display: grid; place-items: center; }
-      .ds-halo { position: absolute; inset: -45%; border-radius: 50%; background: radial-gradient(closest-side, var(--sp-glow-soft), transparent 70%); opacity: 0; animation: ds-halo 2.4s ease-out .1s forwards; }
-      .ds-ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
-      .ds-ring circle { fill: none; stroke-linecap: round; }
-      .ds-track { stroke: var(--sp-ink); stroke-width: 3; opacity: .09; }
-      .ds-arc { stroke: var(--sp-ink); stroke-width: 3; stroke-dasharray: 1; stroke-dashoffset: 1; animation: ds-arc 1.9s cubic-bezier(.45,.05,.25,1) 1.05s forwards; }
-      .ds-dot { position: relative; width: 38%; height: 38%; border-radius: 50%; background: radial-gradient(circle at 36% 30%, #eaff9c, var(--sp-sun) 58%, #a9e62e); box-shadow: 0 0 22px var(--sp-glow-soft); opacity: 0; transform: scale(.2); animation: ds-dot 1.1s cubic-bezier(.25,.6,.3,1) .25s forwards, ds-breathe 3.2s ease-in-out 1.4s infinite; }
-      .ds-name { font: 800 2.1rem/1 "Manrope", system-ui, sans-serif; letter-spacing: -.04em; opacity: 0; transform: translateY(.4rem); animation: ds-up 1s ease-out 2.2s forwards; }
-      .ds-line { margin-top: -.9rem; font: 500 .82rem/1 "Manrope", system-ui, sans-serif; letter-spacing: .06em; color: var(--sp-muted); opacity: 0; animation: ds-up 1s ease-out 2.7s forwards; }
-      @keyframes ds-halo { to { opacity: 1; } }
-      @keyframes ds-arc { to { stroke-dashoffset: 0; } }
-      @keyframes ds-dot { to { opacity: 1; transform: scale(1); } }
-      @keyframes ds-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(.88); } }
+      /* Dotset opening: the new swirl logo. Two lime arcs with tapering tails turn against each other,
+         the inner one breathing in and out, then the name and a quiet line fade in beneath. */
+      .ds { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1.8rem; color: var(--sp-ink); }
+      .ds-mark { position: relative; width: 7rem; height: 7rem; opacity: 0; animation: ds-fade 1s ease-out .2s forwards; }
+      .ds-arc { position: absolute; border-radius: 50%; background: conic-gradient(from 0deg, transparent 0deg, var(--sp-sun) 250deg, transparent 340deg);
+        -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - var(--w)), #000 calc(100% - var(--w) + 1px)); mask: radial-gradient(farthest-side, transparent calc(100% - var(--w)), #000 calc(100% - var(--w) + 1px)); }
+      .ds-out { inset: 0; --w: .62rem; animation: ds-spin 3.4s cubic-bezier(.45,.1,.35,.95) infinite; }
+      .ds-in { inset: 17%; --w: .42rem; animation: ds-spin-r 3.4s cubic-bezier(.45,.1,.35,.95) infinite, ds-breathe 3.4s ease-in-out infinite; }
+      .ds-name { font: 800 2.1rem/1 "Manrope", system-ui, sans-serif; letter-spacing: -.04em; opacity: 0; transform: translateY(.4rem); animation: ds-up 1s ease-out 1.6s forwards; }
+      .ds-line { margin-top: -.9rem; font: 500 .82rem/1 "Manrope", system-ui, sans-serif; letter-spacing: .06em; color: var(--sp-muted); opacity: 0; animation: ds-up 1s ease-out 2.1s forwards; }
+      @keyframes ds-fade { to { opacity: 1; } }
+      @keyframes ds-spin { to { transform: rotate(360deg); } }
+      @keyframes ds-spin-r { to { transform: rotate(-360deg); } }
+      @keyframes ds-breathe { 0%, 100% { scale: 1; } 50% { scale: .72; } }
       @keyframes ds-up { to { opacity: 1; transform: none; } }
-      @media (prefers-reduced-motion: reduce) { .ds, .ds *, .ds-dot { animation-duration: .01s !important; animation-delay: 0s !important; } }
+      @media (prefers-reduced-motion: reduce) { .ds, .ds * { animation-duration: .01s !important; animation-delay: 0s !important; } }
     </style>
     <script>
       // apply the saved light/dark choice before anything paints
@@ -50,9 +48,7 @@
     <!-- Opening screen (first load only). To remove it: delete this block, the splash <style>, and hideSplash() in src/main.tsx. -->
     <div id="splash" aria-label="Dotset, loading">
       <div class="ds" aria-hidden="true">
-        <div class="ds-mark"><i class="ds-halo"></i>
-          <svg class="ds-ring" viewBox="0 0 100 100"><circle class="ds-track" cx="50" cy="50" r="48.5"/><circle class="ds-arc" cx="50" cy="50" r="48.5" pathLength="1"/></svg>
-          <i class="ds-dot"></i></div>
+        <div class="ds-mark"><i class="ds-arc ds-out"></i><i class="ds-arc ds-in"></i></div>
         <div class="ds-name">Dotset</div>
         <div class="ds-line">Every set, remembered.</div>
       </div>
