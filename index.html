@@ -13,20 +13,17 @@
       :root[data-mode="dark"] #splash { --sp-bg: #121514; --sp-ink: #e9ece9; --sp-muted: #868f89; --sp-glow: rgba(200,255,87,.6); }
       @media (prefers-color-scheme: dark) { :root:not([data-mode="light"]) #splash { --sp-bg: #121514; --sp-ink: #e9ece9; --sp-muted: #868f89; --sp-glow: rgba(200,255,87,.6); } }
       #splash.out { opacity: 0; transform: scale(1.04); pointer-events: none; }
-      /* Dotset opening: the new swirl logo. Two lime arcs with tapering tails turn against each other,
-         the inner one breathing in and out, then the name and a quiet line fade in beneath. */
+      /* Dotset opening: the swirl logo. Two crisp lime crescents turn in and slow to rest exactly on the
+         logo's final shape, then the name and a quiet line fade in beneath. */
       .ds { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1.8rem; color: var(--sp-ink); }
-      .ds-mark { position: relative; width: 7rem; height: 7rem; opacity: 0; animation: ds-fade 1s ease-out .2s forwards; }
-      .ds-arc { position: absolute; border-radius: 50%; background: conic-gradient(from 0deg, transparent 0deg, var(--sp-sun) 250deg, transparent 340deg);
-        -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - var(--w)), #000 calc(100% - var(--w) + 1px)); mask: radial-gradient(farthest-side, transparent calc(100% - var(--w)), #000 calc(100% - var(--w) + 1px)); }
-      .ds-out { inset: 0; --w: .62rem; animation: ds-spin 3.4s cubic-bezier(.45,.1,.35,.95) infinite; }
-      .ds-in { inset: 17%; --w: .42rem; animation: ds-spin-r 3.4s cubic-bezier(.45,.1,.35,.95) infinite, ds-breathe 3.4s ease-in-out infinite; }
-      .ds-name { font: 800 2.1rem/1 "Manrope", system-ui, sans-serif; letter-spacing: -.04em; opacity: 0; transform: translateY(.4rem); animation: ds-up 1s ease-out 1.6s forwards; }
-      .ds-line { margin-top: -.9rem; font: 500 .82rem/1 "Manrope", system-ui, sans-serif; letter-spacing: .06em; color: var(--sp-muted); opacity: 0; animation: ds-up 1s ease-out 2.1s forwards; }
-      @keyframes ds-fade { to { opacity: 1; } }
-      @keyframes ds-spin { to { transform: rotate(360deg); } }
-      @keyframes ds-spin-r { to { transform: rotate(-360deg); } }
-      @keyframes ds-breathe { 0%, 100% { scale: 1; } 50% { scale: .72; } }
+      .ds-mark { width: 7.4rem; height: 7.4rem; overflow: visible; }
+      .ds-mark, .ds-mark path { stroke: none; } .ds-mark path { fill: var(--sp-sun); opacity: 0; }
+      .ds-o { transform-origin: 230px 230px; animation: ds-in-o 2.3s cubic-bezier(.15,.7,.2,1) .2s forwards; }
+      .ds-i { transform-origin: 218px 213px; animation: ds-in-i 2.3s cubic-bezier(.15,.7,.2,1) .2s forwards; }
+      .ds-name { font: 800 2.1rem/1 "Manrope", system-ui, sans-serif; letter-spacing: -.04em; opacity: 0; transform: translateY(.4rem); animation: ds-up 1s ease-out 2.2s forwards; }
+      .ds-line { margin-top: -.9rem; font: 500 .82rem/1 "Manrope", system-ui, sans-serif; letter-spacing: .06em; color: var(--sp-muted); opacity: 0; animation: ds-up 1s ease-out 2.6s forwards; }
+      @keyframes ds-in-o { 0% { opacity: 0; transform: rotate(-300deg) scale(.85); } 25% { opacity: 1; } 100% { opacity: 1; transform: none; } }
+      @keyframes ds-in-i { 0% { opacity: 0; transform: rotate(420deg) scale(.6); } 25% { opacity: 1; } 100% { opacity: 1; transform: none; } }
       @keyframes ds-up { to { opacity: 1; transform: none; } }
       @media (prefers-reduced-motion: reduce) { .ds, .ds * { animation-duration: .01s !important; animation-delay: 0s !important; } }
     </style>
@@ -48,7 +45,7 @@
     <!-- Opening screen (first load only). To remove it: delete this block, the splash <style>, and hideSplash() in src/main.tsx. -->
     <div id="splash" aria-label="Dotset, loading">
       <div class="ds" aria-hidden="true">
-        <div class="ds-mark"><i class="ds-arc ds-out"></i><i class="ds-arc ds-in"></i></div>
+        <svg class="ds-mark" viewBox="0 0 460 460"><path class="ds-o" d="M225,10 A220,220 0 1 1 10,220 A207,207 0 1 0 225,10Z"/><path class="ds-i" d="M245,387 A176,176 0 1 1 390,188 A171,171 0 1 0 245,387Z"/></svg>
         <div class="ds-name">Dotset</div>
         <div class="ds-line">Every set, remembered.</div>
       </div>

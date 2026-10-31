@@ -31,7 +31,7 @@ document.addEventListener('pointerdown', (e) => {
 function hideSplash() {
   const el = document.getElementById('splash')
   if (!el) return
-  const wait = Math.max(0, 3900 - performance.now())
+  const wait = Math.max(0, 4300 - performance.now())
   setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 650) }, wait)
 }
 
