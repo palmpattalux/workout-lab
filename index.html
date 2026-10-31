@@ -20,6 +20,8 @@
       .ds-mark, .ds-mark path { stroke: none; } .ds-mark path { fill: var(--sp-sun); opacity: 0; }
       .ds-o { transform-origin: 230px 230px; animation: ds-in-o 2.3s cubic-bezier(.15,.7,.2,1) .2s forwards; }
       .ds-i { transform-origin: 218px 213px; animation: ds-in-i 2.3s cubic-bezier(.15,.7,.2,1) .2s forwards; }
+      .ds-mark circle { fill: var(--sp-sun); opacity: 0; transform-origin: 224px 220px; animation: ds-pop 1.1s cubic-bezier(.25,.7,.3,1.2) 1.7s forwards; }
+      @keyframes ds-pop { 0% { opacity: 0; transform: scale(.2); } 100% { opacity: 1; transform: none; } }
       .ds-name { font: 800 2.1rem/1 "Manrope", system-ui, sans-serif; letter-spacing: -.04em; opacity: 0; transform: translateY(.4rem); animation: ds-up 1s ease-out 2.2s forwards; }
       .ds-line { margin-top: -.9rem; font: 500 .82rem/1 "Manrope", system-ui, sans-serif; letter-spacing: .06em; color: var(--sp-muted); opacity: 0; animation: ds-up 1s ease-out 2.6s forwards; }
       @keyframes ds-in-o { 0% { opacity: 0; transform: rotate(-300deg) scale(.85); } 25% { opacity: 1; } 100% { opacity: 1; transform: none; } }
@@ -45,7 +47,7 @@
     <!-- Opening screen (first load only). To remove it: delete this block, the splash <style>, and hideSplash() in src/main.tsx. -->
     <div id="splash" aria-label="Dotset, loading">
       <div class="ds" aria-hidden="true">
-        <svg class="ds-mark" viewBox="0 0 460 460"><path class="ds-o" d="M225,10 A220,220 0 1 1 10,220 A207,207 0 1 0 225,10Z"/><path class="ds-i" d="M245,387 A176,176 0 1 1 390,188 A171,171 0 1 0 245,387Z"/></svg>
+        <svg class="ds-mark" viewBox="0 0 460 460"><path class="ds-o" d="M225,10 A220,220 0 1 1 10,220 A207,207 0 1 0 225,10Z"/><path class="ds-i" d="M245,387 A176,176 0 1 1 390,188 A171,171 0 1 0 245,387Z"/><circle class="ds-c" cx="224" cy="220" r="32"/></svg>
         <div class="ds-name">Dotset</div>
         <div class="ds-line">Every set, remembered.</div>
       </div>
