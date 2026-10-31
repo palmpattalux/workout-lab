@@ -9,9 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&display=swap" rel="stylesheet" />
     <style>
       /* opening screen: shows before the app's own code arrives */
-      #splash { --sp-bg: #f3f4f2; --sp-ink: #1b201d; --sp-muted: #7a827c; --sp-sun: #ff9a1f; --sp-glow: rgba(255,154,31,.5); --sp-glow-soft: rgba(255,154,31,.22); position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: var(--sp-bg); transition: opacity .5s ease, transform .6s cubic-bezier(.2,.8,.2,1); }
-      :root[data-mode="dark"] #splash { --sp-bg: #121514; --sp-ink: #e9ece9; --sp-muted: #868f89; --sp-glow: rgba(255,154,31,.65); }
-      @media (prefers-color-scheme: dark) { :root:not([data-mode="light"]) #splash { --sp-bg: #121514; --sp-ink: #e9ece9; --sp-muted: #868f89; --sp-glow: rgba(255,154,31,.65); } }
+      #splash { --sp-bg: #f3f4f2; --sp-ink: #1b201d; --sp-muted: #7a827c; --sp-sun: #c8ff57; --sp-glow: rgba(200,255,87,.55); --sp-glow-soft: rgba(200,255,87,.28); position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: var(--sp-bg); transition: opacity .5s ease, transform .6s cubic-bezier(.2,.8,.2,1); }
+      :root[data-mode="dark"] #splash { --sp-bg: #121514; --sp-ink: #e9ece9; --sp-muted: #868f89; --sp-glow: rgba(200,255,87,.6); }
+      @media (prefers-color-scheme: dark) { :root:not([data-mode="light"]) #splash { --sp-bg: #121514; --sp-ink: #e9ece9; --sp-muted: #868f89; --sp-glow: rgba(200,255,87,.6); } }
       #splash.out { opacity: 0; transform: scale(1.04); pointer-events: none; }
       /* Dotset opening: the app icon assembles slowly. A soft glow wakes up, the orange dot appears and
          breathes, a ring draws itself around it, then the name and a quiet line fade in beneath. */
@@ -22,7 +22,7 @@
       .ds-ring circle { fill: none; stroke-linecap: round; }
       .ds-track { stroke: var(--sp-ink); stroke-width: 3; opacity: .09; }
       .ds-arc { stroke: var(--sp-ink); stroke-width: 3; stroke-dasharray: 1; stroke-dashoffset: 1; animation: ds-arc 1.9s cubic-bezier(.45,.05,.25,1) 1.05s forwards; }
-      .ds-dot { position: relative; width: 38%; height: 38%; border-radius: 50%; background: radial-gradient(circle at 36% 30%, #ffc067, var(--sp-sun) 58%, #f08400); box-shadow: 0 0 22px var(--sp-glow-soft); opacity: 0; transform: scale(.2); animation: ds-dot 1.1s cubic-bezier(.25,.6,.3,1) .25s forwards, ds-breathe 3.2s ease-in-out 1.4s infinite; }
+      .ds-dot { position: relative; width: 38%; height: 38%; border-radius: 50%; background: radial-gradient(circle at 36% 30%, #eaff9c, var(--sp-sun) 58%, #a9e62e); box-shadow: 0 0 22px var(--sp-glow-soft); opacity: 0; transform: scale(.2); animation: ds-dot 1.1s cubic-bezier(.25,.6,.3,1) .25s forwards, ds-breathe 3.2s ease-in-out 1.4s infinite; }
       .ds-name { font: 800 2.1rem/1 "Manrope", system-ui, sans-serif; letter-spacing: -.04em; opacity: 0; transform: translateY(.4rem); animation: ds-up 1s ease-out 2.2s forwards; }
       .ds-line { margin-top: -.9rem; font: 500 .82rem/1 "Manrope", system-ui, sans-serif; letter-spacing: .06em; color: var(--sp-muted); opacity: 0; animation: ds-up 1s ease-out 2.7s forwards; }
       @keyframes ds-halo { to { opacity: 1; } }
