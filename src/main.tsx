@@ -27,11 +27,11 @@ document.addEventListener('pointerdown', (e) => {
   if (b && !b.disabled) press(b)
 }, { capture: true })
 
-// Opening screen from index.html: let the flower finish blooming, then fade it away.
+// Opening screen from index.html: let the opening finish, then fade it away.
 function hideSplash() {
   const el = document.getElementById('splash')
   if (!el) return
-  const wait = Math.max(0, 4000 - performance.now())
+  const wait = Math.max(0, 4300 - performance.now())
   setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 650) }, wait)
 }
 
