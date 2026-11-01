@@ -51,6 +51,11 @@
       <div class="ds" aria-hidden="true"><span>D</span><span class="ds-o"><i class="ds-ring"></i><i class="ds-dot"></i></span><span>tset</span><i class="ds-sheet"></i></div>
     </div>
     <script>
+      // computers (the desktop site) skip the opening screen; phones and the store apps keep it
+      try {
+        var nat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()
+        if (!nat && matchMedia('(min-width: 1000px) and (hover: hover) and (pointer: fine)').matches) { var sp = document.getElementById('splash'); if (sp) sp.remove() }
+      } catch (e) {}
       setTimeout(function () { var w = document.querySelector('.ds'); if (w) w.classList.add('lit') }, 3500)
     </script>
     <script type="module" src="/src/main.tsx"></script>
