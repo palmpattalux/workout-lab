@@ -28,6 +28,10 @@ Each file is the whole `index.html` from when that opening screen was live. The 
 | `lipstick.html` | Lipstick with a blooming flower. |
 | `dotset-three-taps.html` | First Dotset splash: a dot taps three sets, then opens into the "o". |
 | `dotset-letters-drift.html` | Dotset with letters drifting in from different angles. |
+| `dotset-orange-o.html` | Orange dot breathes, a ring settles into the "o", the letters are revealed (2026-10-17). |
+| `dotset-loading-screens-preview.html` | Previews of the "t." logo opening screens with tabs: 1 Tick, 2 Whirlpool, 3 Whirlpool + font, 4 Dark centred, 5 Thin text (4 and 5 load the two files below). |
+| `dotset-opening-v4-dark-centred.html` | The app's opening screen on the dark glass page, centred on the page box so the dot lands on the middle exercise (2026-11-01). |
+| `dotset-opening-v5-thin-text.html` | Same, with the ring letters back near the Tick ring's size while the dot stays exercise-sized (2026-11-01). |
 
 The same opening screens are also on the git branches `splash-sidekick`, `splash-tick`, `splash-jarvis`, `splash-right-now` and `splash-lipstick`.
 
