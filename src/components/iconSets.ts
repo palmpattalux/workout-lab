@@ -112,14 +112,26 @@ STYLES.push({
   },
 })
 
-// 4 Thin line
+// 4 Standard (the default): the outlines filled solid, no lines inside (user pick 2026-11-01).
+// Only the plate's centre hole and a thin spine gap on Torso back, so front and back differ.
 STYLES.push({
   key: 'standard', name: 'Standard', bg: '#EEF1F5', fg: '#3A4150',
   draw(k: string) {
     const ic = byKey[k]
-    return `<g fill="none" stroke="currentColor" stroke-width="5.5" stroke-linejoin="round" stroke-linecap="square"><path d="${ic.o}"/>${ic.hole ? `<path d="${ic.hole}"/>` : ''}${ic.d ? `<path d="${ic.d}"/>` : ''}</g>`
+    let s = `<path d="${ic.o}${k === 'plate' ? ' ' + circ(50, 50, 13) : ''}" fill-rule="evenodd" fill="currentColor" stroke="currentColor" stroke-width="5.5" stroke-linejoin="round"/>`
+    if (k === 'back') s += `<path d="M50 20 V84" stroke="var(--bg)" stroke-width="3.5" stroke-linecap="round"/>`
+    return s
   },
 })
+
+// The first Standard (thin line, 2026-11-01 morning). Hidden from gear > Icons; kept to bring back.
+export const LINE_SET: IconSet = {
+  key: 'line', name: 'Line', bg: '#EEF1F5', fg: '#3A4150',
+  draw(k: string) {
+    const ic = byKey[k]
+    return `<g fill="none" stroke="currentColor" stroke-width="5.5" stroke-linejoin="round" stroke-linecap="square"><path d="${ic.o}"/>${ic.hole ? `<path d="${ic.hole}"/>` : ''}${ic.d ? `<path d="${ic.d}"/>` : ''}</g>`
+  },
+}
 
 // 5 Brush ink
 STYLES.push({
