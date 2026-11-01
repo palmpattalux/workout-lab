@@ -55,4 +55,4 @@ Each folder is a full copy of `src/components/icons.tsx` from when that icon set
 
 To restore: copy `icons.tsx` back over `src/components/icons.tsx`.
 
-Also here: `sets-2026-11-01.html` (the mock-up page of the 7 icon sets as first drawn) and `dotset-icons-all.svg` (every icon of every set in one vector file). The live sets are in `src/components/iconSets.ts`. Tokyo is hidden from gear > Icons but still in `icons.tsx` so old workouts draw.
+Also here: `sets-2026-11-01.html` (the mock-up page of the 7 icon sets as first drawn) and `dotset-icons-all.svg` (every icon of every set in one vector file, on coloured tiles) and `dotset-icons-all-transparent.svg` (the same with no background, cut-outs see-through). The live sets are in `src/components/iconSets.ts`. Tokyo is hidden from gear > Icons but still in `icons.tsx` so old workouts draw.
