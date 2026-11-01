@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Icon, type IconName } from '../components/icons'
 import { PLANS, type Tier } from '../lib/plan'
 import { themePrice, shopItem } from '../lib/theme'
@@ -6,6 +6,7 @@ import { TokyoIcon } from './IconsPage'
 import ThemeScene from '../components/ThemeScene'
 import { startCheckout, cardToken, savePending, loadOmise, useSubscription, type Method } from '../lib/billing'
 import { t } from '../lib/i18n'
+import { beginLoading } from '../lib/loading'
 
 // #checkout-<plan> or #checkout-theme-<key>: pick how to pay, then pay. Kept as calm and plain
 // as the rest of the app; the only page that isn't ours is the bank's or wallet's own step.
@@ -37,6 +38,9 @@ export default function CheckoutPage({ tier = 'premium', theme: themeKey, guest 
   const setNumber = (v: string) => setCard((c) => ({ ...c, number: v.replace(/\D/g, '').slice(0, 19).replace(/(\d{4})(?=\d)/g, '$1 ') }))
   const setExp = (v: string) => { const d = v.replace(/\D/g, '').slice(0, 4); setCard((c) => ({ ...c, exp: d.length > 2 ? d.slice(0, 2) + ' / ' + d.slice(2) : d })) }
   const cardReady = card.name.trim() && card.number.replace(/\s/g, '').length >= 13 && card.exp.replace(/\D/g, '').length === 4 && card.cvc.length >= 3
+
+  // a payment that takes a while shows the loading ring on the desktop site
+  useEffect(() => (busy ? beginLoading() : undefined), [busy])
 
   async function pay(e: FormEvent) {
     e.preventDefault()

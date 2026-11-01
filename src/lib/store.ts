@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { supabase } from './auth'
+import { beginLoading } from './loading'
 
 // One saved workout, created from the "+" flow on page A.
 // Soft colours an exercise's icon can take on page A (CSS: .tint-<key>)
@@ -191,8 +192,9 @@ export function setScope(userId: string | null) {
   if (userId) adoptDeviceData()
   emit()
   scopeListeners.forEach((fn) => fn())
-  if (supabase && userId) useSupabase()
-  else if (!supabase && userId) useArtifactDb()
+  // account data arriving counts as a long wait (desktop shows the loading ring if it drags on)
+  if (supabase && userId) { const done = beginLoading(); useSupabase().finally(done) }
+  else if (!supabase && userId) { const done = beginLoading(); useArtifactDb().finally(done) }
 }
 // What a guest made before signing up moves only into a brand-new account (signed up
 // on this device). Logging into an existing account leaves the guest copy alone.
