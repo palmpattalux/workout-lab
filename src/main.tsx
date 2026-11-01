@@ -33,7 +33,7 @@ function hideSplash() {
   if (!el) return
   const start = (window as unknown as { __dsStart?: number }).__dsStart ?? 0
   const wait = Math.max(0, start + 2800 - performance.now())
-  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 550) }, wait)
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 850) }, wait)
 }
 
 createRoot(document.getElementById('root')!).render(
