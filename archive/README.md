@@ -54,3 +54,5 @@ Each folder is a full copy of `src/components/icons.tsx` from when that icon set
 | `glass-2026-10-25/` | Glass icons (fine line over a frosted fill): Arm, Leg, Torso front/back, Dumbbell, Barbell, Pull-up bar, Dip bar, and the Tokyo pack. |
 
 To restore: copy `icons.tsx` back over `src/components/icons.tsx`.
+
+Also here: `sets-2026-11-01.html` (the mock-up page of the 7 icon sets as first drawn) and `dotset-icons-all.svg` (every icon of every set in one vector file). The live sets are in `src/components/iconSets.ts`. Tokyo is hidden from gear > Icons but still in `icons.tsx` so old workouts draw.

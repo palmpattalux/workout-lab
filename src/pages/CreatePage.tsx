@@ -60,8 +60,8 @@ export default function CreatePage({ icon: icon0, letter: letter0, editing, onCl
               <button key={k || 'none'} className={`tint-dot${k ? ' tint-' + k : ' none'}${k === color ? ' on' : ''}`} aria-label={k ? t(k[0].toUpperCase() + k.slice(1)) : t('No colour')} aria-pressed={k === color} onClick={() => setColor(k)} />
             ))}
           </div>
-          <h2>{pack === 'tokyo' ? t('Letter') : t('Body part')}</h2>
-          <div className={`mark-grid letters${pack === 'tokyo' ? ' five' : ''}`}>
+          <h2>{t('Body part')}</h2>
+          <div className="mark-grid letters">
             {packLetters(pack).map((l) => (
               <button key={l.key} aria-label={l.name} aria-pressed={l.key === letter} className={l.key === letter ? 'on' : undefined} onClick={() => setLetter(l.key)}>
                 {l.key}

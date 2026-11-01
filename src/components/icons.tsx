@@ -1,4 +1,6 @@
-import { useId, type ReactNode } from 'react'
+import { useId, useMemo, type ReactNode } from 'react'
+import { SET_ICONS, iconSet, isSetIcon, type IconSetKey } from './iconSets'
+import { useIconPack } from '../lib/iconpack'
 
 // Line icons drawn to match the sketch style. Stroke color comes from the parent.
 const ui = {
@@ -43,25 +45,10 @@ const ui = {
   shield: <><path d="M12 3.5 19 6v5.5c0 4.2-2.9 7.7-7 9-4.1-1.3-7-4.8-7-9V6z" /><path d="m9 12 2.2 2.2L15.5 10" /></>,
 }
 
-// The 8 workout icons offered when dragging up from "+" on page A: body parts, then equipment.
-// Glass style (2026-10-25): `fill` is the frosted shape under the fine line (see WorkoutIcon).
-// Body parts redrawn the same day for proportions: a longer leg, a V-tapered torso, an arm with a fist.
-const ARM = 'M2.5 13.5C5 9.5 10 9 12.5 12l.9.8c.8-1.8 1.2-3.2 1.4-4.2L14.2 8.2 14 4.6C14 3 15.2 2.4 17 2.4h2.2c1.4.2 2 1.4 1.8 3l-.4 2.8-.3.8c1.2 3 1.3 6.5.1 9-.8 1.8-2.4 2.8-4.6 2.8H6c-2 0-3.5-1.2-3.5-3.3Z'
-const LEG = 'M14.6 1.5c1.4 3 1.3 6.5-.2 9.1l-.4 1 .2 8.6 5.4 1c.6.1.9.6.9 1.3H11.4l-.5-1.6.4-1.3c-1.7-2-2.1-5.4-1.1-8.2C8.6 8.6 7.9 5.4 8 1.5Z'
-const TORSO = 'M9.2 2.8c.6 1 5 1 5.6 0l3.8 1.3c1.9.6 3.2 2.4 3 4.4-.1 1.3-.9 2.3-2.2 2.6l-2.4 9.1c-.2.8-.7 1.3-1.6 1.3H8.6c-.9 0-1.4-.5-1.6-1.3L4.6 11.1c-1.3-.3-2.1-1.3-2.2-2.6-.2-2 1.1-3.8 3-4.4Z'
-export const WORKOUT_ICONS: { key: string; name: string; svg: ReactNode; fill?: ReactNode }[] = [
-  { key: 'arm', name: 'Arm', fill: <path d={ARM} />, svg: <><path d={ARM} /><path d="M16.8 2.5v2.4M19 2.5v2.2M14.1 6c1.5-.1 2.6.4 3.2 1.4M7 14.8c1.6-1 3.4-1 4.8.2" /></> },
-  { key: 'leg', name: 'Leg', fill: <path d={LEG} />, svg: <><path d={LEG} /><path d="M14.1 11.2c-1.2.4-2.6.4-3.9 0M12.6 3.5c.6 2 .6 4.2-.1 6" /></> },
-  { key: 'torso', name: 'Torso front', fill: <path d={TORSO} />, svg: <><path d={TORSO} /><path d="M6.8 9.2c1.8 1.4 3.6 1.7 5.2.6 1.6 1.1 3.4.8 5.2-.6M12 9.8v11.4M9.4 13.6h5.2M9.7 16.9h4.6" /></> },
-  { key: 'back', name: 'Torso back', fill: <path d={TORSO} />, svg: <><path d={TORSO} /><path d="M12 3.6v17.9M7 6.2c1.2 2.8 2.9 4.6 5 5.2 2.1-.6 3.8-2.4 5-5.2M9 17.6l3-1.8 3 1.8" /></> },
-  { key: 'dumbbell', name: 'Dumbbell', fill: <><rect x="5.4" y="6.5" width="2.4" height="11" rx="1" /><rect x="16.2" y="6.5" width="2.4" height="11" rx="1" /><rect x="2.6" y="9.2" width="1.8" height="5.6" rx=".9" /><rect x="19.6" y="9.2" width="1.8" height="5.6" rx=".9" /></>,
-    svg: <><rect x="5.4" y="6.5" width="2.4" height="11" rx="1" /><rect x="16.2" y="6.5" width="2.4" height="11" rx="1" /><rect x="2.6" y="9.2" width="1.8" height="5.6" rx=".9" /><rect x="19.6" y="9.2" width="1.8" height="5.6" rx=".9" /><path d="M7.8 12h8.4M4.4 12h1M18.6 12h1" /></> },
-  { key: 'barbell', name: 'Barbell', fill: <><rect x="4.2" y="8" width="1.8" height="8" rx=".9" /><rect x="6.9" y="6.2" width="2.4" height="11.6" rx="1" /><rect x="14.7" y="6.2" width="2.4" height="11.6" rx="1" /><rect x="18" y="8" width="1.8" height="8" rx=".9" /></>,
-    svg: <><path d="M1.8 12h2.4M9.3 12h5.4M19.8 12h2.4" /><rect x="4.2" y="8" width="1.8" height="8" rx=".9" /><rect x="6.9" y="6.2" width="2.4" height="11.6" rx="1" /><rect x="14.7" y="6.2" width="2.4" height="11.6" rx="1" /><rect x="18" y="8" width="1.8" height="8" rx=".9" /></> },
-  { key: 'pullbar', name: 'Pull-up bar', fill: <rect x="2.5" y="4" width="19" height="2.2" rx="1.1" />, svg: <><rect x="2.5" y="4" width="19" height="2.2" rx="1.1" /><path d="M5 6.2V20M19 6.2V20M3 20h4M17 20h4" /></> },
-  { key: 'dipbar', name: 'Dip bar', fill: <><rect x="5" y="7.9" width="5.8" height="2.2" rx="1.1" /><rect x="13.2" y="7.9" width="5.8" height="2.2" rx="1.1" /></>,
-    svg: <><rect x="5" y="7.9" width="5.8" height="2.2" rx="1.1" /><rect x="13.2" y="7.9" width="5.8" height="2.2" rx="1.1" /><path d="M5 21V5.5M19 21V5.5M3 21h4M17 21h4" /></> },
-]
+// The 9 exercise icons offered when dragging up from "+" on page A: body parts, then equipment.
+// They're drawn by the icon set picked in gear > Icons (see iconSets.ts). The Glass set that was
+// here until 2026-11-01 is kept in archive/icons/glass-2026-10-25/.
+export const WORKOUT_ICONS: { key: string; name: string }[] = SET_ICONS.map(({ key, name }) => ({ key, name }))
 
 // Icons from the first version, kept so workouts made with them still draw.
 const OLD_ICONS: { key: string; svg: ReactNode }[] = [
@@ -106,9 +93,11 @@ export const TOKYO_LETTERS: { key: string; name: string }[] = [
   ['ア', 'a'], ['カ', 'ka'], ['サ', 'sa'], ['シ', 'shi'], ['ツ', 'tsu'], ['ミ', 'mi'], ['ヤ', 'ya'], ['ル', 'ru'], ['ワ', 'wa'], ['ン', 'n'],
 ].map(([k, r]) => ({ key: k, name: `${k} ${r}` }))
 
-export type IconPack = 'default' | 'tokyo'
-export const packIcons = (p: IconPack) => p === 'tokyo' ? TOKYO_ICONS : WORKOUT_ICONS
-export const packLetters = (p: IconPack) => p === 'tokyo' ? TOKYO_LETTERS : BODY_LETTERS
+// Tokyo (2026-10-18) is hidden from gear > Icons since 2026-11-01; its icons and letters still draw
+// on workouts that were made with them.
+export type IconPack = IconSetKey
+export const packIcons = (_p?: IconPack) => WORKOUT_ICONS
+export const packLetters = (_p?: IconPack) => BODY_LETTERS
 
 export type IconName = keyof typeof ui
 
@@ -124,23 +113,26 @@ export function Icon({ name, size = '42%', strokeWidth = 1.8 }: { name: IconName
   return <Svg size={size} strokeWidth={strokeWidth}>{ui[name]}</Svg>
 }
 
-// Exercise icons, Glass style (picked 2026-10-25): a fine line over a soft frosted fill that fades
-// from top to bottom, in the icon's own colour. Icons without a `fill` (Tokyo, old ones) are line only.
-const FINE = 1.3
-export function WorkoutIcon({ k, size = '42%', strokeWidth = FINE }: { k: string; size?: string; strokeWidth?: number }) {
-  const found: { svg: ReactNode; fill?: ReactNode } | undefined = WORKOUT_ICONS.find((i) => i.key === k) ?? TOKYO_ICONS.find((i) => i.key === k) ?? OLD_ICONS.find((i) => i.key === k)
-  const id = 'gl' + useId().replace(/:/g, '')
-  return (
-    <Svg size={size} strokeWidth={strokeWidth}>
-      {found?.fill && (
-        <>
-          <defs><linearGradient id={id} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="currentColor" stopOpacity=".5" /><stop offset="1" stopColor="currentColor" stopOpacity=".08" /></linearGradient></defs>
-          <g fill={`url(#${id})`} stroke="none">{found.fill}</g>
-        </>
-      )}
-      {found?.svg}
-    </Svg>
+// Exercise icons. The 9 set icons are drawn by the icon set in use (or `pack`), through a mask:
+// ink is the text colour and cut-outs are see-through, so they sit right on every theme.
+// Older keys (Tokyo, the first version) are fine line drawings.
+export function WorkoutIcon({ k, size = '42%', strokeWidth = 1.3, pack }: { k: string; size?: string; strokeWidth?: number; pack?: IconPack }) {
+  const inUse = useIconPack()
+  const set = pack ?? inUse
+  const id = 'wi' + useId().replace(/:/g, '')
+  const html = useMemo(() => isSetIcon(k)
+    ? iconSet(set).draw(k, id).replace(/currentColor/g, '#fff').replace(/var\(--bg\)/g, '#000')
+    : '', [k, set, id])
+  if (html) return (
+    <svg className="set-icon" viewBox="0 0 100 100" style={{ width: size, height: size, overflow: 'visible' }} aria-hidden="true">
+      <mask id={id} maskUnits="userSpaceOnUse" x="-25" y="-25" width="150" height="150">
+        <g fill="#fff" stroke="none" dangerouslySetInnerHTML={{ __html: html }} />
+      </mask>
+      <rect x="-25" y="-25" width="150" height="150" fill="currentColor" stroke="none" mask={`url(#${id})`} />
+    </svg>
   )
+  const found = TOKYO_ICONS.find((i) => i.key === k) ?? OLD_ICONS.find((i) => i.key === k)
+  return <Svg size={size} strokeWidth={strokeWidth}>{found?.svg}</Svg>
 }
 
 // Icon + letter, used as the workout's title everywhere.
