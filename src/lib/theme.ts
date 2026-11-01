@@ -33,7 +33,15 @@ export const THEMES: (Theme | null)[] = [
 
 // Other things sold the same way as a theme (once, kept for good, or free with a plan).
 export type Extra = { key: string; name: string; kind: 'icons'; tier: Tier }
-export const EXTRAS: Extra[] = [{ key: 'tokyo-icons', name: 'Tokyo icons', kind: 'icons', tier: 'premium' }]
+export const EXTRAS: Extra[] = [
+  { key: 'tokyo-icons', name: 'Tokyo icons', kind: 'icons', tier: 'premium' }, // hidden since 2026-11-01
+  { key: 'icons-electric', name: 'Electric icons', kind: 'icons', tier: 'premium' },
+  { key: 'icons-sparks', name: 'Sparks icons', kind: 'icons', tier: 'premium' },
+  { key: 'icons-rock', name: 'Rock icons', kind: 'icons', tier: 'premium' },
+  { key: 'icons-brush', name: 'Brush Ink icons', kind: 'icons', tier: 'premium' },
+  { key: 'icons-bubbly', name: 'Bubbly icons', kind: 'icons', tier: 'premium' },
+  { key: 'icons-solid', name: 'Solid icons', kind: 'icons', tier: 'premium' },
+]
 export const shopItem = (key: string): (Theme & { kind?: undefined }) | Extra | null =>
   THEMES.find((t) => t?.key === key) ?? EXTRAS.find((x) => x.key === key) ?? null
 

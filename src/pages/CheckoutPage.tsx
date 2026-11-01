@@ -2,7 +2,8 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { Icon, type IconName } from '../components/icons'
 import { PLANS, type Tier } from '../lib/plan'
 import { themePrice, shopItem } from '../lib/theme'
-import { TokyoIcon } from './IconsPage'
+import { TokyoIcon, PackTile } from './IconsPage'
+import { packOfItem } from '../lib/iconpack'
 import ThemeScene from '../components/ThemeScene'
 import { startCheckout, cardToken, savePending, loadOmise, useSubscription, type Method } from '../lib/billing'
 import { t } from '../lib/i18n'
@@ -79,7 +80,7 @@ export default function CheckoutPage({ tier = 'premium', theme: themeKey, guest 
       {theme ? (
         <section className="co-plan co-theme">
           {theme.kind === 'icons'
-            ? <div className="co-theme-art co-icons" aria-hidden="true"><TokyoIcon /></div>
+            ? <div className="co-theme-art co-icons" aria-hidden="true">{packOfItem(theme.key) ? <PackTile pack={packOfItem(theme.key)!} /> : <TokyoIcon />}</div>
             : <div className={`co-theme-art theme-art skin-${theme.key}`} data-skin={theme.key} aria-hidden="true"><ThemeScene skin={theme.key} /></div>}
           <div>
             <h2>{t(theme.name)}</h2>

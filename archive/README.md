@@ -44,3 +44,15 @@ Old screenshots that used to sit in the repo root.
 | File | What it was |
 | --- | --- |
 | `HoloThumb.tsx` | The first-run "right thumb" blueprint that slid up from "+" and the page B buttons, used with a pointing-hand icon. Replaced by the Glass style (frosted pills, sweeping ring, glassy touch circle) on 2026-10-25. Its styles (`.holo-thumb`, `.holo-hand`, `.holo-arrow`) are in `src/styles.css` before that change, in git commit `f91bca2`. |
+
+## Exercise icons (`icons/`)
+
+Each folder is a full copy of `src/components/icons.tsx` from when that icon set was live, plus a `preview.png`.
+
+| Folder | What it was |
+| --- | --- |
+| `glass-2026-10-25/` | Glass icons (fine line over a frosted fill): Arm, Leg, Torso front/back, Dumbbell, Barbell, Pull-up bar, Dip bar, and the Tokyo pack. |
+
+To restore: copy `icons.tsx` back over `src/components/icons.tsx`.
+
+Also here: `sets-2026-11-01.html` (the mock-up page of the 7 icon sets as first drawn) and `dotset-icons-all.svg` (every icon of every set in one vector file, on coloured tiles) and `dotset-icons-all-transparent.svg` (the same with no background, cut-outs see-through). The live sets are in `src/components/iconSets.ts`. The first Standard set (thin line) was replaced by filled Standard the same day; it is `LINE_SET` in `iconSets.ts`, not shown anywhere. Tokyo is hidden from gear > Icons but still in `icons.tsx` so old workouts draw.

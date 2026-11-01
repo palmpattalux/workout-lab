@@ -1666,6 +1666,8 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .app-icon .ai-ring { fill: none; stroke: #f4f1ea; stroke-width: 3.2; }
 .app-icon .ai-dot { fill: #ff6a1a; stroke: none; }
 .icon-tile small.use { color: var(--muted); }
+/* Icon set tiles (gear > Icons, 2026-11-01): the set's arm on its own colour */
+.app-icon.pack-tile { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 15px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.06); }
 /* Tokyo: washi paper, a red sun, an ink katana */
 .app-icon.tokyo { position: relative; display: grid; place-items: center; width: 64px; height: 64px; border-radius: 15px; background: #f4efe4; color: #16130f; overflow: hidden; }
 .app-icon.tokyo .tk-sun { position: absolute; width: 30px; height: 30px; border-radius: 50%; background: #d8352a; top: 10px; left: 10px; }

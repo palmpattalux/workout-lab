@@ -6,6 +6,7 @@ import { setPrefs } from '../lib/prefs'
 import { chargeStatus, getPending, clearPending, refreshSubscription } from '../lib/billing'
 import { formatDate } from '../lib/format'
 import { t } from '../lib/i18n'
+import { packOfItem } from '../lib/iconpack'
 
 // #pay: waiting for a payment to land. PromptPay shows its QR here; cards and TrueMoney
 // come back here from the bank's or wallet's own page. Checks quietly every few seconds.
@@ -66,7 +67,7 @@ export default function PayPage({ userId }: { userId: string | null }) {
           {theme && <p>{t('It stays on your account for good.')}</p>}
           {!theme && until && <p>{pending?.method === 'card' ? t('Renews on {date}', { date: formatDate(new Date(until).getTime()) }) : t('Active until {date}', { date: formatDate(new Date(until).getTime()) })}</p>}
           {theme
-            ? <button className="co-pay" onClick={() => { if (theme.kind === 'icons') setPrefs({ pack: 'tokyo' }); else applyTheme(theme.key); location.hash = '' }}>{t('Use it now')}</button>
+            ? <button className="co-pay" onClick={() => { if (theme.kind === 'icons') setPrefs({ pack: packOfItem(theme.key) ?? 'standard' }); else applyTheme(theme.key); location.hash = '' }}>{t('Use it now')}</button>
             : <button className="co-pay" onClick={() => { location.hash = '' }}>{t('Start training')}</button>}
         </div>
       )}

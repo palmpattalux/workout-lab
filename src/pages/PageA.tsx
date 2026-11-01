@@ -506,7 +506,7 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
           options={letterOptions}
           maxStep={40}
           instant
-          title={pack === 'tokyo' ? t('Choose a letter') : t('Choose a body part')}
+          title={t('Choose a body part')}
           onTap={tapAdd}
           onPick={(i) => { const icon = pickedIcon; setPickedIcon(null); onCreate(icon, letterOptions[i].key) }}
           className={`dot add float in-progress${letterHint ? ' hint-hidden' : ''}`}
