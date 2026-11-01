@@ -20,13 +20,14 @@ import BookDrop from '../components/BookDrop'
 
 // Exercise dot positions, as % of the screen: low and toward the right, in easy reach of a
 // right thumb. The first four are always shown; the rest fill in as more workouts exist.
+// Slot 0 (the first exercise) sits dead centre: the opening screen's dot lands right on it.
 const SLOTS = [
-  { left: 58, top: 57 },
-  { left: 82, top: 55 },
-  { left: 40, top: 70 },
-  { left: 63, top: 72 },
+  { left: 50, top: 50 },
+  { left: 77, top: 56 },
+  { left: 37, top: 66 },
+  { left: 62, top: 70 },
   { left: 85, top: 72.5 },
-  { left: 34, top: 55.5 },
+  { left: 23, top: 53 },
   { left: 43, top: 86 },
   { left: 65, top: 88 },
 ]
