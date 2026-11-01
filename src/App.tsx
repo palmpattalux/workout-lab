@@ -17,6 +17,8 @@ import { refreshSubscription } from './lib/billing'
 import NotePage from './pages/NotePage'
 import WeekPage from './pages/WeekPage'
 import LicensesPage from './pages/LicensesPage'
+import TickLoader from './components/TickLoader'
+import { markUserKnown } from './lib/loading'
 import LandingPage, { DesktopFrame, DesktopView } from './pages/LandingPage'
 import LegalPage, { type LegalDoc } from './pages/LegalPage'
 import DeleteAccountPage from './pages/DeleteAccountPage'
@@ -75,7 +77,7 @@ function go(hash: string) {
 
 export default function App() {
   usePrefs() // re-render everything when the language changes
-  return <><PreviewBar /><Screen /><LockNote /></>
+  return <><PreviewBar /><Screen /><LockNote />{desktop && <TickLoader />}</>
 }
 
 // On Free only the first FREE_WORKOUTS exercises (oldest first) are shown. The rest are never
@@ -103,6 +105,7 @@ function Screen() {
     // device accounts can't prove an email, so only online accounts are checked for ownership
     if (supabase && user !== undefined) checkOwnerEmail(user?.email)
     if (user !== undefined) refreshSubscription(user?.id)
+    if (user !== undefined) markUserKnown()
   }, [user])
 
   useEffect(() => {

@@ -2519,3 +2519,9 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 @keyframes tl-hint { 50% { transform: translateY(-3px); } }
 @media (prefers-reduced-motion: reduce) { .theme-track.enter-up, .theme-track.enter-down, .theme-next-layer { animation: none; } }
 .themes > .theme-pips, .themes > .theme-next-layer { touch-action: none; }
+
+/* Desktop loading ring (components/TickLoader.tsx): shows only for long waits, never on first open */
+.tick-loader { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; background: color-mix(in srgb, var(--stage) 70%, transparent); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); animation: tl-in .3s ease both; }
+.tick-loader svg { width: 150px; height: 150px; fill: var(--ink); stroke: none; overflow: visible; }
+.tick-loader .tl-shade { fill: color-mix(in srgb, var(--ink) 30%, transparent); }
+@keyframes tl-in { from { opacity: 0; } }
