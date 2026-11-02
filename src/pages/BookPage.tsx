@@ -6,15 +6,15 @@ import { usePlan, atLeast } from '../lib/plan'
 import { useNewWeek } from '../lib/week'
 import SetList from '../components/SetList'
 import { day, time, setLines } from '../lib/format'
-import SessionsList from './SessionsPage'
+import SessionsList, { SessionsCalendar } from './SessionsPage'
 import { supabase, signOut } from '../lib/auth'
 import { t, locale } from '../lib/i18n'
 
-// A2 book: three tabs. Exercises: one row per workout, tap for its notes, details and
+// A2 book: Sessions comes first (the book opens on it), with a List / Calendar switch. Exercises: one row per workout, tap for its notes, details and
 // past sessions. Sessions: every session, newest first. Presets (Exclusive): one row
 // per preset, tap for only the sessions done from it. Notes: every note, newest first.
 // "This week" (Exclusive) opens the weekly summary.
-type View = 'exercises' | 'sessions' | 'presets' | 'notes'
+type View = 'exercises' | 'sessions' | 'calendar' | 'presets' | 'notes'
 export default function BookPage({ workouts, kept = 0, view, openId, sessionId, presetId, onOpen, onOpenPreset, onView }: {
   workouts: Workout[]
   // exercises saved but not shown on Free (they come back with a plan)
@@ -32,6 +32,7 @@ export default function BookPage({ workouts, kept = 0, view, openId, sessionId, 
   const canPreset = atLeast(usePlan(), 'exclusive')
   const newWeek = useNewWeek()
   const preset = presetId && canPreset ? presets.find((p) => p.id === presetId) ?? null : null
+  const sessionsTab = view === 'sessions' || view === 'calendar'
 
   return (
     <main className="page scroll book" aria-label={t('Book')}>
@@ -48,8 +49,8 @@ export default function BookPage({ workouts, kept = 0, view, openId, sessionId, 
 
       {!open && !preset && (
         <div className="book-tabs" role="tablist">
+          <button role="tab" aria-selected={sessionsTab} className={sessionsTab ? 'on' : undefined} onClick={() => onView('sessions')}>{t('Sessions')}</button>
           <button role="tab" aria-selected={view === 'exercises'} className={view === 'exercises' ? 'on' : undefined} onClick={() => onView('exercises')}>{t('Exercises')}</button>
-          <button role="tab" aria-selected={view === 'sessions'} className={view === 'sessions' ? 'on' : undefined} onClick={() => onView('sessions')}>{t('Sessions')}</button>
           {canPreset && (
             <button role="tab" aria-selected={view === 'presets'} className={view === 'presets' ? 'on' : undefined} onClick={() => onView('presets')}>{t('Presets')}</button>
           )}
@@ -57,11 +58,19 @@ export default function BookPage({ workouts, kept = 0, view, openId, sessionId, 
         </div>
       )}
 
+      {!open && !preset && sessionsTab && (
+        <div className="seg cal-switch" role="radiogroup" aria-label={t('Show sessions as')}>
+          <button role="radio" aria-checked={view === 'sessions'} className={view === 'sessions' ? 'on' : undefined} onClick={() => onView('sessions')}>{t('List')}</button>
+          <button role="radio" aria-checked={view === 'calendar'} className={view === 'calendar' ? 'on' : undefined} onClick={() => onView('calendar')}>{t('Calendar')}</button>
+        </div>
+      )}
+
       {!open && !preset && supabase && (
         <button className="logout" onClick={() => { signOut(); location.replace('#') }}>{t('Log out')}</button>
       )}
 
-      {open ? <Detail w={open} /> : preset ? <PresetDetail p={preset} workouts={workouts} /> : view === 'sessions' ? <SessionsList workouts={workouts} startOpen={sessionId} />
+      {open ? <Detail w={open} /> : preset ? <PresetDetail p={preset} workouts={workouts} /> : view === 'sessions' ? <SessionsList key={sessionId ?? ''} workouts={workouts} startOpen={sessionId} />
+        : view === 'calendar' ? <SessionsCalendar workouts={workouts} onOpen={(id) => { location.hash = 'session-' + id }} />
         : view === 'notes' ? <NotesList workouts={workouts} />
         : view === 'presets' && canPreset ? (presets.length === 0
           ? <p className="empty-note">{t('No presets yet. Tap the list button on the first page to make one.')}</p>

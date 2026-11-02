@@ -14,7 +14,21 @@ export type PickerOption = { key: string; node: ReactNode; label?: string }
 //
 // `visible` shows only that many options at once. Holding the finger at the top
 // of the line keeps scrolling to higher options; at the bottom, back down.
-export default function HoldPicker({ options, title, visible, extra, start = 0, side = 'above', instant, onTap, onPick, onChange, maxStep, className, style, ariaLabel, children }: {
+// Faster higher up (`accel`): the first few options follow the finger one to one, then each
+// extra bit of slide reaches further, so the top of a tall line is reached with a short slide
+// (easy on the thumb joint). The curve is smooth, so there is no jump where it speeds up.
+function curveOf(len: number, step: number) {
+  const p0 = Math.min(3 * step, len * 0.2) // the low options: one to one
+  const reach = len * 0.45 // finger travel that reaches the top (a bit under half the line)
+  if (len < step * 7 || reach <= p0) return null
+  const a = (len - reach) / ((reach - p0) * (reach - p0))
+  return {
+    f: (p: number) => (p <= p0 ? p : p0 + (p - p0) + a * (p - p0) * (p - p0)),
+    inv: (y: number) => (y <= p0 ? y : p0 + (-1 + Math.sqrt(1 + 4 * a * (y - p0))) / (2 * a)),
+  }
+}
+
+export default function HoldPicker({ options, title, visible, extra, start = 0, side = 'above', instant, accel, onTap, onPick, onChange, maxStep, className, style, ariaLabel, children }: {
   options: PickerOption[]
   title?: string // shown above the line while it's open, e.g. "Choose an icon"
   visible?: number
@@ -22,6 +36,7 @@ export default function HoldPicker({ options, title, visible, extra, start = 0, 
   start?: number // option the line opens on (e.g. the weight already set), so long lists don't start from the bottom
   side?: 'above' | 'left' // 'left' for buttons near the top of the screen
   instant?: boolean // open as soon as the finger drags up, no hold
+  accel?: boolean // higher options come faster than the finger (see curveOf)
   onTap?: () => void // pressed and let go without opening
   onPick: (index: number) => void
   onChange?: (index: number) => void
@@ -40,6 +55,8 @@ export default function HoldPicker({ options, title, visible, extra, start = 0, 
   const [local, setLocal] = useState(0)
   const pos = useRef({ offset: 0, local: 0 })
   const base = useRef(0)
+  const curve = useRef<ReturnType<typeof curveOf>>(null)
+  const from = useRef(0) // where the finger starts on the curve, in px from the bottom option
   const pageLeft = useRef(0)
   const [onExtra, setOnExtra] = useState(false)
   const extraRef = useRef(false)
@@ -66,18 +83,21 @@ export default function HoldPicker({ options, title, visible, extra, start = 0, 
     extraRef.current = false
     setOnExtra(false)
     const r = el.getBoundingClientRect()
+    let step: number
     if (side === 'left') {
       // line sits beside the button, option 1 level with its center
       const cy = r.top - page.top + r.height / 2
-      const step = Math.max(10, Math.min(maxStep, (cy - 8) / shown))
+      step = Math.max(10, Math.min(maxStep, (cy - 8) / shown))
       setRuler({ left: r.left - page.left - 50, top: cy + step / 2 - step * shown, step })
     } else {
-      const step = Math.max(10, Math.min(maxStep, (r.top - page.top - 16) / shown))
+      step = Math.max(10, Math.min(maxStep, (r.top - page.top - 16) / shown))
       setRuler({ left: r.left - page.left + r.width / 2 - 22, top: r.top - page.top - step * shown - 4, step })
     }
     const at = Math.max(0, Math.min(total - 1, start))
     const o = Math.max(0, Math.min(total - shown, at - 3))
     base.current = at - o
+    curve.current = accel ? curveOf((shown - 1) * step, step) : null
+    from.current = curve.current ? curve.current.inv((at - o) * step) : (at - o) * step
     pos.current = { offset: o, local: at - o }
     setOffset(o)
     setLocal(at - o)
@@ -119,7 +139,8 @@ export default function HoldPicker({ options, title, visible, extra, start = 0, 
       if (over !== extraRef.current) { extraRef.current = over; setOnExtra(over); if (over) sound.tick() }
       if (over) { stopScroll(); return }
     }
-    const raw = base.current + (startY.current - e.clientY) / ruler.step
+    const p = from.current + (startY.current - e.clientY)
+    const raw = (curve.current && p > 0 ? curve.current.f(p) : p) / ruler.step
     const l = Math.max(0, Math.min(shown - 1, Math.round(raw)))
     if (l !== pos.current.local) update(pos.current.offset, l)
     // at either end of a scrolling line, keep going while the finger stays there

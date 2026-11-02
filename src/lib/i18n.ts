@@ -643,6 +643,19 @@ const ROWS: [string, string, string, string][] = [
   ["Soft rain on glass, drops sliding down. A grey day, or city lights blurred at night.", "สายฝนบนกระจก หยดน้ำไหลลงช้าๆ วันฟ้าครึ้ม หรือแสงไฟเมืองพร่ามัวยามค่ำคืน", "ガラスに降る優しい雨、滑り落ちるしずく。曇りの日、または夜ににじむ街の灯り。", "轻雨落在玻璃上，水珠缓缓滑落。阴天，或夜晚朦胧的城市灯光。"],
   ["Koi gliding under lily pads. Their shadows pass slowly across the water.", "ปลาคาร์ปว่ายใต้ใบบัว เงาของพวกมันเคลื่อนผ่านผิวน้ำช้าๆ", "蓮の葉の下を泳ぐ鯉。その影が水面をゆっくりと横切る。", "锦鲤在睡莲叶下游弋，影子缓缓掠过水面。"],
   ["A spinning star sweeping its beams through space. It turns and ticks with every rep and load you choose.", "ดาวที่หมุนวนกวาดลำแสงผ่านอวกาศ มันหมุนและส่งเสียงติ๊กทุกครั้งที่คุณเลือกจำนวนครั้งและน้ำหนัก", "宇宙に光のビームを放ちながら回る星。回数や重さを選ぶたびに回転し、チクタクと鳴る。", "旋转的星体在太空中扫出光束。每次选择次数和重量时，它都会转动并发出滴答声。"],
+  // ease-of-use batch (2026-11-02)
+  ['Slide up to choose', 'ปัดขึ้นเพื่อเลือก', '上にスライドして選ぶ', '上滑选择'],
+  ['Tap again to type it', 'แตะอีกครั้งเพื่อพิมพ์', 'もう一度タップで入力', '再点一次可输入'],
+  ['Since last time', 'เทียบกับครั้งก่อน', '前回から', '与上次相比'],
+  ['Earlier today', 'วันนี้ก่อนหน้านี้', '今日の先ほど', '今天早些时候'],
+  ['Yesterday', 'เมื่อวาน', '昨日', '昨天'],
+  ['{n} days ago', '{n} วันก่อน', '{n}日前', '{n}天前'],
+  ['Today', 'วันนี้', '今日', '今天'],
+  ['Previous month', 'เดือนก่อน', '前の月', '上个月'],
+  ['Next month', 'เดือนถัดไป', '次の月', '下个月'],
+  ['Show sessions as', 'แสดงเซสชันแบบ', 'セッションの表示', '训练显示方式'],
+  ['List', 'รายการ', 'リスト', '列表'],
+  ['Calendar', 'ปฏิทิน', 'カレンダー', '日历'],
 ]
 for (const [en, th, ja, zh] of ROWS) { D.th[en] = th; D.ja[en] = ja; D.zh[en] = zh }
 

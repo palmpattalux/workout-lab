@@ -7,7 +7,7 @@ import SetList from '../components/SetList'
 import { keyNum, keySide } from '../lib/session'
 import { day, time, duration, setLines } from '../lib/format'
 import { compare } from '../lib/progress'
-import { t } from '../lib/i18n'
+import { t, locale } from '../lib/i18n'
 
 // A small change chip, the same look as the summary page: ▲ +3 reps, ▼ −2.5 kg, first time.
 function Change({ d, unit, label }: { d: number | null; unit?: string; label: string }) {
@@ -183,6 +183,66 @@ function SessionEditor({ s, workouts, onClose }: { s: Session; workouts: Workout
       <div className="detail-actions">
         <button className="edit-session primary" onClick={save}>{t('Save')}</button>
         <button className="edit-session" onClick={onClose}>{t('Cancel')}</button>
+      </div>
+    </div>
+  )
+}
+
+// Book > Sessions > Calendar: a month of day boxes, each holding the sessions done that day
+// (their exercise icons). An easier way to see which days you trained. Tap a session to open
+// it in the list, the usual session view.
+const dayStart = (ts: number) => { const d = new Date(ts); d.setHours(0, 0, 0, 0); return d.getTime() }
+export function SessionsCalendar({ workouts, onOpen }: { workouts: Workout[]; onOpen: (id: string) => void }) {
+  const done = useSessions()
+  const [month, setMonth] = useState(() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1).getTime() })
+  const first = new Date(month)
+  const y = first.getFullYear(), m = first.getMonth()
+  const days = new Date(y, m + 1, 0).getDate()
+  const lead = (first.getDay() + 6) % 7 // Monday first
+  const byDay = new Map<number, Session[]>()
+  for (const s of done) {
+    const k = dayStart(s.startedAt)
+    const d = new Date(k)
+    if (d.getFullYear() !== y || d.getMonth() !== m) continue
+    byDay.set(k, [...(byDay.get(k) ?? []), s])
+  }
+  const count = [...byDay.values()].reduce((n, l) => n + l.length, 0)
+  const today = dayStart(Date.now())
+  const weekdays = Array.from({ length: 7 }, (_, i) => new Date(2024, 0, 1 + i).toLocaleDateString(locale(), { weekday: 'narrow' }))
+  const shift = (n: number) => setMonth(new Date(y, m + n, 1).getTime())
+  const isThisMonth = new Date(today).getFullYear() === y && new Date(today).getMonth() === m
+
+  return (
+    <div className="cal">
+      <div className="cal-head">
+        <button className="icon-btn" aria-label={t('Previous month')} onClick={() => shift(-1)}><Icon name="arrowLeft" size="20px" /></button>
+        <span className="cal-title">
+          <b>{first.toLocaleDateString(locale(), { month: 'long', year: 'numeric' })}</b>
+          <small>{count === 1 ? t('1 session') : t('{n} sessions', { n: count })}</small>
+        </span>
+        <button className="icon-btn" aria-label={t('Next month')} disabled={isThisMonth} onClick={() => shift(1)}><Icon name="arrowRight" size="20px" /></button>
+      </div>
+      <div className="cal-grid" role="grid">
+        {weekdays.map((w, i) => <span key={'w' + i} className="cal-wd" aria-hidden="true">{w}</span>)}
+        {Array.from({ length: lead }, (_, i) => <span key={'e' + i} className="cal-day blank" />)}
+        {Array.from({ length: days }, (_, i) => {
+          const k = new Date(y, m, i + 1).getTime()
+          const list = byDay.get(k) ?? []
+          return (
+            <div key={k} role="gridcell" className={`cal-day${list.length ? ' trained' : ''}${k === today ? ' today' : ''}${k > today ? ' future' : ''}`}>
+              <span className="cal-num">{i + 1}</span>
+              {list.map((s) => {
+                const marks = s.order.map((id) => s.snap?.[id] ?? workouts.find((w) => w.id === id)).filter((x): x is NonNullable<typeof x> => !!x)
+                return (
+                  <button key={s.id} className="cal-session" aria-label={`${day(s.startedAt)} ${time(s.startedAt)}, ${marks.map((x) => x.exercise || t('Untitled')).join(', ')}`} onClick={() => onOpen(s.id)}>
+                    {marks.slice(0, 2).map((x, j) => <WorkoutMark key={j} icon={x.icon} letter={x.letter} size="1em" />)}
+                    {marks.length > 2 && <small>+{marks.length - 2}</small>}
+                  </button>
+                )
+              })}
+            </div>
+          )
+        })}
       </div>
     </div>
   )

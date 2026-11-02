@@ -2540,3 +2540,75 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 }
 @keyframes upright { 0%, 30% { rotate: -90deg; } 60%, 100% { rotate: 0deg; } }
 @media (prefers-reduced-motion: reduce) { @keyframes upright { from, to { rotate: 0deg; } } }
+
+/* ---------- ease-of-use batch (2026-11-02) ---------- */
+/* page B: tapped weight or reps instead of sliding: the demo line plays and a card says what to do */
+.slide-tip-card { border: 1px solid var(--glass-edge); text-align: left; cursor: pointer; font-family: var(--font); }
+.slide-tip.holo-demo .demo-line, .slide-tip.holo-demo::after, .slide-tip .holo-ring { animation-iteration-count: 1; }
+
+/* page A: when the app opens, every exercise's name shows above its dot for a few seconds */
+.dot-flash {
+  position: absolute; z-index: 4; transform: translate(-50%, -100%); max-width: 34cqw; pointer-events: none;
+  padding: 4px 10px; border-radius: 999px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font: 600 .74rem var(--font); color: var(--ink);
+  background: var(--glass-panel); border: 1px solid var(--glass-edge); box-shadow: var(--lift);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  animation: dot-flash 3.4s var(--ease) both;
+}
+@keyframes dot-flash { 0% { opacity: 0; translate: 0 6px; scale: .9; } 10%, 82% { opacity: 1; translate: 0 0; scale: 1; } 100% { opacity: 0; translate: 0 -4px; } }
+
+/* page A, back from a session: a card drops from the book (last time -> today), then folds back into it */
+.book-recap {
+  position: absolute; z-index: 9; left: calc(35.2% - 24.8cqw); top: calc(20.4% + min(17.5cqw, 9.8cqh) / 2 + 8px); width: min(84cqw, 360px);
+  display: flex; flex-direction: column; gap: 2px; padding: 8px; border-radius: 22px; pointer-events: none;
+  background: var(--glass-panel); border: 1px solid var(--glass-edge); box-shadow: var(--float);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  transform-origin: 50% -20px; animation: book-recap 6.6s var(--ease) .25s both;
+}
+@keyframes book-recap {
+  0% { opacity: 0; transform: translateY(-18px) scale(.6, .4); }
+  7%, 88% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(-26px) scale(.4, .2); }
+}
+.recap-row { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "mark when delta" "mark num delta"; column-gap: 12px; align-items: center; padding: 8px 10px; border-radius: 16px; color: var(--ink); }
+.recap-mark { grid-area: mark; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--glass); border: 1px solid var(--glass-edge); font-size: .85rem; }
+.recap-when { grid-area: when; position: relative; height: 1.1em; font: 600 .7rem var(--font); color: var(--muted); }
+.recap-when i { position: absolute; left: 0; top: 0; font-style: normal; white-space: nowrap; }
+.recap-when .was { animation: recap-out .35s var(--ease) var(--d) both; }
+.recap-when .now { color: var(--active); animation: recap-in .35s var(--ease) var(--d) both; }
+@keyframes recap-out { to { opacity: 0; translate: 0 -6px; } }
+@keyframes recap-in { from { opacity: 0; translate: 0 6px; } }
+.recap-num { grid-area: num; display: flex; align-items: baseline; gap: 3px; font: 500 1.05rem var(--num); font-variant-numeric: tabular-nums; }
+.recap-num small { font: 600 .66rem var(--font); color: var(--muted); }
+.recap-num em { font-style: normal; color: var(--muted); margin: 0 3px; }
+.recap-delta { grid-area: delta; font: 650 .74rem var(--font); padding: 4px 9px; border-radius: 999px; background: var(--sunk); color: var(--muted); white-space: nowrap; animation: count-pop .5s var(--ease) calc(var(--d) + 1100ms) both; }
+.recap-delta.up { background: var(--active-soft); color: var(--active); }
+@media (prefers-reduced-motion: reduce) { .book-recap { animation-name: fade-recap; } @keyframes fade-recap { 0%, 100% { opacity: 0; } 7%, 88% { opacity: 1; } } }
+
+/* book > sessions: List / Calendar */
+.cal-switch { grid-template-columns: repeat(2, auto); width: max-content; margin: 14px 5.7% 0; }
+.cal-switch button { padding: 0 16px; }
+.cal { padding: 14px 5.7% 40px; }
+.cal-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.cal-head .icon-btn:disabled { opacity: .25; }
+.cal-title { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.cal-title b { font: 600 1rem var(--font); color: var(--ink); text-transform: capitalize; }
+.cal-title small { font: 500 .74rem var(--font); color: var(--muted); }
+.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; }
+.cal-wd { text-align: center; font: 600 .68rem var(--font); color: var(--muted); padding-bottom: 2px; }
+.cal-day {
+  min-height: 62px; min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: 3px; padding: 5px 3px 4px; border-radius: 12px;
+  background: var(--glass); border: 1px solid var(--glass-edge); color: var(--ink);
+}
+.cal-day.blank { background: none; border: 0; }
+.cal-day.future { opacity: .45; }
+.cal-num { font: 500 .72rem var(--num); color: var(--muted); padding-left: 3px; }
+.cal-day.today .cal-num { color: var(--active); font-weight: 700; }
+.cal-day.today { border-color: color-mix(in srgb, var(--active) 55%, transparent); }
+.cal-day.trained { background: color-mix(in srgb, var(--active) 9%, var(--glass)); }
+.cal-session {
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 2px; padding: 4px 2px; border-radius: 8px; cursor: pointer;
+  border: 0; background: var(--active-soft); color: var(--ink); font: 600 .66rem var(--font); min-width: 0; overflow: hidden;
+}
+.cal-session small { font: 600 .6rem var(--font); color: var(--muted); }
+.cal-session:active { transform: scale(.94); }

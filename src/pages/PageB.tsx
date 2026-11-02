@@ -127,6 +127,20 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
   }, [set])
   // typing a number instead of dragging: tap the load or sec button
   const [typing, setTyping] = useState<'weight' | 'reps' | null>(null)
+  // Tapped the weight or reps button instead of sliding it: it doesn't just sit there. A small
+  // number line rises and a touch slides up it, with a card saying what to do. Tapping again
+  // (or the card) types the number instead.
+  const [slideTip, setSlideTip] = useState<{ which: 'weight' | 'reps'; n: number } | null>(null)
+  function tapped(which: 'weight' | 'reps') {
+    if (slideTip?.which === which) { setSlideTip(null); setTyping(which); return }
+    setSlideTip({ which, n: Date.now() })
+    sound.tap()
+  }
+  useEffect(() => {
+    if (!slideTip) return
+    const tm = setTimeout(() => setSlideTip(null), 4200)
+    return () => clearTimeout(tm)
+  }, [slideTip])
   // hold timer: slide onto it from the sec line, a 5 s countdown, then it counts up.
   // It lives outside this page (home shows it too); tap the sec button to stop and keep the time.
   const timer = useTimer()
@@ -320,8 +334,8 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
           maxStep={20}
           instant
           onChange={(i) => put('weight', loads[i])}
-          onPick={(i) => put('weight', loads[i])}
-          onTap={() => setTyping('weight')}
+          onPick={(i) => { setSlideTip(null); put('weight', loads[i]) }}
+          onTap={() => tapped('weight')}
           className="mid load"
           style={{ left: '35.1%', top: '64.1%' }}
           ariaLabel={`Load (B3)${weight ? `: ${weight} ${unit}` : ` in ${unit}`}, drag up to set`}
@@ -336,10 +350,11 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
         start={reps ? Math.min(timed ? 59 : 99, reps - 1) : 0}
         maxStep={20}
         instant
+        accel
         extra={timed && inSession ? { node: <Icon name="stopwatch" size="22px" />, label: t('Timer'), onPick: () => startTimer(id!, key) } : undefined}
         onChange={(i) => { if (!timerHere) put('reps', countValue(i)) }}
-        onPick={(i) => { if (timerHere) stopTimer(); put('reps', countValue(i)) }}
-        onTap={() => (timerHere ? stopWatch() : setTyping('reps'))}
+        onPick={(i) => { setSlideTip(null); if (timerHere) stopTimer(); put('reps', countValue(i)) }}
+        onTap={() => (timerHere ? stopWatch() : tapped('reps'))}
         className={`mid reps${timed ? ' dense' : ''}${timerHere ? (ts?.counting ? ' timing counting' : ' timing') : ''}`}
         style={{ left: '69%', top: '64.1%' }}
         ariaLabel={timerHere ? t('Timer running: tap to stop') : `${timed ? 'Seconds' : 'Reps'} (B4)${reps ? `: ${reps}` : ''}, tap to type, drag up to set`}
@@ -350,6 +365,25 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
             : <span className="val"><Icon name="stopwatch" size="14px" />{ts.held}<small>{t('sec')}</small></span>
           : reps ? <span className="val">{reps}{timed && <small>{t('sec')}</small>}</span> : timed ? <span className="unit-label">{t('sec')}</span> : <Icon name="numbers" />}
       </HoldPicker>
+      {slideTip && !tourOn && !typing && (() => {
+        const weightTip = slideTip.which === 'weight'
+        const x = weightTip ? 35.1 : 69
+        const nums = weightTip ? (unit === 'lbs' ? [45, 95, 135] : [20, 40, 60]) : timed ? [10, 20, 30] : [6, 8, 10]
+        return (
+          <>
+            <div className="holo holo-demo b-tour slide-tip" key={slideTip.n} style={{ left: `${x}%`, top: '64.1%' }} aria-hidden="true">
+              <span className="holo-ring" />
+              <span className="demo-line">{nums.map((n, i) => <i key={i} style={{ ['--i' as string]: i }}>{n}</i>)}</span>
+            </div>
+            <button className="tour-tip b-tip slide-tip-card" key={'c' + slideTip.n} role="status"
+              style={{ left: `clamp(118px, ${x}%, calc(100% - 118px))`, top: 'calc(64.1% + min(17.5cqw, 9.8cqh) / 2 + 16px)' }}
+              onClick={() => { setSlideTip(null); setTyping(slideTip.which) }}>
+              <b>{t('Slide up to choose')}</b>
+              <small>{t('Tap again to type it')}</small>
+            </button>
+          </>
+        )
+      })()}
       {tourOn && <BTour step={tour} progression={isProgression} timed={timed} unit={unit} onStep={setTour} onEnd={endTour} />}
       {typing && (
         <NumberPrompt
