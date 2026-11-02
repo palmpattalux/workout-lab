@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
-import { Icon, WorkoutIcon, WorkoutMark, packIcons, packLetters, type IconPack } from '../components/icons'
+import { Icon, WorkoutIcon, WorkoutMark, packIcons, type IconPack } from '../components/icons'
 import HoldPicker from '../components/HoldPicker'
 import { updateWorkout, usePresets, addPreset, updatePreset, type Workout } from '../lib/store'
 import { sound } from '../lib/sound'
@@ -87,7 +87,6 @@ function fan(slot: number, n: number) {
 }
 
 const iconOptionsOf = (p: IconPack) => packIcons(p).map((i) => ({ key: i.key, label: t(i.name), node: <WorkoutIcon k={i.key} size="24px" /> }))
-const letterOptionsOf = (p: IconPack) => packLetters(p).map((l) => ({ key: l.key, label: l.name, node: <b className="letter">{l.key}</b> }))
 
 export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdit, onOpenBook, onOpenSession, onThemes, onPlans, onCreate }: {
   guest: boolean
@@ -101,11 +100,10 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
   onPlans: () => void
   onCreate: (icon: string, letter: string) => void
 }) {
-  // "+" flow: first drag up picks the workout icon, second drag up picks the body-part letter.
-  const [pickedIcon, setPickedIcon] = useState<string | null>(null)
+  // "+" flow: one slide up picks the icon and opens the create page. The body-part letter comes
+  // from the exercise's name there (no second slide: people got stuck on it, 2026-11-02).
   const pack = useIconPack()
   const iconOptions = iconOptionsOf(pack)
-  const letterOptions = letterOptionsOf(pack)
   // First tap on a workout dot arms it: it turns into a glowing fingerprint (tap again to start)
   // and a pen (edit) appears above it.
   const [chosen, setChosen] = useState<string | null>(null)
@@ -306,8 +304,6 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
   }
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [slideHint, setSlideHint] = useState(0)
-  // an icon was just picked: the same slide shows again, now for the letter, straight away
-  const [letterHint, setLetterHint] = useState(0)
   // hold on an empty spot: a small pop with a way to the themes
   const [themePop, setThemePop] = useState<{ x: number; y: number } | null>(null)
   const blank = useRef<{ x: number; y: number; timer: number } | null>(null)
@@ -330,13 +326,6 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
   const [savedSign] = useState(() => { try { const v = sessionStorage.getItem('dotset:saved'); sessionStorage.removeItem('dotset:saved'); return !!v } catch { return false } })
   const [moreOpen, setMoreOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false) // flags stay folded until the arrow is tapped
-  const lastTap = useRef(0)
-  // While an icon is picked, a double tap on "+" or a press anywhere else means "never mind".
-  function tapAdd() {
-    const now = Date.now()
-    if (pickedIcon && now - lastTap.current < 400) setPickedIcon(null)
-    lastTap.current = now
-  }
   const prefs = usePrefs()
   const newWeek = useNewWeek()
   // First run (a guest or a brand-new account): everything but "+" is blurred and a hologram
@@ -347,7 +336,7 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
   const timer = useTimer()
   // also a brand-new account (no exercises or sessions yet), not only guests
   const firstRun = pastSessions.length === 0 && !live
-  const showCreateHolo = firstRun && workouts.length === 0 && pickedIcon === null && !settingsOpen
+  const showCreateHolo = firstRun && workouts.length === 0 && !settingsOpen
   const tapTarget = firstRun && workouts.length > 0 && !drag && !ring && !settingsOpen ? workouts[0].id : null
   const email = useEmail()
   const skin = useSkin()
@@ -362,13 +351,27 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
     const on = window.setTimeout(() => { namesShown = true; setFlashNames(true); off = window.setTimeout(() => setFlashNames(false), 3600) }, wait)
     return () => { clearTimeout(on); clearTimeout(off) }
   }, [hasWorkouts])
+  // Grouping, for plans that have it (Free never sees it: features a plan lacks stay hidden). Once
+  // per device, when there are 3+ single exercises: a ghost dot glides from one onto another.
+  const [groupHint, setGroupHint] = useState<{ from: number; to: number } | null>(null)
+  const singles = [...bySlot].filter(([, u]) => u.members.length === 1).map(([i]) => i)
+  const groupReady = canGroup && !firstRun && !getPreview() && singles.length >= 3 && !units.some((u) => u.members.length > 1)
+  useEffect(() => {
+    if (!groupReady) return
+    try { if (localStorage.getItem('dotset:hint-group')) return } catch { return }
+    const tm = window.setTimeout(() => {
+      try { localStorage.setItem('dotset:hint-group', '1') } catch { /* blocked */ }
+      setGroupHint({ from: singles[1], to: singles[0] })
+    }, namesShown ? 900 : 7600)
+    return () => clearTimeout(tm)
+  }, [groupReady])
   // back from a session's summary: a card drops from the book, "3 days ago" with last time's
   // numbers, then they run to today's, so checking last time becomes a habit
   const [recap] = useState(() => (savedSign ? recapOf(pastSessions, workouts) : null))
 
   return (
     <main className={`page${picking ? ' picking' : ''}${firstRun && workouts.length === 0 && !settingsOpen ? ' first-run' : ''}`} aria-label="Page A"
-      onPointerDownCapture={(e) => { if (letterHint) setLetterHint(0); if (pickedIcon && !(e.target as Element).closest('.add')) setPickedIcon(null) }}
+      onPointerDownCapture={() => { if (groupHint) setGroupHint(null) }}
       onPointerDown={onBlankDown} onPointerMove={onBlankMove} onPointerUp={onBlankUp} onPointerCancel={onBlankUp}
       onClick={(e) => { if (e.target === e.currentTarget) { setChosen(null); setSettingsOpen(false); setRing(null); setPresetOpen(false); setArmedPreset(null) } }}>
       <ThemeScene skin={skin} />
@@ -462,6 +465,16 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
         )
       })}
 
+      {groupHint && !drag && (
+        <div className="group-hint" aria-hidden="true" onAnimationEnd={(e) => { if (e.target === e.currentTarget) setGroupHint(null) }}
+          style={{ ['--ax' as string]: `${SLOTS[groupHint.from].left}%`, ['--ay' as string]: `${SLOTS[groupHint.from].top}%`, ['--bx' as string]: `${SLOTS[groupHint.to].left}%`, ['--by' as string]: `${SLOTS[groupHint.to].top}%` }}>
+          <span className="group-ghost" />
+          <span className="holo-label group-hint-label" style={{ left: `clamp(130px, ${SLOTS[groupHint.to].left}%, calc(100% - 130px))`, top: `calc(${SLOTS[groupHint.to].top}% - min(18.7cqw, 10.6cqh) / 2 - 14px)` }}>
+            {t('Drag one exercise onto another to group them')}
+          </span>
+        </div>
+      )}
+
       {groupWith && drag && canGroup && (
         <span className={`group-pop${groupWith.ready ? ' on' : ''}`} style={{ left: `${SLOTS[groupWith.slot].left}%`, top: `calc(${SLOTS[groupWith.slot].top}% - min(18.7cqw, 10.6cqh) / 2 - 22px)` }}>{t('Group')}</span>
       )}
@@ -512,13 +525,13 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
         </>
       )}
 
-      {atLimit && pickedIcon === null ? (
+      {atLimit ? (
         // Free plan, 5 exercises made: the + stays, faded, and says why
         <button className="btn circle dot add float limit" style={{ left: '20%', top: '87%' }} aria-label={t('Exercise limit reached for your plan')}
           onClick={() => showLocked(t('You have reached the exercise limit for your plan'))}>
           <Icon name="plus" strokeWidth={2.6} />
         </button>
-      ) : pickedIcon === null ? (
+      ) : (
         <HoldPicker
           options={iconOptions}
           maxStep={40}
@@ -526,37 +539,16 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
           accel
           title={t('Choose an icon')}
           onTap={() => setSlideHint((n) => n + 1)}
-          onPick={(i) => { setPickedIcon(iconOptions[i].key); setLetterHint((n) => n + 1) }}
+          onPick={(i) => onCreate(iconOptions[i].key, '')}
           className={`dot add float${slideHint ? ' hint-hidden' : ''}`}
           style={{ left: '20%', top: '87%' }}
           ariaLabel="Add workout, drag up to pick an icon"
         >
           <Icon name="plus" strokeWidth={2.6} />
         </HoldPicker>
-      ) : (
-        <HoldPicker
-          options={letterOptions}
-          maxStep={40}
-          instant
-          accel
-          title={t('Choose a body part')}
-          onTap={tapAdd}
-          onPick={(i) => { const icon = pickedIcon; setPickedIcon(null); onCreate(icon, letterOptions[i].key) }}
-          className={`dot add float in-progress${letterHint ? ' hint-hidden' : ''}`}
-          style={{ left: '20%', top: '87%' }}
-          ariaLabel="Adding workout, drag up to pick a body part, double tap to cancel"
-        >
-          <WorkoutIcon k={pickedIcon} size="40%" />
-          <span className="badge" aria-hidden="true">?</span>
-        </HoldPicker>
-      )}
-      {letterHint > 0 && pickedIcon !== null && (
-        <div key={'l' + letterHint} className="add-hint twice" style={{ left: '20%', top: '87%' }} aria-hidden="true" onAnimationEnd={(e) => { if (e.target === e.currentTarget) setLetterHint(0) }}>
-          <span className="add-hint-knob"><b className="add-hint-letter">{letterOptions[0]?.key ?? 'A'}</b></span>
-        </div>
       )}
       {/* tapped + instead of sliding it: show the slide, like a tall switch */}
-      {slideHint > 0 && pickedIcon === null && !atLimit && (
+      {slideHint > 0 && !atLimit && (
         <div key={slideHint} className="add-hint" style={{ left: '20%', top: '87%' }} aria-hidden="true" onAnimationEnd={() => setSlideHint(0)}>
           <span className="add-hint-knob"><Icon name="plus" size="38%" strokeWidth={2.6} /></span>
         </div>
@@ -691,7 +683,6 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
         <div className="holo holo-create" aria-hidden="true">
           <span className="holo-track" />
           <span className="holo-pick one"><WorkoutIcon k="dumbbell" size="52%" /></span>
-          <span className="holo-pick two"><b>A</b></span>
           <span className="holo-ring" />
           <span className="holo-label">{t('Start here')}<small>{t('Slide up to make an exercise')}</small></span>
         </div>

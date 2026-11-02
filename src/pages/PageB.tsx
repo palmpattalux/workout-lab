@@ -57,6 +57,8 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
   }, [session, id])
 
   const inSession = !!session && !!id && session.current === id
+  // sets with something recorded, across the session (Left and Right count as one set)
+  const setsDone = session ? Object.values(session.sets).reduce((n, byKey) => n + new Set(Object.entries(byKey).filter(([, e]) => e.reps != null).map(([k]) => keyNum(k))).size, 0) : 0
   const skin = useSkin()
   // a session started from a preset: the switcher only offers that preset, in its order
   const presets = usePresets()
@@ -172,6 +174,8 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
   const [safety, setSafety] = useState(() => { try { return inSession && !localStorage.getItem('dotset:safety-ok') } catch { return false } })
   const safetyOk = () => { try { localStorage.setItem('dotset:safety-ok', '1') } catch { /* blocked */ } setSafety(false) }
   const [adding, setAdding] = useState(false)
+  // progression button, tapped: a small list of the moves (tap one for this set) and "Add a move"
+  const [movesOpen, setMovesOpen] = useState(false)
   const [move, setMove] = useState('')
   // Page B guide: one step at a time, each with a moving demo and a short instruction (slide up
   // for weight, slide up for reps, tap the arrow). It runs in the first session until finished or
@@ -179,7 +183,12 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
   const tourKey = isProgression ? 'dotset:tour-b-prog' : 'dotset:tour-b'
   const [tour, setTour] = useState(() => { try { return inSession && firstSession && !localStorage.getItem(tourKey) ? 0 : -1 } catch { return -1 } })
   const tourOn = tour >= 0 && inSession && !safety && !confirmEnd && !adding && !typing
-  function endTour() { try { localStorage.setItem(tourKey, '1') } catch { /* blocked */ } setTour(-1) }
+  function endTour() { try { localStorage.setItem(tourKey, '1'); localStorage.setItem('dotset:tip-sides', '1') } catch { /* blocked */ } setTour(-1) }
+  // The set number step (sets + one side at a time) was added to the guide later: anyone who already
+  // finished the guide sees just that step once, from set 2 of a session.
+  const [sidesTip, setSidesTip] = useState(() => { try { return !!localStorage.getItem('dotset:tour-b') && !localStorage.getItem('dotset:tip-sides') } catch { return false } })
+  const sidesTipOn = sidesTip && tour < 0 && inSession && set >= 2 && !safety && !confirmEnd && !adding && !typing
+  function endSidesTip() { try { localStorage.setItem('dotset:tip-sides', '1') } catch { /* blocked */ } setSidesTip(false) }
   // anyone's first session, once the guide is done: from set 2 on, a hologram shows that Active ends it
   const endHint = firstSession && inSession && set >= 2 && !confirmEnd && tour < 0
 
@@ -197,8 +206,10 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
       {skin === 'summit' && (inSession || trying) && <SummitClimb steps={trying ? demo : Object.values(session!.setOf).reduce((a, n) => a + Math.max(0, n - 1), 0)} />}
       {(inSession || trying) && <ThemeSession skin={skin} steps={trying ? demo : Object.values(session!.setOf).reduce((a, n) => a + Math.max(0, n - 1), 0)} />}
       <div className="tabs">
-        <button className={`btn pill${session ? ' live' : ''}${endHint ? ' holo-target' : ''}`} id="b1" aria-label={session ? t('Active session: tap to end') : t('Active')} onClick={() => session && setConfirmEnd(true)}>
-          <span className="led" />{t('Active')}
+        {/* while a session runs it says Finish (people looked for a way to end), with the sets done so far */}
+        <button className={`btn pill${session ? ' live' : ''}${endHint ? ' holo-target' : ''}`} id="b1" aria-label={session ? t('Finish session, {n} sets done', { n: setsDone }) : t('Active')} onClick={() => session && setConfirmEnd(true)}>
+          <span className="led" />{session ? t('Finish') : t('Active')}
+          {session && setsDone > 0 && <small className="b1-count">{setsDone}</small>}
         </button>
         <button className="btn pill" id="b2" aria-label={t('Notes')}
           onClick={() => { const n = addNote({ sessionId: session?.id, workoutId: id ?? undefined }); location.hash = 'note-' + n.id }}>{t('Notes')}</button>
@@ -271,6 +282,7 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
                 {workout?.sided && workout.first === 'R'
                   ? <><span>{t('R')}</span><i /><span>{t('L')}</span></>
                   : <><span>{t('L')}</span><i /><span>{t('R')}</span></>}
+                <span className="side-cap">{!workout?.sided ? t('One side at a time') : workout.first === 'R' ? t('Right side first') : t('Left side first')}</span>
               </button>
             </div>
           )}
@@ -293,7 +305,7 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
       {/* B3 load: kg/lbs number picker for equipment workouts, stairs + "add" for progression workouts */}
       {isProgression ? (
         <>
-          {moves.length > 0 && (
+          {moves.length > 0 && !movesOpen && (
             <ul className="moves" aria-label={t('Progressions')}>
               {moves.slice(-4).map((m, i) => <li key={i} className={m === chosenMove ? 'on' : undefined}>{m}</li>)}
             </ul>
@@ -306,11 +318,11 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
               start={chosenMove ? Math.max(0, moves.lastIndexOf(chosenMove)) : moves.length - 1}
               maxStep={30}
               instant
-              onTap={() => setAdding(!adding)}
-              onPick={(i) => { if (inSession) recordMove(moves[i]) }}
+              onTap={() => { setAdding(false); setMovesOpen(!movesOpen) }}
+              onPick={(i) => { setMovesOpen(false); if (inSession) recordMove(moves[i]) }}
               className="mid move-btn"
               style={{ left: '35.1%', top: '64.1%' }}
-              ariaLabel={`Progression${chosenMove ? `: ${chosenMove}` : ''}. Tap to add one, drag up to choose`}
+              ariaLabel={`Progression${chosenMove ? `: ${chosenMove}` : ''}. Tap for the list, drag up to choose`}
             >
               <Icon name="stairs" />
             </HoldPicker>
@@ -318,6 +330,17 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
             <button className="btn circle mid move-btn" style={{ left: '35.1%', top: '64.1%' }} aria-label="Load: add progression" onClick={() => setAdding(!adding)}>
               <Icon name="stairs" />
             </button>
+          )}
+          {movesOpen && !adding && (
+            <div className="move-menu" role="menu" aria-label={t('Progressions')}>
+              {[...moves].reverse().map((m) => (
+                <button key={m} role="menuitem" className={m === chosenMove ? 'on' : undefined}
+                  onClick={() => { if (inSession) recordMove(m); setMovesOpen(false) }}>{m}</button>
+              ))}
+              <button role="menuitem" className="add-move" onClick={() => { setMovesOpen(false); setAdding(true) }}>
+                <Icon name="plus" size="15px" strokeWidth={2.4} />{t('Add a move')}
+              </button>
+            </div>
           )}
           {adding && (
             <form className="move-form" onSubmit={(e) => { e.preventDefault(); addMove() }}>
@@ -386,6 +409,7 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
         )
       })()}
       {tourOn && <BTour step={tour} progression={isProgression} timed={timed} unit={unit} onStep={setTour} onEnd={endTour} />}
+      {sidesTipOn && !tourOn && <BTour only="sets" step={0} progression={isProgression} timed={timed} unit={unit} onStep={endSidesTip} onEnd={endSidesTip} />}
       {typing && (
         <NumberPrompt
           title={typing === 'weight' ? t('Weight') : timed ? t('Seconds') : t('Reps')}
@@ -438,14 +462,16 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
 // One step of the page B guide: a demo moving on the control (a touch sliding up a small number
 // line, or a tap on the arrow) and a card that says what to do. Using the control moves it on.
 type TourStep = { sel: string; at: [number, number]; kind: 'slide' | 'tap'; text: string; sub: string; nums?: (number | string)[] }
-function BTour({ step, progression, timed, unit, onStep, onEnd }: { step: number; progression: boolean; timed: boolean; unit: string; onStep: (n: number) => void; onEnd: () => void }) {
-  const steps: TourStep[] = [
+function BTour({ only, step, progression, timed, unit, onStep, onEnd }: { only?: 'sets'; step: number; progression: boolean; timed: boolean; unit: string; onStep: (n: number) => void; onEnd: () => void }) {
+  const setsStep: TourStep = { sel: '.set-num', at: [50, 34], kind: 'tap', text: t('Tap the set number'), sub: t('Jump to a set, or do one side at a time (L / R)') }
+  const steps: TourStep[] = only ? [setsStep] : [
     progression
       ? { sel: '.move-btn', at: [35.1, 64.1], kind: 'tap', text: t('Tap to add a move'), sub: t('e.g. Knee push-up. Slide up later to pick one') }
       : { sel: '.load', at: [35.1, 64.1], kind: 'slide', text: t('Slide up to set the weight'), sub: t('Or tap to type it'), nums: unit === 'lbs' ? [45, 95, 135] : [20, 40, 60] },
     timed
       ? { sel: '.reps', at: [69, 64.1], kind: 'slide', text: t('Slide up to set the seconds'), sub: t('Or tap to type it'), nums: [10, 20, 30] }
       : { sel: '.reps', at: [69, 64.1], kind: 'slide', text: t('Slide up to count your reps'), sub: t('Let go on the number you did'), nums: [6, 8, 10] },
+    setsStep,
     { sel: '.next-set', at: [85.1, 43.2], kind: 'tap', text: t('Tap for the next set'), sub: t('This set is saved as you go') },
   ]
   const cur = steps[step]

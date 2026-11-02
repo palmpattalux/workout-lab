@@ -2612,3 +2612,55 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 }
 .cal-session small { font: 600 .6rem var(--font); color: var(--muted); }
 .cal-session:active { transform: scale(.94); }
+
+/* ---------- friction picks (2026-11-02) ---------- */
+/* page A, the armed dot: "press me", it presses itself in twice like a heartbeat (pulse C) */
+.dot.armed { color: var(--active); border-color: color-mix(in srgb, var(--active) 55%, transparent); animation: press-me 1.7s ease-in-out infinite; }
+@keyframes press-me {
+  0%, 40%, 100% { scale: 1; box-shadow: var(--lift), 0 0 0 0 transparent; }
+  10% { scale: .9; box-shadow: 0 2px 6px -3px rgba(0, 0, 0, .3), 0 0 0 0 transparent; }
+  20% { scale: 1.04; box-shadow: var(--lift), 0 0 0 5px color-mix(in srgb, var(--active) 14%, transparent); }
+  28% { scale: .93; }
+}
+@media (prefers-reduced-motion: reduce) { .dot.armed { animation: none; } }
+
+/* page A, plans with grouping: a ghost dot glides onto another exercise, once */
+.group-hint { position: absolute; inset: 0; z-index: 7; pointer-events: none; animation: group-hint-life 6.4s linear both; }
+@keyframes group-hint-life { 0%, 100% { opacity: 0; } 5%, 92% { opacity: 1; } }
+.group-ghost {
+  position: absolute; width: min(18.7cqw, 10.6cqh); aspect-ratio: 1; border-radius: 50%; translate: -50% -50%;
+  border: 1.5px dashed color-mix(in srgb, var(--active) 70%, transparent); background: color-mix(in srgb, var(--surface) 40%, transparent);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  animation: group-glide 3.2s var(--ease) infinite;
+}
+@keyframes group-glide {
+  0%, 12% { left: var(--ax); top: var(--ay); scale: 1; opacity: 0; }
+  20% { left: var(--ax); top: var(--ay); opacity: 1; }
+  62% { left: var(--bx); top: var(--by); scale: 1; opacity: 1; }
+  74% { left: var(--bx); top: var(--by); scale: .7; opacity: .9; }
+  86%, 100% { left: var(--bx); top: var(--by); scale: .5; opacity: 0; }
+}
+.group-hint-label { translate: -50% -100%; width: max-content; max-width: 240px; white-space: normal; text-align: center; }
+
+/* page B: "Finish" with the sets done so far */
+#b1 .b1-count { font: 600 .7rem var(--num); min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; display: grid; place-items: center; background: color-mix(in srgb, var(--active) 18%, transparent); color: var(--active); }
+/* page B: progression button tapped: the moves, newest first, and "Add a move" */
+.move-menu {
+  position: absolute; left: 5.7%; top: calc(64.1% + min(17.5cqw, 9.8cqh) / 2 + 10px); z-index: 6; width: 62%; max-height: 30%; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 2px; padding: 5px; border-radius: 18px;
+  background: var(--glass-panel); border: 1px solid var(--glass-edge); box-shadow: var(--float);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); animation: rise .18s var(--ease);
+}
+.move-menu button { display: flex; align-items: center; gap: 6px; text-align: left; padding: 10px 12px; border: 0; border-radius: 13px; background: none; color: var(--ink); font: 500 .92rem var(--font); cursor: pointer; overflow-wrap: anywhere; }
+.move-menu button.on { background: var(--active-soft); color: var(--active); font-weight: 600; }
+.move-menu .add-move { color: var(--muted); border-top: 1px solid var(--glass-edge); border-radius: 0 0 13px 13px; margin-top: 2px; }
+.move-menu .add-move svg { fill: none; stroke: currentColor; stroke-linecap: round; }
+/* page B set menu: the L | R toggle says what it is */
+.set-menu .side-toggle { position: relative; overflow: visible; }
+.set-menu .side-cap {
+  position: absolute; left: 50%; top: calc(100% + 14px); translate: -50% 0; white-space: nowrap; pointer-events: none;
+  font: 600 .74rem var(--font); letter-spacing: 0; text-transform: none; color: var(--ink); padding: 5px 10px; border-radius: 999px;
+  background: var(--glass-panel); border: 1px solid var(--glass-edge); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+}
+.set-menu .side-toggle.on .side-cap { color: var(--active); }
+.set-num.tour-target { border-radius: 18px; }
