@@ -333,6 +333,7 @@ export default function PageB({ workout, workouts, onGo, onHome, onEnded }: {
           start={loadStart}
           maxStep={20}
           instant
+          accel
           onChange={(i) => put('weight', loads[i])}
           onPick={(i) => { setSlideTip(null); put('weight', loads[i]) }}
           onTap={() => tapped('weight')}
