@@ -656,6 +656,18 @@ const ROWS: [string, string, string, string][] = [
   ['Show sessions as', 'แสดงเซสชันแบบ', 'セッションの表示', '训练显示方式'],
   ['List', 'รายการ', 'リスト', '列表'],
   ['Calendar', 'ปฏิทิน', 'カレンダー', '日历'],
+  // friction picks (2026-11-02)
+  ['Finish', 'จบ', '終了', '结束'],
+  ['Finish session, {n} sets done', 'จบเซสชัน ทำไปแล้ว {n} เซ็ต', 'セッション終了、{n}セット完了', '结束训练，已完成 {n} 组'],
+  ['Add a move', 'เพิ่มท่า', '動きを追加', '添加动作'],
+  ['One side at a time', 'ทีละข้าง', '片側ずつ', '单侧交替'],
+  ['Left side first', 'เริ่มข้างซ้าย', '左から', '先左侧'],
+  ['Right side first', 'เริ่มข้างขวา', '右から', '先右侧'],
+  ['Tap the set number', 'แตะเลขเซ็ต', 'セット番号をタップ', '点击组数'],
+  ['Jump to a set, or do one side at a time (L / R)', 'ข้ามไปเซ็ตอื่น หรือทำทีละข้าง (ซ / ข)', '別のセットへ移動、または片側ずつ (左 / 右)', '跳到某一组，或单侧交替（左 / 右）'],
+  ['Drag one exercise onto another to group them', 'ลากท่าหนึ่งไปวางบนอีกท่าเพื่อจัดกลุ่ม', '種目を別の種目に重ねるとグループになります', '把一个动作拖到另一个上即可分组'],
+  ['Tap to change the icon, letter or colour', 'แตะเพื่อเปลี่ยนไอคอน ตัวอักษร หรือสี', 'タップでアイコン・文字・色を変更', '点击更改图标、字母或颜色'],
+  ['The letter follows the name', 'ตัวอักษรจะตามชื่อท่า', '文字は名前から自動で決まります', '字母会跟随名称'],
 ]
 for (const [en, th, ja, zh] of ROWS) { D.th[en] = th; D.ja[en] = ja; D.zh[en] = zh }
 

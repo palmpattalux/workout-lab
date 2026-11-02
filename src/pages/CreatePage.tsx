@@ -9,7 +9,9 @@ import { t } from '../lib/i18n'
 export default function CreatePage({ icon: icon0, letter: letter0, editing, onClose }: { icon: string; letter: string; editing?: Workout; onClose: () => void }) {
   const pack = useIconPack()
   const [icon, setIcon] = useState(icon0)
-  const [letter, setLetter] = useState(letter0)
+  // A new exercise made from "+" arrives without a letter: it follows the first letter of the name
+  // (Bicep curl -> B) until one is picked by hand in the icon sheet.
+  const [chosenLetter, setLetter] = useState(letter0)
   const [picking, setPicking] = useState(false)
   const [color, setColor] = useState(editing?.color ?? '')
   const [confirmRemove, setConfirmRemove] = useState(false)
@@ -22,6 +24,9 @@ export default function CreatePage({ icon: icon0, letter: letter0, editing, onCl
   const [notes, setNotes] = useState(editing?.notes ?? '')
   // a new exercise starts with just the name, weight type and equipment; focus and notes come once it's named
   const [named, setNamed] = useState(!!editing)
+  const letters = packLetters(pack).map((l) => l.key)
+  const fromName = exercise.trim().charAt(0).toUpperCase()
+  const letter = chosenLetter || (letters.includes(fromName) ? fromName : letters[0])
 
   function save() {
     const fields = { icon, letter, color: color || undefined, exercise: exercise.trim(), equipment: equipment.trim(), mode, unit, count, focus: focus.trim(), notes: notes.trim() }
@@ -154,7 +159,7 @@ function CreateTour({ named, progression }: { named: boolean; progression: boole
     { sel: '#exercise', text: t('Name your exercise'), sub: t('e.g. Bench press') },
     { sel: '.create .unit', text: progression ? t('Tap to switch reps / seconds') : t('Tap to switch kg / lbs') },
     { sel: '.create .switch', text: t('Equipment or progressions'), sub: t('Tap to switch') },
-    { sel: '.create .mark-btn', text: t('Tap to change the icon or colour') },
+    { sel: '.create .mark-btn', text: t('Tap to change the icon, letter or colour'), sub: t('The letter follows the name') },
     { sel: '.save-new', text: t('Tap to save'), above: true },
   ]
   const cur = step >= 0 ? steps[step] : undefined
