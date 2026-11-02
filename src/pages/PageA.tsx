@@ -1,4 +1,4 @@
-import { useRef, useState, type PointerEvent } from 'react'
+import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import { Icon, WorkoutIcon, WorkoutMark, packIcons, packLetters, type IconPack } from '../components/icons'
 import HoldPicker from '../components/HoldPicker'
 import { updateWorkout, usePresets, addPreset, updatePreset, type Workout } from '../lib/store'
@@ -17,6 +17,11 @@ import { usePlan, atLeast, tierName, FREE_WORKOUTS, showLocked } from '../lib/pl
 import { useNewWeek } from '../lib/week'
 import RenewNotice from '../components/RenewNotice'
 import BookDrop from '../components/BookDrop'
+import BookRecap, { recapOf } from '../components/BookRecap'
+
+// Each time the app opens, the exercise names show under their dots for a few seconds
+// (normally a name needs a tap). Once per app open, not every time the home page comes back.
+let namesShown = false
 
 // Exercise dot positions, as % of the screen: low and toward the right, in easy reach of a
 // right thumb. The first four are always shown; the rest fill in as more workouts exist.
@@ -346,6 +351,20 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
   const tapTarget = firstRun && workouts.length > 0 && !drag && !ring && !settingsOpen ? workouts[0].id : null
   const email = useEmail()
   const skin = useSkin()
+  // (it waits for the opening screen to clear, so the names are actually seen)
+  const [flashNames, setFlashNames] = useState(false)
+  const hasWorkouts = workouts.length > 0
+  useEffect(() => {
+    if (namesShown || !hasWorkouts) return
+    const start = (window as unknown as { __dsStart?: number }).__dsStart ?? 0
+    const wait = document.getElementById('splash') ? Math.max(0, start + 3300 - performance.now()) : 0
+    let off = 0
+    const on = window.setTimeout(() => { namesShown = true; setFlashNames(true); off = window.setTimeout(() => setFlashNames(false), 3600) }, wait)
+    return () => { clearTimeout(on); clearTimeout(off) }
+  }, [hasWorkouts])
+  // back from a session's summary: a card drops from the book, "3 days ago" with last time's
+  // numbers, then they run to today's, so checking last time becomes a habit
+  const [recap] = useState(() => (savedSign ? recapOf(pastSessions, workouts) : null))
 
   return (
     <main className={`page${picking ? ' picking' : ''}${firstRun && workouts.length === 0 && !settingsOpen ? ' first-run' : ''}`} aria-label="Page A"
@@ -360,7 +379,8 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
         </div>
       )}
       {themePop && <div className="theme-pop-scrim" onPointerDown={() => setThemePop(null)} />}
-      {savedSign && (
+      {recap && <BookRecap rows={recap} />}
+      {savedSign && !recap && (
         <span className="saved-sign" aria-live="polite"><Icon name="check" size="13px" strokeWidth={2.6} />{t('Saved in your book')}</span>
       )}
       <BookDrop className={`btn pill${savedSign ? ' just-saved' : ''}`} onOpenBook={onOpenBook} onOpenSession={onOpenSession}>
@@ -432,6 +452,16 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
         )
       })}
 
+      {flashNames && !drag && !picking && !ring && [...bySlot].map(([i, u]) => {
+        if (chosen && u.members.some((w) => w.id === chosen)) return null
+        const s = SLOTS[i]
+        return (
+          <span key={'n' + u.key} className="dot-flash" aria-hidden="true" style={{ left: `${s.left}%`, top: `calc(${s.top}% - min(18.7cqw, 10.6cqh) / 2 - 6px)`, animationDelay: `${i * 60}ms` }}>
+            {u.members.map((w) => w.exercise || t('Untitled')).join(' · ')}
+          </span>
+        )
+      })}
+
       {groupWith && drag && canGroup && (
         <span className={`group-pop${groupWith.ready ? ' on' : ''}`} style={{ left: `${SLOTS[groupWith.slot].left}%`, top: `calc(${SLOTS[groupWith.slot].top}% - min(18.7cqw, 10.6cqh) / 2 - 22px)` }}>{t('Group')}</span>
       )}
@@ -493,6 +523,7 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
           options={iconOptions}
           maxStep={40}
           instant
+          accel
           title={t('Choose an icon')}
           onTap={() => setSlideHint((n) => n + 1)}
           onPick={(i) => { setPickedIcon(iconOptions[i].key); setLetterHint((n) => n + 1) }}
@@ -507,6 +538,7 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
           options={letterOptions}
           maxStep={40}
           instant
+          accel
           title={t('Choose a body part')}
           onTap={tapAdd}
           onPick={(i) => { const icon = pickedIcon; setPickedIcon(null); onCreate(icon, letterOptions[i].key) }}
