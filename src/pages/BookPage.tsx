@@ -9,6 +9,7 @@ import { day, time, setLines } from '../lib/format'
 import SessionsList, { SessionsCalendar } from './SessionsPage'
 import { supabase, signOut } from '../lib/auth'
 import { t, locale } from '../lib/i18n'
+import { appleApp } from '../lib/billing'
 
 // A2 book: Sessions comes first (the book opens on it), with a List / Calendar switch. Exercises: one row per workout, tap for its notes, details and
 // past sessions. Sessions: every session, newest first. Presets (Exclusive): one row
@@ -91,7 +92,7 @@ export default function BookPage({ workouts, kept = 0, view, openId, sessionId, 
           {kept > 0 && (
             <li className="kept-note">
               <span>{t('{n} more saved. They come back when you renew.', { n: kept })}</span>
-              <button onClick={() => { location.hash = 'plans' }}>{t('Plans')}</button>
+              {!appleApp && <button onClick={() => { location.hash = 'plans' }}>{t('Plans')}</button>}
             </li>
           )}
         </ul>

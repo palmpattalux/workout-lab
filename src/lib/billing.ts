@@ -8,8 +8,13 @@ import { setOwnedThemes } from './theme'
 // Only on the public site, and only once the Omise public key is set. Never inside the store apps:
 // Apple and Google require their own in-app purchase for digital items there.
 const PUBLIC_KEY = import.meta.env.VITE_OMISE_PUBLIC_KEY as string | undefined
-const native = !!(window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.()
+const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean; getPlatform?: () => string } }).Capacitor
+const native = !!cap?.isNativePlatform?.()
 export const canPay = !!supabase && !!PUBLIC_KEY && !native
+// The iPhone app sells nothing yet (Apple In-App Purchase comes in a later update), so it shows no
+// plans, prices or shop: only what the account already has. Apple rejects apps that point to other
+// ways to pay. The Android app and the website are unchanged.
+export const appleApp = native && cap?.getPlatform?.() === 'ios'
 
 export type Method = 'card' | 'promptpay' | 'truemoney'
 export type Subscription = { tier: Tier; paid_until: string; method: Method; renews: boolean } | null

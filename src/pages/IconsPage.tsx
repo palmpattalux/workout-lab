@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { usePrefs, setPrefs } from '../lib/prefs'
 import { getPreview, previewBlocked, THEME_PRICE } from '../lib/theme'
 import { useCanUsePack, useIconPack, PACK_ITEM } from '../lib/iconpack'
-import { canPay } from '../lib/billing'
+import { canPay, appleApp } from '../lib/billing'
 import { useOwnedThemes } from '../lib/theme'
 import { TierChip } from '../components/TierChip'
 import { sound } from '../lib/sound'
@@ -56,6 +56,8 @@ export default function IconsPage() {
   // the set being looked at: tap a tile to see its icons; one you have is put to use straight away
   const [look, setLook] = useState<IconPack>(pack)
   const price = '฿' + THEME_PRICE
+  // the iPhone app lists only the sets the account already has: no prices or buying there (see appleApp)
+  const packs = appleApp ? PACKS.filter((p) => canUse(p.key)) : PACKS
   function tap(p: IconPack) {
     setLook(p)
     if (!canUse(p) || p === pack) return
@@ -73,7 +75,7 @@ export default function IconsPage() {
       </header>
       <p className="icons-blurb">{t('The icons and letters you mark your exercises with.')}</p>
       <div className="icon-grid">
-        {PACKS.map((p) => (
+        {packs.map((p) => (
           <button key={p.key} className={`icon-tile${p.key === pack ? ' on' : ''}${p.key === look && p.key !== pack ? ' look' : ''}`} aria-pressed={p.key === pack} onClick={() => tap(p.key)}>
             {p.key !== DEFAULT_SET && <TierChip tier="premium" compact />}
             <PackTile pack={p.key} />
@@ -85,7 +87,7 @@ export default function IconsPage() {
                 : <small className="use price">{price}</small>}
           </button>
         ))}
-        {Array.from({ length: SLOTS - PACKS.length }, (_, i) => (
+        {Array.from({ length: SLOTS - packs.length }, (_, i) => (
           <div key={i} className="icon-tile empty" aria-label={t('Coming soon')}>
             <span className="ai-blank" />
             <small>{t('Coming soon')}</small>

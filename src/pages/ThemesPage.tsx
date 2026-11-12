@@ -3,7 +3,7 @@ import { Icon } from '../components/icons'
 import ThemeScene from '../components/ThemeScene'
 import { type Feature, type Theme, THEMES, themePrice, setPreview, getPreview, holdMode, heldModeOr, dropHeldMode, usePreview, useApplied, useOwnedThemes, applyTheme, canUseTheme } from '../lib/theme'
 import { usePlan, atLeast } from '../lib/plan'
-import { canPay } from '../lib/billing'
+import { canPay, appleApp } from '../lib/billing'
 import { sound } from '../lib/sound'
 import { TierChip } from '../components/TierChip'
 import { t } from '../lib/i18n'
@@ -44,7 +44,7 @@ const LEVEL: Record<Exclude<Sort, 'all'>, number> = { basic: 75, premium: 149, e
 
 // Three layers, swiped up and down like a feed: Basic (฿75), Premium (฿149), Exclusive (฿159).
 // Left and right moves between the themes of one layer, in slot order.
-const LAYERS = (['basic', 'premium', 'exclusive'] as const).map((key) => ({
+const ALL_LAYERS = (['basic', 'premium', 'exclusive'] as const).map((key) => ({
   key, label: SORTS.find((o) => o.key === key)!.label,
   themes: THEMES.filter((th): th is Theme => !!th && themePrice(th.key) === LEVEL[key]),
 }))
@@ -54,6 +54,9 @@ export default function ThemesPage({ onViewed }: { onViewed: () => void }) {
   const plan = usePlan()
   const applied = useApplied()
   const ownedThemes = useOwnedThemes()
+  // the iPhone app lists only the themes the account already has: no prices or buying there (see appleApp)
+  const mine = ALL_LAYERS.map((l) => ({ ...l, themes: l.themes.filter((th) => canUseTheme(th.key, plan)) })).filter((l) => l.themes.length)
+  const LAYERS = !appleApp ? ALL_LAYERS : mine.length ? mine : [{ ...ALL_LAYERS[0], themes: [] }]
   const track = useRef<HTMLDivElement>(null)
   const [pos, setPos] = useState(0)
   const last = useRef(0)

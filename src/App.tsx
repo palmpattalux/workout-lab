@@ -13,7 +13,7 @@ import LockNote from './components/LockNote'
 import PlansPage from './pages/PlansPage'
 import CheckoutPage from './pages/CheckoutPage'
 import PayPage from './pages/PayPage'
-import { refreshSubscription } from './lib/billing'
+import { refreshSubscription, appleApp } from './lib/billing'
 import NotePage from './pages/NotePage'
 import WeekPage from './pages/WeekPage'
 import LicensesPage from './pages/LicensesPage'
@@ -143,10 +143,12 @@ function AppScreen({ hash, user, recovering }: { hash: string; user: ReturnType<
   if (user && supabase && hash === 'password') return <NewPasswordPage change />
   const guest = !user
 
-  if (hash === 'plans') return <PlansPage userId={user?.id ?? null} />
-  if (hash === 'checkout-premium' || hash === 'checkout-exclusive') return <CheckoutPage key={hash} tier={hash.slice(9) as 'premium' | 'exclusive'} guest={!user} />
-  if (hash.startsWith('checkout-theme-')) return <CheckoutPage key={hash} theme={hash.slice(15)} guest={!user} />
-  if (hash === 'pay') return <PayPage userId={user?.id ?? null} />
+  // the iPhone app has no plans or shop pages (see appleApp): those addresses open home
+  const shop = appleApp && (hash === 'plans' || hash === 'pay' || hash.startsWith('checkout-'))
+  if (hash === 'plans' && !shop) return <PlansPage userId={user?.id ?? null} />
+  if ((hash === 'checkout-premium' || hash === 'checkout-exclusive') && !shop) return <CheckoutPage key={hash} tier={hash.slice(9) as 'premium' | 'exclusive'} guest={!user} />
+  if (hash.startsWith('checkout-theme-') && !shop) return <CheckoutPage key={hash} theme={hash.slice(15)} guest={!user} />
+  if (hash === 'pay' && !shop) return <PayPage userId={user?.id ?? null} />
   if (hash.startsWith('note-')) return <NotePage key={hash} id={hash.slice(5)} workouts={workouts} />
   if (hash === 'licenses') return <LicensesPage />
   if (hash === 'week') return <WeekPage workouts={workouts} />
