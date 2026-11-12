@@ -8,6 +8,7 @@ import { NoteRow } from './NotePage'
 import { usePlan, atLeast } from '../lib/plan'
 import { LockBadge } from '../components/LockNote'
 import { t, locale } from '../lib/i18n'
+import { appleApp } from '../lib/billing'
 
 // Weekly summary (Exclusive): one page for a Monday-to-Sunday week. First what was
 // trained and how it moved compared with before the week, and what wasn't trained;
@@ -42,7 +43,7 @@ export default function WeekPage({ workouts }: { workouts: Workout[] }) {
       <main className="page scroll week" aria-label={t('This week')}>
         {head}
         <div className="week-locked"><LockBadge /><p>{t('The weekly summary is an Exclusive feature')}</p>
-          <button className="ln-plans" onClick={() => { location.hash = 'plans' }}>{t('Plans')}</button></div>
+          {!appleApp && <button className="ln-plans" onClick={() => { location.hash = 'plans' }}>{t('Plans')}</button>}</div>
       </main>
     )
   }

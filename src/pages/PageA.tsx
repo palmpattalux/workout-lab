@@ -4,8 +4,10 @@ import HoldPicker from '../components/HoldPicker'
 import { updateWorkout, usePresets, addPreset, updatePreset, type Workout } from '../lib/store'
 import { sound } from '../lib/sound'
 import { usePrefs, setPrefs } from '../lib/prefs'
-import { useIconPack } from '../lib/iconpack'
-import { useSkin, getPreview } from '../lib/theme'
+import { useIconPack, useCanUsePack } from '../lib/iconpack'
+import { useSkin, getPreview, THEMES, canUseTheme, useOwnedThemes } from '../lib/theme'
+import { ICON_SETS, DEFAULT_SET, type IconSetKey } from '../components/iconSets'
+import { appleApp } from '../lib/billing'
 import { useSessions } from '../lib/store'
 import { useSession } from '../lib/session'
 import { useTimer } from '../lib/timer'
@@ -109,6 +111,11 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
   const [chosen, setChosen] = useState<string | null>(null)
   // Free plan: grouping is locked and only FREE_WORKOUTS exercises can be made
   const plan = usePlan()
+  useOwnedThemes()
+  const canUsePack = useCanUsePack()
+  // the iPhone app shows only what the account already has (see appleApp in billing.ts)
+  const showThemes = !appleApp || THEMES.some((th) => !!th && canUseTheme(th.key, plan))
+  const showIcons = !appleApp || ICON_SETS.some((st) => st.key !== DEFAULT_SET && canUsePack(st.key as IconSetKey))
   const canGroup = atLeast(plan, 'premium')
   // groups made on a plan show as single exercises on Free (kept, and back on renewal)
   const units = unitsOf(canGroup ? workouts : workouts.map((w) => (w.group ? { ...w, group: undefined } : w)))
@@ -313,7 +320,7 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
     setThemePop(null)
     const r = e.currentTarget.getBoundingClientRect()
     const at = { x: e.clientX - r.left, y: e.clientY - r.top }
-    blank.current = { ...at, timer: window.setTimeout(() => { blank.current = null; sound.pop(); setThemePop(at) }, 520) }
+    blank.current = { ...at, timer: window.setTimeout(() => { blank.current = null; if (!showThemes) return; sound.pop(); setThemePop(at) }, 520) }
   }
   function onBlankMove(e: PointerEvent<HTMLElement>) {
     const b = blank.current
@@ -627,19 +634,25 @@ export default function PageA({ guest, workouts, onOpenDot, onStartPreset, onEdi
             <span className="chev"><Icon name="back" size="18px" /></span>
           </button>
           {langOpen && <div className="lang-flags"><LangPicker /></div>}
-          <button className="set-row themes-link plan-link" onClick={onPlans}>
-            <span>{t('Plan')}</span>
-            <span className="lang-now">{t(tierName(plan))}</span>
-            <span className="chev"><Icon name="back" size="18px" /></span>
-          </button>
-          <button className="set-row themes-link" onClick={onThemes}>
-            <span>{t('Themes')}</span>
-            <span className="chev"><Icon name="back" size="18px" /></span>
-          </button>
-          <button className="set-row themes-link icons-link" onClick={() => { setSettingsOpen(false); location.hash = 'icons' }}>
-            <span>{t('Icon')}</span>
-            <span className="chev"><Icon name="back" size="18px" /></span>
-          </button>
+          {!appleApp && (
+            <button className="set-row themes-link plan-link" onClick={onPlans}>
+              <span>{t('Plan')}</span>
+              <span className="lang-now">{t(tierName(plan))}</span>
+              <span className="chev"><Icon name="back" size="18px" /></span>
+            </button>
+          )}
+          {showThemes && (
+            <button className="set-row themes-link" onClick={onThemes}>
+              <span>{t('Themes')}</span>
+              <span className="chev"><Icon name="back" size="18px" /></span>
+            </button>
+          )}
+          {showIcons && (
+            <button className="set-row themes-link icons-link" onClick={() => { setSettingsOpen(false); location.hash = 'icons' }}>
+              <span>{t('Icon')}</span>
+              <span className="chev"><Icon name="back" size="18px" /></span>
+            </button>
+          )}
           {/* Settings: the rarely used things, folded away */}
           <button className={`set-row themes-link lang-toggle more-toggle${moreOpen ? ' open' : ''}`} aria-expanded={moreOpen} onClick={() => setMoreOpen(!moreOpen)}>
             <span>{t('Settings')}</span>
