@@ -56,9 +56,12 @@ jobs:
           KEY="$RUNNER_TEMP/AuthKey_$KEY_ID.p8"
           mv "$RUNNER_TEMP/AuthKey.p8" "$KEY"
           AUTH=(-allowProvisioningUpdates -authenticationKeyPath "$KEY" -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER")
+          # Archive unsigned, then let the export sign it for the App Store with Apple's cloud signing.
+          # (A signed archive needs a development profile, which Apple only makes once an iPhone is
+          # registered on the team. The App Store profile used by the export needs no devices.)
           xcodebuild -project App.xcodeproj -scheme App -configuration Release -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/Dotset.xcarchive" archive \
-            DEVELOPMENT_TEAM="$TEAM" CODE_SIGN_STYLE=Automatic CURRENT_PROJECT_VERSION="$BUILD" "${AUTH[@]}"
+            DEVELOPMENT_TEAM="$TEAM" CODE_SIGNING_ALLOWED=NO CURRENT_PROJECT_VERSION="$BUILD"
           cat > "$RUNNER_TEMP/export.plist" <<PLIST
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
