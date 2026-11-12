@@ -2664,3 +2664,28 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 }
 .set-menu .side-toggle.on .side-cap { color: var(--active); }
 .set-num.tour-target { border-radius: 18px; }
+
+/* phones: the backdrop and the theme art run edge to edge, under the status bar and the home bar.
+   The buttons stay inside the safe area (#root's padding); only what is painted behind them bleeds.
+   --bleed-x covers the few px either side of the 430px column on the widest iPhones. */
+@media (max-width: 600px) {
+  :root { --bleed-t: env(safe-area-inset-top); --bleed-b: env(safe-area-inset-bottom); --bleed-x: min(0px, calc((100% - 100vw) / 2)); }
+  :root[data-ios-web] { --bleed-b: calc(env(safe-area-inset-bottom) + 34px); }
+  :root[data-preview] { --bleed-t: calc(env(safe-area-inset-top) + 38px); }
+  body { background: var(--stage); }
+  #root::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: var(--stage); transition: background .3s ease; }
+  :root:not([data-skin]) #root::before {
+    background:
+      radial-gradient(70% 45% at 85% 8%, color-mix(in srgb, var(--active) 9%, transparent), transparent 70%),
+      radial-gradient(60% 40% at 10% 92%, color-mix(in srgb, var(--sun) 7%, transparent), transparent 70%),
+      var(--stage);
+  }
+  .page, :root:not([data-skin]) .page { background: transparent; }
+  .page:not(.scroll) { overflow: visible; clip-path: inset(calc(-1 * var(--bleed-t)) var(--bleed-x) calc(-1 * var(--bleed-b))); }
+  .page:not(.scroll) > [aria-hidden="true"]:is([class*="-scene"], [class*="-session"]),
+  :root[data-skin="manga"] .page:not(.scroll)::before { inset: calc(-1 * var(--bleed-t)) var(--bleed-x) calc(-1 * var(--bleed-b)); }
+  @keyframes mg-turn {
+    from { clip-path: inset(calc(-1 * var(--bleed-t)) 100% calc(-1 * var(--bleed-b)) 0); }
+    to { clip-path: inset(calc(-1 * var(--bleed-t)) var(--bleed-x) calc(-1 * var(--bleed-b))); }
+  }
+}
