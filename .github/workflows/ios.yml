@@ -32,6 +32,15 @@ jobs:
         if: env.UPLOAD != 'true'
         working-directory: ios/App
         run: xcodebuild -project App.xcodeproj -scheme App -configuration Release -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build
+      - name: Check the Apple secrets
+        if: env.UPLOAD == 'true'
+        env:
+          TEAM: ${{ secrets.APPLE_TEAM_ID }}
+          KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ISSUER: ${{ secrets.ASC_ISSUER_ID }}
+          KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        # Prints only yes/no checks and lengths. Writes a clean copy of the .p8 key for the next step.
+        run: python3 -I .github/ios-key.py "$RUNNER_TEMP/AuthKey.p8"
       - name: Sign and upload to App Store Connect
         if: env.UPLOAD == 'true'
         working-directory: ios/App
@@ -39,15 +48,20 @@ jobs:
           TEAM: ${{ secrets.APPLE_TEAM_ID }}
           KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ISSUER: ${{ secrets.ASC_ISSUER_ID }}
-          KEY_P8: ${{ secrets.ASC_KEY_P8 }}
           BUILD: ${{ github.run_number }}
         run: |
+          TEAM=$(printf '%s' "$TEAM" | tr -d '[:space:]')
+          KEY_ID=$(printf '%s' "$KEY_ID" | tr -d '[:space:]')
+          ISSUER=$(printf '%s' "$ISSUER" | tr -d '[:space:]')
           KEY="$RUNNER_TEMP/AuthKey_$KEY_ID.p8"
-          printf '%s\n' "$KEY_P8" > "$KEY"
+          mv "$RUNNER_TEMP/AuthKey.p8" "$KEY"
           AUTH=(-allowProvisioningUpdates -authenticationKeyPath "$KEY" -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER")
+          # Archive unsigned, then let the export sign it for the App Store with Apple's cloud signing.
+          # (A signed archive needs a development profile, which Apple only makes once an iPhone is
+          # registered on the team. The App Store profile used by the export needs no devices.)
           xcodebuild -project App.xcodeproj -scheme App -configuration Release -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/Dotset.xcarchive" archive \
-            DEVELOPMENT_TEAM="$TEAM" CODE_SIGN_STYLE=Automatic CURRENT_PROJECT_VERSION="$BUILD" "${AUTH[@]}"
+            DEVELOPMENT_TEAM="$TEAM" CODE_SIGNING_ALLOWED=NO CURRENT_PROJECT_VERSION="$BUILD"
           cat > "$RUNNER_TEMP/export.plist" <<PLIST
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
